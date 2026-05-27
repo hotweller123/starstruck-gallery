@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -266,25 +266,45 @@ export function MegaNav() {
           </div>
 
           <div className="flex flex-1 flex-col overflow-y-auto">
-            {/* Primary nav */}
-            <nav className="flex flex-col px-6 pt-10">
-              {[
-                { to: "/gallery", label: "Gallery" },
-                { to: "/categories", label: "Categories" },
-                { to: "/artists", label: "Artists" },
-                { to: "/about", label: "About" },
-                { to: "/contact", label: "Contact" },
-              ].map((l) => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
-                >
-                  {l.label}
-                </Link>
-              ))}
+            {/* Primary nav with expandable sub-routes */}
+            <nav className="flex flex-col px-6 pt-8">
+              <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
+
+              <MobileNavGroup
+                label="Categories"
+                items={categories.map((c) => ({
+                  to: "/categories/$slug" as const,
+                  params: { slug: c.slug },
+                  label: c.label,
+                  note: c.description,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavGroup
+                label="Artists"
+                items={artists.map((a) => ({
+                  to: "/artists/$slug" as const,
+                  params: { slug: a.slug },
+                  label: a.name,
+                  note: a.discipline,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavGroup
+                label="About"
+                items={aboutLinks.map((l) => ({
+                  to: l.to,
+                  label: l.label,
+                  note: l.note,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
             </nav>
+
 
             {/* Footer-style details below nav */}
             <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
@@ -324,3 +344,84 @@ export function MegaNav() {
     </header>
   );
 }
+
+function MobileNavLink({
+  to,
+  label,
+  onNavigate,
+}: {
+  to: string;
+  label: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
+    >
+      {label}
+    </Link>
+  );
+}
+
+type MobileNavItem = {
+  to: string;
+  params?: Record<string, string>;
+  label: string;
+  note?: string;
+};
+
+function MobileNavGroup({
+  label,
+  items,
+  onNavigate,
+}: {
+  label: string;
+  items: MobileNavItem[];
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-ink/10">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between py-5 text-left font-display text-3xl italic text-ink"
+      >
+        <span>{label}</span>
+        <ChevronDown
+          className={`size-6 text-detail transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
+          strokeWidth={ICON_STROKE}
+        />
+      </button>
+      {open && (
+        <ul className="flex flex-col gap-4 pb-6 pl-1 pr-2">
+          {items.map((item) => (
+            <li key={`${item.to}-${item.label}`}>
+              <Link
+                to={item.to}
+                params={item.params as never}
+                onClick={onNavigate}
+                className="group block"
+              >
+                <p className="font-display text-lg italic text-ink group-hover:text-clay">
+                  {item.label}
+                </p>
+                {item.note && (
+                  <p className="mt-0.5 text-xs leading-relaxed text-detail">
+                    {item.note}
+                  </p>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
