@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
   artworks,
+  formatPrice,
   getArtworkBySlug,
   getArtworksByArtist,
 } from "@/data/artworks";
@@ -82,7 +83,7 @@ function ArtworkPage() {
             {artwork.description}
           </p>
 
-          <dl className="grid grid-cols-3 gap-px border-y border-ink/10 bg-ink/10">
+          <dl className="grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10 sm:grid-cols-4">
             <div className="bg-canvas p-5">
               <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
                 Medium
@@ -101,7 +102,24 @@ function ArtworkPage() {
               </dt>
               <dd className="mt-2 text-sm">{artwork.year}</dd>
             </div>
+            <div className="bg-canvas p-5">
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Price
+              </dt>
+              <dd className="mt-2 font-display text-xl italic text-ink">
+                {formatPrice(artwork.price)}
+              </dd>
+            </div>
           </dl>
+
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs text-detail sm:grid-cols-3">
+            <li><span className="text-ink/60">Theme</span> — {artwork.theme}</li>
+            <li><span className="text-ink/60">Style</span> — {artwork.style}</li>
+            <li><span className="text-ink/60">Technique</span> — {artwork.technique}</li>
+            <li><span className="text-ink/60">Orientation</span> — {artwork.orientation}</li>
+            <li><span className="text-ink/60">Country</span> — {artwork.country}</li>
+            <li><span className="text-ink/60">Palette</span> — {artwork.dominantColor}</li>
+          </ul>
 
           <Link
             to="/contact"

@@ -9,13 +9,13 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { Nav } from "@/components/site/Nav";
+import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Nav />
+      <MegaNav />
       <div className="flex flex-1 items-center justify-center px-6 py-32">
         <div className="max-w-md text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
@@ -140,7 +140,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-canvas">
-        <Nav />
+        <MegaNav />
         <main className="flex-1">
           <Outlet />
         </main>

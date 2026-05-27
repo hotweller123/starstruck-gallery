@@ -1,56 +1,50 @@
-## Exhibition Website — Build Plan
+# Expansion Plan — Aethelred Exhibition Site
 
-A serene, editorial-style gallery site combining the Editorial Swiss Minimalist composition (clean nav, oversized italic display hero, masonry grid, dark featured-artist band, minimal newsletter footer) with the locked Warm Sand palette and Instrument Serif + Work Sans typography you chose earlier. Built on React (Vite + React Router), as confirmed.
+A substantial build that layers new content, navigation, filtering and storytelling onto the existing Editorial Swiss Minimalist foundation — without touching the locked design tokens (Warm Sand palette, Instrument Serif + Work Sans, hairline borders, no rounded corners on artworks).
 
-### Design tokens (locked, in `index.css`)
+## 1. Data layer expansion (`src/data/`)
 
-- canvas `#faf8f5`, surface `#f0ebe3`, accent `#c9b99a`, detail `#8b7355`, ink `#3a342d`
-- Heading: Instrument Serif (italic display); Body: Work Sans
-- Hairline borders, generous whitespace, no rounded corners on artworks
-- A single warm-clay accent (`#a8553a`) used sparingly for "Featured Artist" eyebrow and hover states
+Extend `Artwork` and seed more works (target ~24, up from 12):
+- New fields: `price` (number, USD), `priceLabel`, `sizeCategory` ("small"|"medium"|"large"), `orientation` ("portrait"|"landscape"|"square"), `theme` (e.g. "Nature","Urban","Portrait","Still Life","Abstract Form"), `style` (e.g. "Impressionist","Minimal","Brutalist","Romantic"), `technique` (e.g. "Oil","Charcoal","Hand-thrown","Digital print"), `country`, `dominantColor` ("Warm","Cool","Neutral","Monochrome","Earth"), `highlight` (boolean — staff pick), plus existing medium/dimensions/year.
+- New `src/data/sponsors.ts` — 6 sponsor entries (name, blurb, tier).
+- New `src/data/partners-benefits.ts` — 4–5 "reasons to partner" entries.
+- New `src/data/faqs.ts` — 6 accordion entries (about the gallery, shipping, commissions, partnerships).
+- New `src/data/history.ts` — gallery origin story timeline (4 milestones).
+- Reuse existing 12 generated images; cycle them across the 12 added entries (no new image gen needed to keep build fast).
 
-### Routes
+## 2. New shared components (`src/components/site/`)
 
-```
-/                  Home — hero, featured masonry preview, artist spotlight band, newsletter
-/gallery           Full masonry of all artworks with category filter chips
-/categories        Index of categories as editorial cards
-/categories/:slug  Filtered masonry for one category
-/artworks/:slug    Artwork detail — large image, metadata, artist link, related works
-/artists           Grid of artist portraits
-/artists/:slug     Artist profile — bio, portrait, works grid
-/about             Editorial about page
-/contact           Contact form + gallery info
-*                  404
-```
+- `MegaNav.tsx` — replaces current `Nav`. Full-width top bar; on hover/focus of "Categories" / "Artists" / "About" it expands into a full-viewport panel containing: route columns on the left, a contextual image on the right (e.g. Artists panel shows renowned-artist names + a portrait), and a small footer strip below with contact + newsletter line. Mobile collapses to a sheet.
+- `HeroCarousel.tsx` — swipeable background-image hero using existing `components/ui/carousel` (Embla). Autoplay + drag; overlay text (kicker, oversized italic headline, sub, CTAs) stays fixed above slides; subtle dark gradient for legibility.
+- `ImageCarousel.tsx` — generic horizontal swipe rail (used for "Curator's picks", "New arrivals", "Sponsors").
+- `FilterDrawer.tsx` — opens via "Filters" button. Uses shadcn `Sheet` (side drawer) on `md+`, `Dialog` (fullscreen) on small screens. Sections: Price range (Slider), Size, Medium, Orientation, Theme, Style, Country, Technique, Colour, Highlight (Switch). Apply / Clear actions.
+- `ActiveFilterChips.tsx` — pill row above the gallery showing each selected filter with an "×" to remove.
+- `Accordion` section component using existing `components/ui/accordion`.
+- `Sponsors.tsx`, `PartnerReasons.tsx`, `HistoryTimeline.tsx`.
+- `ArtworkCard.tsx` updated label: Title (italic), Artist, Medium · Dimensions, Price.
 
-### Categories (curated for design coherence)
+## 3. Filter state
 
-Abstract, Figurative, Minimalism, Sculpture, Photography, Digital, Mixed Media, Ceramics.
+Filters live as URL search params on `/gallery` using `zodValidator` + `fallback`. `ActiveFilterChips` reads from search; removing a chip navigates with that param cleared. Gallery filters `artworks` client-side. Preserves shareable URLs and back-button behaviour.
 
-### Sections (matching the chosen direction's composition)
+## 4. Routes
 
-1. **Sticky nav** — wordmark left; Gallery / Categories / Artists / About; Contact button right
-2. **Hero** — oversized italic serif headline, supporting paragraph + category chips row
-3. **Masonry gallery** — 3-column varied aspect ratios, gentle hover scale, caption below
-4. **Artist spotlight band** — dark ink background, portrait + bio + CTA
-5. **Footer** — newsletter signup + two link columns + fine print
+- `/` (index): new `HeroCarousel`, "Curator's picks" image carousel, existing masonry, new `PartnerReasons` band, `Sponsors` carousel, FAQ accordion, history teaser → about.
+- `/gallery`: Filters button + drawer + active chips + masonry.
+- `/about`: extend with `HistoryTimeline`, mission accordion, partner benefits.
+- Existing routes (`/artworks/$slug`, `/artists`, `/categories`, `/contact`) updated only to show new fields (price, etc.) on artwork detail.
 
-### Data
+## 5. Out of scope
 
-Static seed files `src/data/artworks.ts` (~16 works: title, slug, artist, category, aspect, image, year, medium) and `src/data/artists.ts` (~6 artists). All imagery via `data-lov-image-placeholder` → generated into `src/assets/` during build.
+- No new image generation (cycle existing 12 + 4 portraits).
+- No backend / persistence; newsletter & contact remain stubs.
+- No real payment / inquiry checkout.
+- No CMS.
 
-### Components
+## Technical notes
 
-`Nav`, `Footer`, `Hero`, `MasonryGallery`, `ArtworkCard`, `CategoryChips`, `ArtistSpotlight`, `PageHeader`.
-
-### Tech notes
-
-- React + Vite + React Router
-- Tailwind tokens via `@theme` in `index.css`; semantic class names only
-- SEO: per-route `<title>`/meta, single H1, semantic landmarks, alt text on every artwork
-- No backend in v1 (contact form is a styled stub — can be wired to Lovable Cloud later)
-
-### Out of scope (for now)
-
-Auth, CMS, real form submission, purchase/inquiry flow.
+- Tailwind v4 via `@theme` in `src/styles.css` — no new tokens needed; reuse `--canvas`, `--ink`, `--detail`, `--surface`, `--clay`.
+- Carousels: `embla-carousel-react` (already installed via shadcn carousel).
+- Filter URL schema with `@tanstack/zod-adapter` `fallback()`; `loaderDeps` not needed since filtering is client-side.
+- Mega-nav uses Radix `NavigationMenu` (already in `components/ui/navigation-menu.tsx`) for accessible hover/focus panels; mobile uses `Sheet`.
+- All new copy written in the editorial voice already established.

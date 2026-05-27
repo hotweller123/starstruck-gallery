@@ -1,8 +1,12 @@
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { artworks } from "@/data/artworks";
+import { artworks, filterOptions } from "@/data/artworks";
 import { MasonryGallery } from "@/components/site/MasonryGallery";
 import { CategoryChips } from "@/components/site/CategoryChips";
 import { PageHeader } from "@/components/site/PageHeader";
+import { FilterDrawer } from "@/components/site/FilterDrawer";
+import { ActiveFilterChips } from "@/components/site/ActiveFilterChips";
+import { makeDefaultFilters, type Filters } from "@/components/site/filters-types";
 
 export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
@@ -12,25 +16,67 @@ export const Route = createFileRoute("/gallery")({
       {
         name: "description",
         content:
-          "Browse the full exhibition: twelve contemporary works across painting, sculpture, photography, ceramics and digital media.",
+          "Browse the full exhibition with refined filters across price, size, medium, theme, technique, country and colour.",
       },
     ],
   }),
 });
 
+function applyFilters(f: Filters) {
+  return artworks.filter((a) => {
+    if (a.price < f.priceMin || a.price > f.priceMax) return false;
+    if (f.category.length && !f.category.includes(a.category)) return false;
+    if (f.size.length && !f.size.includes(a.sizeCategory)) return false;
+    if (f.orientation.length && !f.orientation.includes(a.orientation)) return false;
+    if (f.medium.length && !f.medium.includes(a.medium)) return false;
+    if (f.theme.length && !f.theme.includes(a.theme)) return false;
+    if (f.style.length && !f.style.includes(a.style)) return false;
+    if (f.technique.length && !f.technique.includes(a.technique)) return false;
+    if (f.country.length && !f.country.includes(a.country)) return false;
+    if (f.color.length && !f.color.includes(a.dominantColor)) return false;
+    if (f.highlight && !a.highlight) return false;
+    return true;
+  });
+}
+
 function GalleryPage() {
+  const [filters, setFilters] = useState<Filters>(() =>
+    makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
+  );
+
+  const filtered = useMemo(() => applyFilters(filters), [filters]);
+
   return (
     <>
       <PageHeader
         eyebrow="The exhibition"
         title="All Works"
-        description="The full hang of the current exhibition, presented as a quiet vertical scroll. Filter by mode of design to narrow the view."
+        description="The full hang of the current exhibition. Filter by mode of design, price, medium, theme, or any combination."
       />
-      <div className="mx-auto max-w-7xl px-6 pb-10">
+
+      <div className="mx-auto max-w-7xl px-6 pb-6">
         <CategoryChips active="all" />
       </div>
-      <section className="mx-auto max-w-7xl px-6 pb-32 pt-10">
-        <MasonryGallery artworks={artworks} />
+
+      <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-6 md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <ActiveFilterChips value={filters} onChange={setFilters} />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-[11px] uppercase tracking-[0.22em] text-detail">
+            {filtered.length} {filtered.length === 1 ? "work" : "works"}
+          </span>
+          <FilterDrawer
+            value={filters}
+            onChange={setFilters}
+            totalCount={artworks.length}
+            matchCount={filtered.length}
+          />
+        </div>
+      </div>
+
+      <section className="mx-auto max-w-7xl px-6 pb-32 pt-6">
+        <MasonryGallery artworks={filtered} />
       </section>
     </>
   );
