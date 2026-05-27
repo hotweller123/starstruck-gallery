@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
