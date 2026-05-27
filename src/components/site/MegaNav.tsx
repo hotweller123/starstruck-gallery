@@ -344,3 +344,84 @@ export function MegaNav() {
     </header>
   );
 }
+
+function MobileNavLink({
+  to,
+  label,
+  onNavigate,
+}: {
+  to: string;
+  label: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
+    >
+      {label}
+    </Link>
+  );
+}
+
+type MobileNavItem = {
+  to: string;
+  params?: Record<string, string>;
+  label: string;
+  note?: string;
+};
+
+function MobileNavGroup({
+  label,
+  items,
+  onNavigate,
+}: {
+  label: string;
+  items: MobileNavItem[];
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-ink/10">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between py-5 text-left font-display text-3xl italic text-ink"
+      >
+        <span>{label}</span>
+        <ChevronDown
+          className={`size-6 text-detail transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
+          strokeWidth={ICON_STROKE}
+        />
+      </button>
+      {open && (
+        <ul className="flex flex-col gap-4 pb-6 pl-1 pr-2">
+          {items.map((item) => (
+            <li key={`${item.to}-${item.label}`}>
+              <Link
+                to={item.to}
+                params={item.params as never}
+                onClick={onNavigate}
+                className="group block"
+              >
+                <p className="font-display text-lg italic text-ink group-hover:text-clay">
+                  {item.label}
+                </p>
+                {item.note && (
+                  <p className="mt-0.5 text-xs leading-relaxed text-detail">
+                    {item.note}
+                  </p>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
