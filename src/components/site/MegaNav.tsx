@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen } from "lucide-react";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -9,6 +9,8 @@ import artist02 from "@/assets/artist-02.jpg";
 import art10 from "@/assets/art-10.jpg";
 
 type PanelKey = "categories" | "artists" | "about" | null;
+
+const ICON_STROKE = 1.25;
 
 const aboutLinks = [
   { to: "/about", label: "Our story", note: "Founded 2019. Four seasons a year." },
@@ -20,15 +22,33 @@ const aboutLinks = [
 export function MegaNav() {
   const [openPanel, setOpenPanel] = useState<PanelKey>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const close = () => setOpenPanel(null);
+  const cancelClose = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpenPanel(null), 180);
+  };
+
+  const openNow = (key: Exclude<PanelKey, null>) => {
+    cancelClose();
+    setOpenPanel(key);
+  };
+
+  const closeNow = () => {
+    cancelClose();
+    setOpenPanel(null);
+  };
 
   return (
-    <header
-      className="sticky top-0 z-50 border-b border-ink/10 bg-canvas/95 backdrop-blur-md"
-      onMouseLeave={close}
-    >
-      {/* Top utility row — mini-footer style */}
+    <header className="sticky top-0 z-50 border-b border-ink/10 bg-canvas/95 backdrop-blur-md">
+      {/* Top utility row */}
       <div className="hidden border-b border-ink/10 px-6 py-2 text-[10px] uppercase tracking-[0.22em] text-detail md:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <span>Exhibition No. 12 &middot; Spring 2026 &middot; Open online, daily</span>
@@ -50,21 +70,18 @@ export function MegaNav() {
           className="font-display text-2xl italic tracking-tight text-ink"
           onClick={() => {
             setMobileOpen(false);
-            close();
+            closeNow();
           }}
         >
           Aethelred
         </Link>
 
-        <nav
-          className="hidden items-center gap-9 md:flex"
-          onMouseLeave={close}
-        >
+        <nav className="hidden items-center gap-9 md:flex">
           <Link
             to="/gallery"
             className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
             activeProps={{ className: "text-clay" }}
-            onMouseEnter={close}
+            onMouseEnter={closeNow}
           >
             Gallery
           </Link>
@@ -72,8 +89,10 @@ export function MegaNav() {
             <button
               key={key}
               type="button"
-              onMouseEnter={() => setOpenPanel(key)}
-              onFocus={() => setOpenPanel(key)}
+              onMouseEnter={() => openNow(key)}
+              onMouseLeave={scheduleClose}
+              onFocus={() => openNow(key)}
+              onClick={() => openNow(key)}
               className={`text-[11px] font-medium uppercase tracking-[0.22em] ${
                 openPanel === key ? "text-clay" : "text-ink/80 hover:text-clay"
               }`}
@@ -96,16 +115,21 @@ export function MegaNav() {
             className="text-ink md:hidden"
             onClick={() => setMobileOpen((v) => !v)}
           >
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            {mobileOpen ? (
+              <X className="size-6" strokeWidth={ICON_STROKE} />
+            ) : (
+              <Menu className="size-6" strokeWidth={ICON_STROKE} />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mega-panel */}
+      {/* Mega-panel — desktop */}
       {openPanel && (
         <div
           className="absolute left-0 right-0 top-full hidden border-t border-ink/10 bg-canvas shadow-[0_30px_50px_-30px_rgba(58,52,45,0.25)] md:block"
-          onMouseEnter={() => setOpenPanel(openPanel)}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
         >
           <div className="mx-auto grid max-w-7xl grid-cols-[1.5fr_1fr] gap-12 px-6 py-12">
             <div>
@@ -120,7 +144,7 @@ export function MegaNav() {
                         <Link
                           to="/categories/$slug"
                           params={{ slug: c.slug }}
-                          onClick={close}
+                          onClick={closeNow}
                           className="group block"
                         >
                           <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
@@ -147,7 +171,7 @@ export function MegaNav() {
                         <Link
                           to="/artists/$slug"
                           params={{ slug: a.slug }}
-                          onClick={close}
+                          onClick={closeNow}
                           className="group block"
                         >
                           <h4 className="font-display text-xl italic text-ink group-hover:text-clay">
@@ -182,11 +206,7 @@ export function MegaNav() {
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {aboutLinks.map((l) => (
                       <li key={l.label}>
-                        <Link
-                          to={l.to}
-                          onClick={close}
-                          className="group block"
-                        >
+                        <Link to={l.to} onClick={closeNow} className="group block">
                           <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
                             {l.label}
                           </h4>
@@ -201,7 +221,6 @@ export function MegaNav() {
               )}
             </div>
 
-            {/* Side image */}
             <div className="relative">
               <img
                 src={
@@ -224,28 +243,64 @@ export function MegaNav() {
         </div>
       )}
 
-      {/* Mobile sheet */}
+      {/* Mobile full-screen sheet */}
       {mobileOpen && (
-        <div className="border-t border-ink/10 px-6 py-6 md:hidden">
-          <div className="flex flex-col gap-5">
-            {[
-              { to: "/gallery", label: "Gallery" },
-              { to: "/categories", label: "Categories" },
-              { to: "/artists", label: "Artists" },
-              { to: "/about", label: "About" },
-              { to: "/contact", label: "Contact" },
-            ].map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setMobileOpen(false)}
-                className="text-sm uppercase tracking-[0.22em] text-ink"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <div className="mt-4 border-t border-ink/10 pt-4 text-[10px] uppercase tracking-[0.22em] text-detail">
-              hello@aethelred.gallery
+        <div className="fixed inset-0 top-0 z-40 flex flex-col bg-canvas md:hidden">
+          {/* Spacer to match header height */}
+          <div className="h-[73px] shrink-0 border-b border-ink/10" />
+
+          <div className="flex flex-1 flex-col overflow-y-auto">
+            {/* Primary nav */}
+            <nav className="flex flex-col px-6 pt-10">
+              {[
+                { to: "/gallery", label: "Gallery" },
+                { to: "/categories", label: "Categories" },
+                { to: "/artists", label: "Artists" },
+                { to: "/about", label: "About" },
+                { to: "/contact", label: "Contact" },
+              ].map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setMobileOpen(false)}
+                  className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Footer-style details below nav */}
+            <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
+              <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
+                The gallery
+              </p>
+              <ul className="flex flex-col gap-4 text-sm text-ink">
+                <li className="flex items-start gap-3">
+                  <Mail className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                  <a href="mailto:hello@aethelred.gallery">hello@aethelred.gallery</a>
+                </li>
+                <li className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                  <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Instagram className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                  <a href="#">@aethelred.gallery</a>
+                </li>
+                <li className="flex items-start gap-3">
+                  <BookOpen className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                  <a href="#">Journal &amp; broadsheets</a>
+                </li>
+              </ul>
+
+              <div className="mt-8 border-t border-ink/10 pt-6 text-[10px] uppercase tracking-[0.22em] text-detail">
+                <p>Exhibition No. 12</p>
+                <p className="mt-1">Spring 2026 &middot; Open online, daily</p>
+                <p className="mt-4 normal-case tracking-normal text-detail/70">
+                  &copy; {new Date().getFullYear()} Aethelred Gallery
+                </p>
+              </div>
             </div>
           </div>
         </div>
