@@ -1,0 +1,95 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Exhibition design system — Warm Sand palette + Instrument Serif / Work Sans
+ * All colors in oklch.
+ */
+
+@theme inline {
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-detail: var(--detail);
+  --color-accent: var(--accent);
+  --color-clay: var(--clay);
+
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--canvas);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--canvas);
+  --color-secondary: var(--surface);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--detail);
+  --color-destructive: oklch(0.55 0.2 27);
+  --color-destructive-foreground: var(--canvas);
+  --color-border: var(--border-color);
+  --color-input: var(--border-color);
+  --color-ring: var(--detail);
+}
+
+:root {
+  /* Warm Sand palette → oklch */
+  --canvas: oklch(0.978 0.008 80);        /* #faf8f5 */
+  --surface: oklch(0.945 0.014 75);       /* #f0ebe3 */
+  --accent: oklch(0.795 0.05 80);         /* #c9b99a */
+  --detail: oklch(0.555 0.04 65);         /* #8b7355 */
+  --ink: oklch(0.305 0.018 60);           /* #3a342d */
+  --clay: oklch(0.57 0.135 38);           /* #a8553a — single warm accent */
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --border-color: oklch(0.555 0.04 65 / 0.15);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+
+  ::selection {
+    background-color: var(--color-clay);
+    color: var(--color-canvas);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
