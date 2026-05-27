@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
 import { categories } from "@/data/categories";
@@ -23,6 +24,16 @@ export function MegaNav() {
   const [openPanel, setOpenPanel] = useState<PanelKey>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   const cancelClose = () => {
     if (closeTimer.current) {
@@ -243,9 +254,9 @@ export function MegaNav() {
         </div>
       )}
 
-      {/* Mobile full-screen sheet */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden">
+      {/* Mobile full-screen sheet — portaled to body to escape header's backdrop-filter containing block */}
+      {mounted && mobileOpen && createPortal(
+        <div className="fixed inset-0 z-[100] flex flex-col bg-canvas md:hidden">
           {/* In-sheet header with close button */}
           <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
             <Link
@@ -339,7 +350,8 @@ export function MegaNav() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
