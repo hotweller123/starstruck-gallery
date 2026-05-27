@@ -245,9 +245,25 @@ export function MegaNav() {
 
       {/* Mobile full-screen sheet */}
       {mobileOpen && (
-        <div className="fixed inset-0 top-0 z-40 flex flex-col bg-canvas md:hidden">
-          {/* Spacer to match header height */}
-          <div className="h-[73px] shrink-0 border-b border-ink/10" />
+        <div className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden">
+          {/* In-sheet header with close button */}
+          <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
+            <Link
+              to="/"
+              onClick={() => setMobileOpen(false)}
+              className="font-display text-2xl italic tracking-tight text-ink"
+            >
+              Aethelred
+            </Link>
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
+              className="text-ink"
+            >
+              <X className="size-6" strokeWidth={ICON_STROKE} />
+            </button>
+          </div>
 
           <div className="flex flex-1 flex-col overflow-y-auto">
             {/* Primary nav */}
