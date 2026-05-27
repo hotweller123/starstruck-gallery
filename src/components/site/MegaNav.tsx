@@ -254,9 +254,9 @@ export function MegaNav() {
         </div>
       )}
 
-      {/* Mobile full-screen sheet */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden">
+      {/* Mobile full-screen sheet — portaled to body to escape header's backdrop-filter containing block */}
+      {mounted && mobileOpen && createPortal(
+        <div className="fixed inset-0 z-[100] flex flex-col bg-canvas md:hidden">
           {/* In-sheet header with close button */}
           <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
             <Link
