@@ -266,25 +266,45 @@ export function MegaNav() {
           </div>
 
           <div className="flex flex-1 flex-col overflow-y-auto">
-            {/* Primary nav */}
-            <nav className="flex flex-col px-6 pt-10">
-              {[
-                { to: "/gallery", label: "Gallery" },
-                { to: "/categories", label: "Categories" },
-                { to: "/artists", label: "Artists" },
-                { to: "/about", label: "About" },
-                { to: "/contact", label: "Contact" },
-              ].map((l) => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
-                >
-                  {l.label}
-                </Link>
-              ))}
+            {/* Primary nav with expandable sub-routes */}
+            <nav className="flex flex-col px-6 pt-8">
+              <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
+
+              <MobileNavGroup
+                label="Categories"
+                items={categories.map((c) => ({
+                  to: "/categories/$slug" as const,
+                  params: { slug: c.slug },
+                  label: c.label,
+                  note: c.description,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavGroup
+                label="Artists"
+                items={artists.map((a) => ({
+                  to: "/artists/$slug" as const,
+                  params: { slug: a.slug },
+                  label: a.name,
+                  note: a.discipline,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavGroup
+                label="About"
+                items={aboutLinks.map((l) => ({
+                  to: l.to,
+                  label: l.label,
+                  note: l.note,
+                }))}
+                onNavigate={() => setMobileOpen(false)}
+              />
+
+              <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
             </nav>
+
 
             {/* Footer-style details below nav */}
             <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
