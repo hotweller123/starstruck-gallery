@@ -9,25 +9,34 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { Nav } from "@/components/site/Nav";
+import { Footer } from "@/components/site/Footer";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
+    <div className="flex min-h-screen flex-col">
+      <Nav />
+      <div className="flex flex-1 items-center justify-center px-6 py-32">
+        <div className="max-w-md text-center">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
+            404
+          </p>
+          <h1 className="mt-6 font-display text-6xl italic text-ink">
+            Lost in the gallery
+          </h1>
+          <p className="mt-6 text-detail">
+            The page you're looking for doesn't exist, or has been moved to
+            another wall.
+          </p>
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="mt-10 inline-block border border-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
           >
-            Go home
+            Return home
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
@@ -37,27 +46,27 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center px-6">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-4xl italic text-ink">
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p className="mt-4 text-sm text-detail">
+          Something went wrong on our end.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="border border-ink bg-ink px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-canvas"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="border border-ink px-5 py-2 text-[11px] uppercase tracking-[0.22em]"
           >
             Go home
           </a>
@@ -72,19 +81,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Aethelred — A Curated Exhibition of Contemporary Artworks" },
+      {
+        name: "description",
+        content:
+          "A curated digital exhibition of paintings, sculpture, photography and digital works from a small circle of contemporary artists.",
+      },
+      { name: "author", content: "Aethelred Gallery" },
+      {
+        property: "og:title",
+        content: "Aethelred — A Curated Exhibition",
+      },
+      {
+        property: "og:description",
+        content:
+          "Quiet, considered works from a small circle of contemporary artists.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&display=swap",
       },
     ],
   }),
@@ -113,7 +139,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="flex min-h-screen flex-col bg-canvas">
+        <Nav />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </QueryClientProvider>
   );
 }
