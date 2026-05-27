@@ -350,7 +350,8 @@ export function MegaNav() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
