@@ -51,7 +51,7 @@ export function Nav() {
               <Link
                 key={l.to}
                 to={l.to}
-                onClick={() => setOpen(true)}
+                onClick={() => setOpen(false)}
                 className="text-sm uppercase tracking-[0.22em] text-ink"
               >
                 {l.label}
