@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
 import { categories } from "@/data/categories";
