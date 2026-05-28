@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuctionsRouteImport } from './routes/auctions'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as ArtistsIndexRouteImport } from './routes/artists.index'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 
@@ -27,6 +29,11 @@ const GalleryRoute = GalleryRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsRoute = AuctionsRouteImport.update({
+  id: '/auctions',
+  path: '/auctions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -54,6 +61,11 @@ const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   path: '/categories/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuctionsSlugRoute = AuctionsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AuctionsRoute,
+} as any)
 const ArtworksSlugRoute = ArtworksSlugRouteImport.update({
   id: '/artworks/$slug',
   path: '/artworks/$slug',
@@ -68,10 +80,12 @@ const ArtistsSlugRoute = ArtistsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
+  '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/artists/': typeof ArtistsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -79,10 +93,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
+  '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/artists': typeof ArtistsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -91,10 +107,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
+  '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/artists/': typeof ArtistsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -104,10 +122,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/auctions'
     | '/contact'
     | '/gallery'
     | '/artists/$slug'
     | '/artworks/$slug'
+    | '/auctions/$slug'
     | '/categories/$slug'
     | '/artists/'
     | '/categories/'
@@ -115,10 +135,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/auctions'
     | '/contact'
     | '/gallery'
     | '/artists/$slug'
     | '/artworks/$slug'
+    | '/auctions/$slug'
     | '/categories/$slug'
     | '/artists'
     | '/categories'
@@ -126,10 +148,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/auctions'
     | '/contact'
     | '/gallery'
     | '/artists/$slug'
     | '/artworks/$slug'
+    | '/auctions/$slug'
     | '/categories/$slug'
     | '/artists/'
     | '/categories/'
@@ -138,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AuctionsRoute: typeof AuctionsRouteWithChildren
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   ArtistsSlugRoute: typeof ArtistsSlugRoute
@@ -161,6 +186,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions': {
+      id: '/auctions'
+      path: '/auctions'
+      fullPath: '/auctions'
+      preLoaderRoute: typeof AuctionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -198,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auctions/$slug': {
+      id: '/auctions/$slug'
+      path: '/$slug'
+      fullPath: '/auctions/$slug'
+      preLoaderRoute: typeof AuctionsSlugRouteImport
+      parentRoute: typeof AuctionsRoute
+    }
     '/artworks/$slug': {
       id: '/artworks/$slug'
       path: '/artworks/$slug'
@@ -215,9 +254,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuctionsRouteChildren {
+  AuctionsSlugRoute: typeof AuctionsSlugRoute
+}
+
+const AuctionsRouteChildren: AuctionsRouteChildren = {
+  AuctionsSlugRoute: AuctionsSlugRoute,
+}
+
+const AuctionsRouteWithChildren = AuctionsRoute._addFileChildren(
+  AuctionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AuctionsRoute: AuctionsRouteWithChildren,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   ArtistsSlugRoute: ArtistsSlugRoute,
