@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User } from "lucide-react";
+import { useStore } from "@/lib/store";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -25,6 +26,9 @@ export function MegaNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { favorites, cart } = useStore();
+  const favCount = favorites.length;
+  const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
