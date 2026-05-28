@@ -18,12 +18,24 @@ function diff(endsAt: string) {
 }
 
 export function Countdown({ endsAt, size = "md", className }: Props) {
-  const [t, setT] = useState(() => diff(endsAt));
+  const [t, setT] = useState<ReturnType<typeof diff> | null>(null);
 
   useEffect(() => {
+    setT(diff(endsAt));
     const id = setInterval(() => setT(diff(endsAt)), 1000);
     return () => clearInterval(id);
   }, [endsAt]);
+
+  if (!t) {
+    return (
+      <div
+        className={cn("inline-flex items-end gap-3 opacity-0", className)}
+        aria-hidden
+      >
+        <span className="font-display italic text-2xl">00:00:00:00</span>
+      </div>
+    );
+  }
 
   const ended = t.ms === 0;
   const closing = t.ms > 0 && t.ms < 3_600_000; // < 1h
