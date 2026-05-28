@@ -100,6 +100,14 @@ export function MegaNav() {
           >
             Gallery
           </Link>
+          <Link
+            to="/auctions"
+            className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
+            activeProps={{ className: "text-clay" }}
+            onMouseEnter={closeNow}
+          >
+            Auction
+          </Link>
           {(["categories", "artists", "about"] as const).map((key) => (
             <button
               key={key}
@@ -250,6 +258,7 @@ export function MegaNav() {
               {/* Primary nav with expandable sub-routes */}
               <nav className="flex flex-col px-6 pt-8">
                 <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/auctions" label="Auction" onNavigate={() => setMobileOpen(false)} />
 
                 <MobileNavGroup
                   label="Categories"
