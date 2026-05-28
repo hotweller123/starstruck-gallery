@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getArtist } from "@/data/artists";
 import { getArtworksByArtist } from "@/data/artworks";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
+import { SmartImage } from "@/components/site/SmartImage";
 
 export const Route = createFileRoute("/artists/$slug")({
   component: ArtistPage,
