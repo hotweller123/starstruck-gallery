@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User } from "lucide-react";
+import { useStore } from "@/lib/store";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -25,6 +26,9 @@ export function MegaNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { favorites, cart } = useStore();
+  const favCount = favorites.length;
+  const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
@@ -125,10 +129,13 @@ export function MegaNav() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 md:gap-2">
+          <IconLink to="/favourites" label="Favourites" count={favCount} icon={Heart} />
+          <IconLink to="/cart" label="Cart" count={cartCount} icon={ShoppingBag} />
+          <IconLink to="/profile" label="Profile" icon={User} />
           <Link
             to="/contact"
-            className="hidden border border-ink px-5 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-ink transition-colors hover:bg-ink hover:text-canvas md:inline-block"
+            className="ml-2 hidden border border-ink px-5 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-ink transition-colors hover:bg-ink hover:text-canvas md:inline-block"
           >
             Contact
           </Link>
@@ -292,6 +299,11 @@ export function MegaNav() {
                   onNavigate={() => setMobileOpen(false)}
                 />
 
+                <MobileNavLink to="/favourites" label={`Favourites${favCount ? ` (${favCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/cart" label={`Cart${cartCount ? ` (${cartCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/sell" label="Sell your work" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/profile" label="Profile" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
               </nav>
 
@@ -385,5 +397,33 @@ function MobileNavGroup({
         </ul>
       )}
     </div>
+  );
+}
+
+function IconLink({
+  to,
+  label,
+  count,
+  icon: Icon,
+}: {
+  to: string;
+  label: string;
+  count?: number;
+  icon: typeof Heart;
+}) {
+  return (
+    <Link
+      to={to}
+      aria-label={label}
+      className="relative inline-flex size-10 items-center justify-center text-ink/80 transition-colors hover:text-clay"
+      activeProps={{ className: "text-clay" }}
+    >
+      <Icon className="size-[18px]" strokeWidth={ICON_STROKE} />
+      {typeof count === "number" && count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-clay px-1 text-[10px] font-medium leading-[18px] text-canvas">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
   );
 }

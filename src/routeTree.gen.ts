@@ -9,8 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SellRouteImport } from './routes/sell'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as FavouritesRouteImport } from './routes/favourites'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as BidsRouteImport } from './routes/bids'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
@@ -21,14 +26,39 @@ import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FavouritesRoute = FavouritesRouteImport.update({
+  id: '/favourites',
+  path: '/favourites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BidsRoute = BidsRouteImport.update({
+  id: '/bids',
+  path: '/bids',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -80,8 +110,13 @@ const ArtistsSlugRoute = ArtistsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bids': typeof BidsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
+  '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
+  '/profile': typeof ProfileRoute
+  '/sell': typeof SellRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -93,8 +128,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bids': typeof BidsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
+  '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
+  '/profile': typeof ProfileRoute
+  '/sell': typeof SellRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -107,8 +147,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bids': typeof BidsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
+  '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
+  '/profile': typeof ProfileRoute
+  '/sell': typeof SellRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -122,8 +167,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/bids'
+    | '/cart'
     | '/contact'
+    | '/favourites'
     | '/gallery'
+    | '/profile'
+    | '/sell'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -135,8 +185,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/bids'
+    | '/cart'
     | '/contact'
+    | '/favourites'
     | '/gallery'
+    | '/profile'
+    | '/sell'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -148,8 +203,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/bids'
+    | '/cart'
     | '/contact'
+    | '/favourites'
     | '/gallery'
+    | '/profile'
+    | '/sell'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -162,8 +222,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BidsRoute: typeof BidsRoute
+  CartRoute: typeof CartRoute
   ContactRoute: typeof ContactRoute
+  FavouritesRoute: typeof FavouritesRoute
   GalleryRoute: typeof GalleryRoute
+  ProfileRoute: typeof ProfileRoute
+  SellRoute: typeof SellRoute
   ArtistsSlugRoute: typeof ArtistsSlugRoute
   ArtworksSlugRoute: typeof ArtworksSlugRoute
   AuctionsSlugRoute: typeof AuctionsSlugRoute
@@ -175,6 +240,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery': {
       id: '/gallery'
       path: '/gallery'
@@ -182,11 +261,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/favourites': {
+      id: '/favourites'
+      path: '/favourites'
+      fullPath: '/favourites'
+      preLoaderRoute: typeof FavouritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bids': {
+      id: '/bids'
+      path: '/bids'
+      fullPath: '/bids'
+      preLoaderRoute: typeof BidsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -258,8 +358,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BidsRoute: BidsRoute,
+  CartRoute: CartRoute,
   ContactRoute: ContactRoute,
+  FavouritesRoute: FavouritesRoute,
   GalleryRoute: GalleryRoute,
+  ProfileRoute: ProfileRoute,
+  SellRoute: SellRoute,
   ArtistsSlugRoute: ArtistsSlugRoute,
   ArtworksSlugRoute: ArtworksSlugRoute,
   AuctionsSlugRoute: AuctionsSlugRoute,
@@ -271,13 +376,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

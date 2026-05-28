@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
+import { StoreProvider } from "@/lib/store";
 
 function NotFoundComponent() {
   return (
@@ -139,13 +140,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col bg-canvas">
-        <MegaNav />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <Footer />
-      </div>
+      <StoreProvider>
+        <div className="flex min-h-screen flex-col bg-canvas">
+          <MegaNav />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
+      </StoreProvider>
     </QueryClientProvider>
   );
 }
