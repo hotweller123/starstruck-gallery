@@ -89,10 +89,9 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
               className="group block min-w-0 flex-[0_0_75%] sm:flex-[0_0_45%] lg:flex-[0_0_30%]"
             >
               <div className="relative aspect-[4/5] overflow-hidden bg-surface">
-                <img
+                <SmartImage
                   src={a.image}
                   alt={`${a.title} by ${a.artist}`}
-                  loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                 />
               </div>
