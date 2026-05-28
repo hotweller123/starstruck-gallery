@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
+import { SmartImage } from "./SmartImage";
 import art09 from "@/assets/art-09.jpg";
 import art10 from "@/assets/art-10.jpg";
 import art01 from "@/assets/art-01.jpg";
