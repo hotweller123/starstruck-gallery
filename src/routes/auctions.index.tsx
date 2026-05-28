@@ -24,7 +24,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-export const Route = createFileRoute("/auctions")({
+export const Route = createFileRoute("/auctions/")({
   component: AuctionsPage,
   head: () => ({
     meta: [
