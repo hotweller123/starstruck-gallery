@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Artwork } from "@/data/artworks";
 import { formatPrice } from "@/data/artworks";
+import { SmartImage } from "./SmartImage";
 
 interface Props {
   artworks: Artwork[];
