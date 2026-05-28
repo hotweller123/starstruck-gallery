@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { Artist } from "@/data/artists";
+import { SmartImage } from "./SmartImage";
 
 export function ArtistSpotlight({ artist }: { artist: Artist }) {
   return (
