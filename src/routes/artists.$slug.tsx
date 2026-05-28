@@ -36,11 +36,12 @@ function ArtistPage() {
 
       <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
         <div className="bg-surface">
-          <img
+          <SmartImage
             src={artist.portrait}
             alt={`Portrait of ${artist.name}`}
             width={800}
             height={1000}
+            priority
             className="block aspect-[4/5] w-full object-cover"
           />
         </div>
