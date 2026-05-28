@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getArtist } from "@/data/artists";
 import { getArtworksByArtist } from "@/data/artworks";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
+import { SmartImage } from "@/components/site/SmartImage";
 
 export const Route = createFileRoute("/artists/$slug")({
   component: ArtistPage,
@@ -35,11 +36,12 @@ function ArtistPage() {
 
       <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
         <div className="bg-surface">
-          <img
+          <SmartImage
             src={artist.portrait}
             alt={`Portrait of ${artist.name}`}
             width={800}
             height={1000}
+            priority
             className="block aspect-[4/5] w-full object-cover"
           />
         </div>

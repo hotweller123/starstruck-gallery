@@ -1,17 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import type { Artist } from "@/data/artists";
+import { SmartImage } from "./SmartImage";
 
 export function ArtistSpotlight({ artist }: { artist: Artist }) {
   return (
     <section className="bg-ink px-6 py-24 text-canvas md:py-32">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-14 md:flex-row md:gap-20">
         <div className="w-full md:w-1/2">
-          <img
+          <SmartImage
             src={artist.portrait}
             alt={`Portrait of ${artist.name}`}
             width={800}
             height={1000}
-            loading="lazy"
             className="block aspect-[4/5] w-full object-cover outline outline-1 -outline-offset-1 outline-canvas/10"
           />
         </div>

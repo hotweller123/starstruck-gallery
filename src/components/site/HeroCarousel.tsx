@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
+import { SmartImage } from "./SmartImage";
 import art09 from "@/assets/art-09.jpg";
 import art10 from "@/assets/art-10.jpg";
 import art01 from "@/assets/art-01.jpg";
@@ -60,10 +61,11 @@ export function HeroCarousel() {
               key={i}
               className="relative h-full min-w-0 flex-[0_0_100%]"
             >
-              <img
+              <SmartImage
                 src={s.image}
                 alt=""
                 aria-hidden
+                priority={i === 0}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/30" />

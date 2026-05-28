@@ -7,6 +7,7 @@ import {
 } from "@/data/artworks";
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
+import { SmartImage } from "@/components/site/SmartImage";
 
 export const Route = createFileRoute("/artworks/$slug")({
   component: ArtworkPage,
@@ -53,11 +54,12 @@ function ArtworkPage() {
 
       <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1.4fr_1fr] lg:gap-24">
         <div className="bg-surface">
-          <img
+          <SmartImage
             src={artwork.image}
             alt={`${artwork.title} by ${artwork.artist}`}
             width={artwork.width}
             height={artwork.height}
+            priority
             className="block h-auto w-full"
           />
         </div>
@@ -130,12 +132,11 @@ function ArtworkPage() {
 
           {artist && (
             <div className="mt-4 flex items-center gap-4 border-t border-ink/10 pt-8">
-              <img
+              <SmartImage
                 src={artist.portrait}
                 alt={artist.name}
                 width={80}
                 height={80}
-                loading="lazy"
                 className="size-16 object-cover"
               />
               <div>
