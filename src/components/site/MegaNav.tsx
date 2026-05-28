@@ -68,8 +68,12 @@ export function MegaNav() {
               hello@aethelred.gallery
             </a>
             <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
-            <a href="#" className="hover:text-ink">Instagram</a>
-            <a href="#" className="hover:text-ink">Journal</a>
+            <a href="#" className="hover:text-ink">
+              Instagram
+            </a>
+            <a href="#" className="hover:text-ink">
+              Journal
+            </a>
           </div>
         </div>
       </div>
@@ -87,7 +91,7 @@ export function MegaNav() {
           Aethelred
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex">
+        <nav className="hidden items-center gap-9 md:flex divide-x">
           <Link
             to="/gallery"
             className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
@@ -146,9 +150,7 @@ export function MegaNav() {
             <div>
               {openPanel === "categories" && (
                 <>
-                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
-                    Browse by mode of design
-                  </p>
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">Browse by mode of design</p>
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {categories.map((c) => (
                       <li key={c.slug}>
@@ -158,12 +160,8 @@ export function MegaNav() {
                           onClick={closeNow}
                           className="group block"
                         >
-                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
-                            {c.label}
-                          </h4>
-                          <p className="mt-1 text-xs leading-relaxed text-detail">
-                            {c.description}
-                          </p>
+                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">{c.label}</h4>
+                          <p className="mt-1 text-xs leading-relaxed text-detail">{c.description}</p>
                         </Link>
                       </li>
                     ))}
@@ -173,31 +171,18 @@ export function MegaNav() {
 
               {openPanel === "artists" && (
                 <>
-                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
-                    In our rotation
-                  </p>
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">In our rotation</p>
                   <ul className="mb-10 grid grid-cols-2 gap-x-10 gap-y-4">
                     {artists.map((a) => (
                       <li key={a.slug}>
-                        <Link
-                          to="/artists/$slug"
-                          params={{ slug: a.slug }}
-                          onClick={closeNow}
-                          className="group block"
-                        >
-                          <h4 className="font-display text-xl italic text-ink group-hover:text-clay">
-                            {a.name}
-                          </h4>
-                          <p className="text-[11px] uppercase tracking-[0.18em] text-detail">
-                            {a.discipline}
-                          </p>
+                        <Link to="/artists/$slug" params={{ slug: a.slug }} onClick={closeNow} className="group block">
+                          <h4 className="font-display text-xl italic text-ink group-hover:text-clay">{a.name}</h4>
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-detail">{a.discipline}</p>
                         </Link>
                       </li>
                     ))}
                   </ul>
-                  <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-detail">
-                    Renowned, the world over
-                  </p>
+                  <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-detail">Renowned, the world over</p>
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-3">
                     {renownedArtists.map((r) => (
                       <li key={r.name}>
@@ -211,19 +196,13 @@ export function MegaNav() {
 
               {openPanel === "about" && (
                 <>
-                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
-                    The gallery
-                  </p>
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">The gallery</p>
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {aboutLinks.map((l) => (
                       <li key={l.label}>
                         <Link to={l.to} onClick={closeNow} className="group block">
-                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
-                            {l.label}
-                          </h4>
-                          <p className="mt-1 text-xs leading-relaxed text-detail">
-                            {l.note}
-                          </p>
+                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">{l.label}</h4>
+                          <p className="mt-1 text-xs leading-relaxed text-detail">{l.note}</p>
                         </Link>
                       </li>
                     ))}
@@ -234,13 +213,7 @@ export function MegaNav() {
 
             <div className="relative">
               <img
-                src={
-                  openPanel === "categories"
-                    ? art09
-                    : openPanel === "artists"
-                      ? artist02
-                      : art10
-                }
+                src={openPanel === "categories" ? art09 : openPanel === "artists" ? artist02 : art10}
                 alt=""
                 className="aspect-[4/5] w-full object-cover"
               />
@@ -255,123 +228,105 @@ export function MegaNav() {
       )}
 
       {/* Mobile full-screen sheet — portaled to body to escape header's backdrop-filter containing block */}
-      {mounted && mobileOpen && createPortal(
-        <div className="fixed inset-0 z-[100] flex flex-col bg-canvas md:hidden">
-          {/* In-sheet header with close button */}
-          <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
-            <Link
-              to="/"
-              onClick={() => setMobileOpen(false)}
-              className="font-display text-2xl italic tracking-tight text-ink"
-            >
-              Aethelred
-            </Link>
-            <button
-              type="button"
-              aria-label="Close menu"
-              onClick={() => setMobileOpen(false)}
-              className="text-ink"
-            >
-              <X className="size-6" strokeWidth={ICON_STROKE} />
-            </button>
-          </div>
+      {mounted &&
+        mobileOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex flex-col bg-canvas md:hidden">
+            {/* In-sheet header with close button */}
+            <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
+              <Link
+                to="/"
+                onClick={() => setMobileOpen(false)}
+                className="font-display text-2xl italic tracking-tight text-ink"
+              >
+                Aethelred
+              </Link>
+              <button type="button" aria-label="Close menu" onClick={() => setMobileOpen(false)} className="text-ink">
+                <X className="size-6" strokeWidth={ICON_STROKE} />
+              </button>
+            </div>
 
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            {/* Primary nav with expandable sub-routes */}
-            <nav className="flex flex-col px-6 pt-8">
-              <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              {/* Primary nav with expandable sub-routes */}
+              <nav className="flex flex-col px-6 pt-8">
+                <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
 
-              <MobileNavGroup
-                label="Categories"
-                items={categories.map((c) => ({
-                  to: "/categories/$slug" as const,
-                  params: { slug: c.slug },
-                  label: c.label,
-                  note: c.description,
-                }))}
-                onNavigate={() => setMobileOpen(false)}
-              />
+                <MobileNavGroup
+                  label="Categories"
+                  items={categories.map((c) => ({
+                    to: "/categories/$slug" as const,
+                    params: { slug: c.slug },
+                    label: c.label,
+                    note: c.description,
+                  }))}
+                  onNavigate={() => setMobileOpen(false)}
+                />
 
-              <MobileNavGroup
-                label="Artists"
-                items={artists.map((a) => ({
-                  to: "/artists/$slug" as const,
-                  params: { slug: a.slug },
-                  label: a.name,
-                  note: a.discipline,
-                }))}
-                onNavigate={() => setMobileOpen(false)}
-              />
+                <MobileNavGroup
+                  label="Artists"
+                  items={artists.map((a) => ({
+                    to: "/artists/$slug" as const,
+                    params: { slug: a.slug },
+                    label: a.name,
+                    note: a.discipline,
+                  }))}
+                  onNavigate={() => setMobileOpen(false)}
+                />
 
-              <MobileNavGroup
-                label="About"
-                items={aboutLinks.map((l) => ({
-                  to: l.to,
-                  label: l.label,
-                  note: l.note,
-                }))}
-                onNavigate={() => setMobileOpen(false)}
-              />
+                <MobileNavGroup
+                  label="About"
+                  items={aboutLinks.map((l) => ({
+                    to: l.to,
+                    label: l.label,
+                    note: l.note,
+                  }))}
+                  onNavigate={() => setMobileOpen(false)}
+                />
 
-              <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
-            </nav>
+                <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
+              </nav>
 
+              {/* Footer-style details below nav */}
+              <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
+                <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">The gallery</p>
+                <ul className="flex flex-col gap-4 text-sm text-ink">
+                  <li className="flex items-start gap-3">
+                    <Mail className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                    <a href="mailto:hello@aethelred.gallery">hello@aethelred.gallery</a>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                    <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Instagram className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                    <a href="#">@aethelred.gallery</a>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <BookOpen className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+                    <a href="#">Journal &amp; broadsheets</a>
+                  </li>
+                </ul>
 
-            {/* Footer-style details below nav */}
-            <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
-              <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
-                The gallery
-              </p>
-              <ul className="flex flex-col gap-4 text-sm text-ink">
-                <li className="flex items-start gap-3">
-                  <Mail className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
-                  <a href="mailto:hello@aethelred.gallery">hello@aethelred.gallery</a>
-                </li>
-                <li className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
-                  <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Instagram className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
-                  <a href="#">@aethelred.gallery</a>
-                </li>
-                <li className="flex items-start gap-3">
-                  <BookOpen className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
-                  <a href="#">Journal &amp; broadsheets</a>
-                </li>
-              </ul>
-
-              <div className="mt-8 border-t border-ink/10 pt-6 text-[10px] uppercase tracking-[0.22em] text-detail">
-                <p>Exhibition No. 12</p>
-                <p className="mt-1">Spring 2026 &middot; Open online, daily</p>
-                <p className="mt-4 normal-case tracking-normal text-detail/70">
-                  &copy; {new Date().getFullYear()} Aethelred Gallery
-                </p>
+                <div className="mt-8 border-t border-ink/10 pt-6 text-[10px] uppercase tracking-[0.22em] text-detail">
+                  <p>Exhibition No. 12</p>
+                  <p className="mt-1">Spring 2026 &middot; Open online, daily</p>
+                  <p className="mt-4 normal-case tracking-normal text-detail/70">
+                    &copy; {new Date().getFullYear()} Aethelred Gallery
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </header>
   );
 }
 
-function MobileNavLink({
-  to,
-  label,
-  onNavigate,
-}: {
-  to: string;
-  label: string;
-  onNavigate: () => void;
-}) {
+function MobileNavLink({ to, label, onNavigate }: { to: string; label: string; onNavigate: () => void }) {
   return (
-    <Link
-      to={to}
-      onClick={onNavigate}
-      className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
-    >
+    <Link to={to} onClick={onNavigate} className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink">
       {label}
     </Link>
   );
@@ -404,9 +359,7 @@ function MobileNavGroup({
       >
         <span>{label}</span>
         <ChevronDown
-          className={`size-6 text-detail transition-transform duration-300 ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`size-6 text-detail transition-transform duration-300 ${open ? "rotate-180" : ""}`}
           strokeWidth={ICON_STROKE}
         />
       </button>
@@ -414,20 +367,9 @@ function MobileNavGroup({
         <ul className="flex flex-col gap-4 pb-6 pl-1 pr-2">
           {items.map((item) => (
             <li key={`${item.to}-${item.label}`}>
-              <Link
-                to={item.to}
-                params={item.params as never}
-                onClick={onNavigate}
-                className="group block"
-              >
-                <p className="font-display text-lg italic text-ink group-hover:text-clay">
-                  {item.label}
-                </p>
-                {item.note && (
-                  <p className="mt-0.5 text-xs leading-relaxed text-detail">
-                    {item.note}
-                  </p>
-                )}
+              <Link to={item.to} params={item.params as never} onClick={onNavigate} className="group block">
+                <p className="font-display text-lg italic text-ink group-hover:text-clay">{item.label}</p>
+                {item.note && <p className="mt-0.5 text-xs leading-relaxed text-detail">{item.note}</p>}
               </Link>
             </li>
           ))}
@@ -436,4 +378,3 @@ function MobileNavGroup({
     </div>
   );
 }
-
