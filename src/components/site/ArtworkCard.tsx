@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { Artwork } from "@/data/artworks";
+import { SmartImage } from "./SmartImage";
 import { formatPrice } from "@/data/artworks";
 
 interface Props {
