@@ -41,7 +41,7 @@ function AuctionLotPage() {
 
   // Side rail: this lot's own images + first image of each other seller lot
   const railImages = [
-    ...lot.images.map((src, i) => ({
+    ...lot.images.map((src: string, i: number) => ({
       src,
       label: `${lot.title} · ${i + 1}`,
       lotSlug: lot.slug,
