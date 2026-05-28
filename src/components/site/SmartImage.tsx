@@ -1,55 +1,55 @@
-import { UnLazyImage } from "@unlazy/react";
-import { useState, type ImgHTMLAttributes } from "react";
+import { useEffect, useRef, useState, type ImgHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-interface Props extends ImgHTMLAttributes<HTMLImageElement> {
+interface Props extends Omit<ImgHTMLAttributes<HTMLImageElement>, "loading"> {
   src: string;
   alt: string;
+  /** Eager-load + high fetchpriority for above-the-fold images. */
   priority?: boolean;
-  thumbhash?: string;
-  blurhash?: string;
-  placeholderSrc?: string;
 }
 
 /**
  * Site-wide image primitive.
- * - Lazy-loads off-screen images via IntersectionObserver (unlazy)
- * - Decodes async, fades in on load
- * - Pass `priority` for above-the-fold hero images (eager + high priority)
+ * - Native lazy-loading + async decoding
+ * - Fades in on load (skips fade if cached / already complete)
+ * - `priority` flag for above-the-fold (eager + fetchPriority="high")
  */
 export function SmartImage({
   src,
   alt,
   priority,
-  thumbhash,
-  blurhash,
-  placeholderSrc,
   className,
   onLoad,
+  style,
   ...rest
 }: Props) {
+  const ref = useRef<HTMLImageElement | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // If the browser already has the image cached, the load event may have
+  // fired before React attached its handler — sync state on mount.
+  useEffect(() => {
+    if (ref.current?.complete) setLoaded(true);
+  }, []);
+
   return (
-    <UnLazyImage
+    <img
+      ref={ref}
       src={src}
       alt={alt}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
-      // @ts-expect-error - valid HTML attribute, types lag
-      fetchpriority={priority ? "high" : "auto"}
-      thumbhash={thumbhash}
-      blurhash={blurhash}
-      placeholderSrc={placeholderSrc}
-      onImageLoad={(img) => {
+      fetchPriority={priority ? "high" : "auto"}
+      onLoad={(e) => {
         setLoaded(true);
-        onLoad?.({ currentTarget: img } as never);
+        onLoad?.(e);
       }}
       className={cn(
         "transition-opacity duration-700 ease-out",
         loaded || priority ? "opacity-100" : "opacity-0",
         className,
       )}
+      style={style}
       {...rest}
     />
   );
