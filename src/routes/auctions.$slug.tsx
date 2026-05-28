@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Gavel, ShieldCheck, Mail, MapPin } from "lucide-react";
+import { Gavel, Heart, ShieldCheck, Mail, MapPin } from "lucide-react";
 import {
   auctionLots,
   formatBid,
@@ -11,6 +11,7 @@ import {
 import { SmartImage } from "@/components/site/SmartImage";
 import { Countdown } from "@/components/site/Countdown";
 import { AuctionCard } from "@/components/site/AuctionCard";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/auctions/$slug")({
@@ -62,6 +63,18 @@ function AuctionLotPage() {
     .slice(0, 3);
 
   const minBid = lot.currentBid + 100;
+  const { placeBid, toggleFavorite, isFavorite } = useStore();
+  const [bidAmount, setBidAmount] = useState(minBid);
+  const fav = isFavorite(lot.slug);
+
+  const submitBid = () => {
+    if (bidAmount < minBid) {
+      alert(`Minimum next bid is ${formatBid(minBid)}.`);
+      return;
+    }
+    placeBid(lot.slug, bidAmount);
+    alert(`Bid of ${formatBid(bidAmount)} placed on Lot ${lot.lotNumber}.`);
+  };
 
   return (
     <article>
@@ -206,7 +219,8 @@ function AuctionLotPage() {
                 <span className="px-3 text-sm text-detail">$</span>
                 <input
                   type="number"
-                  defaultValue={minBid}
+                  value={bidAmount}
+                  onChange={(e) => setBidAmount(Number(e.target.value))}
                   min={minBid}
                   step={100}
                   className="w-full bg-transparent py-3 pr-3 text-base text-ink focus:outline-none"
@@ -215,15 +229,29 @@ function AuctionLotPage() {
               </div>
               <button
                 type="button"
+                onClick={submitBid}
                 className="inline-flex items-center justify-center gap-2 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
               >
                 <Gavel className="size-3.5" strokeWidth={1.5} />
                 Place bid
               </button>
+              <button
+                type="button"
+                onClick={() => toggleFavorite(lot.slug)}
+                aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+                className={cn(
+                  "inline-flex size-12 items-center justify-center border transition-colors",
+                  fav
+                    ? "border-clay bg-clay/10 text-clay"
+                    : "border-ink/20 text-ink hover:border-ink",
+                )}
+              >
+                <Heart className="size-4" strokeWidth={1.5} fill={fav ? "currentColor" : "none"} />
+              </button>
             </div>
             <p className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-detail">
               <ShieldCheck className="size-3.5" strokeWidth={1.5} />
-              Min next bid {formatBid(minBid)} · Buyer's premium 12%
+              Min next bid {formatBid(minBid)} · Buyer's premium 12% · Auctioned lots cannot be added to cart
             </p>
           </div>
 
