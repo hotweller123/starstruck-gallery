@@ -16,12 +16,12 @@ export function ArtworkCard({ artwork, priority }: Props) {
       className="group mb-10 block break-inside-avoid"
     >
       <div className="overflow-hidden bg-surface outline outline-1 -outline-offset-1 outline-ink/5">
-        <img
+        <SmartImage
           src={artwork.image}
           alt={`${artwork.title} by ${artwork.artist}`}
           width={artwork.width}
           height={artwork.height}
-          loading={priority ? "eager" : "lazy"}
+          priority={priority}
           className="block h-auto w-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.02]"
         />
       </div>
