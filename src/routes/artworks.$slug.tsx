@@ -7,6 +7,7 @@ import {
 } from "@/data/artworks";
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
+import { SmartImage } from "@/components/site/SmartImage";
 
 export const Route = createFileRoute("/artworks/$slug")({
   component: ArtworkPage,
