@@ -132,12 +132,11 @@ function ArtworkPage() {
 
           {artist && (
             <div className="mt-4 flex items-center gap-4 border-t border-ink/10 pt-8">
-              <img
+              <SmartImage
                 src={artist.portrait}
                 alt={artist.name}
                 width={80}
                 height={80}
-                loading="lazy"
                 className="size-16 object-cover"
               />
               <div>
