@@ -95,7 +95,7 @@ export function MegaNav() {
           Aethelred
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex divide-x justify-around">
+        <nav className="hidden items-center gap-9 md:flex ">
           <Link
             to="/gallery"
             className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
@@ -299,8 +299,16 @@ export function MegaNav() {
                   onNavigate={() => setMobileOpen(false)}
                 />
 
-                <MobileNavLink to="/favourites" label={`Favourites${favCount ? ` (${favCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
-                <MobileNavLink to="/cart" label={`Cart${cartCount ? ` (${cartCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink
+                  to="/favourites"
+                  label={`Favourites${favCount ? ` (${favCount})` : ""}`}
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink
+                  to="/cart"
+                  label={`Cart${cartCount ? ` (${cartCount})` : ""}`}
+                  onNavigate={() => setMobileOpen(false)}
+                />
                 <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/sell" label="Sell your work" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/profile" label="Profile" onNavigate={() => setMobileOpen(false)} />
@@ -400,17 +408,7 @@ function MobileNavGroup({
   );
 }
 
-function IconLink({
-  to,
-  label,
-  count,
-  icon: Icon,
-}: {
-  to: string;
-  label: string;
-  count?: number;
-  icon: typeof Heart;
-}) {
+function IconLink({ to, label, count, icon: Icon }: { to: string; label: string; count?: number; icon: typeof Heart }) {
   return (
     <Link
       to={to}
