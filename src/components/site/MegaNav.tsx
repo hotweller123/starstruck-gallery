@@ -394,3 +394,31 @@ function MobileNavGroup({
     </div>
   );
 }
+
+function IconLink({
+  to,
+  label,
+  count,
+  icon: Icon,
+}: {
+  to: string;
+  label: string;
+  count?: number;
+  icon: typeof Heart;
+}) {
+  return (
+    <Link
+      to={to}
+      aria-label={label}
+      className="relative inline-flex size-10 items-center justify-center text-ink/80 transition-colors hover:text-clay"
+      activeProps={{ className: "text-clay" }}
+    >
+      <Icon className="size-[18px]" strokeWidth={ICON_STROKE} />
+      {typeof count === "number" && count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-clay px-1 text-[10px] font-medium leading-[18px] text-canvas">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
+  );
+}
