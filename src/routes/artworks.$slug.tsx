@@ -54,11 +54,12 @@ function ArtworkPage() {
 
       <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1.4fr_1fr] lg:gap-24">
         <div className="bg-surface">
-          <img
+          <SmartImage
             src={artwork.image}
             alt={`${artwork.title} by ${artwork.artist}`}
             width={artwork.width}
             height={artwork.height}
+            priority
             className="block h-auto w-full"
           />
         </div>
