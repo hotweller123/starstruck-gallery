@@ -91,7 +91,7 @@ export function MegaNav() {
           Aethelred
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex divide-x">
+        <nav className="hidden items-center gap-9 md:flex divide-x justify-around">
           <Link
             to="/gallery"
             className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
