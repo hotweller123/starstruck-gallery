@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import {
   artworks,
   formatPrice,
@@ -8,6 +10,8 @@ import {
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { SmartImage } from "@/components/site/SmartImage";
+import { useStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/artworks/$slug")({
   component: ArtworkPage,
@@ -34,6 +38,9 @@ export const Route = createFileRoute("/artworks/$slug")({
 function ArtworkPage() {
   const { artwork } = Route.useLoaderData();
   const artist = getArtist(artwork.artistSlug);
+  const { isFavorite, toggleFavorite, addToCart } = useStore();
+  const [qty, setQty] = useState(1);
+  const fav = isFavorite(artwork.slug);
   const related = getArtworksByArtist(artwork.artistSlug)
     .filter((a) => a.slug !== artwork.slug)
     .concat(artworks.filter((a) => a.category === artwork.category))
@@ -123,11 +130,53 @@ function ArtworkPage() {
             <li><span className="text-ink/60">Palette</span> — {artwork.dominantColor}</li>
           </ul>
 
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex items-center border border-ink/20">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="px-3 py-3 text-detail hover:text-ink"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="size-3.5" strokeWidth={1.5} />
+              </button>
+              <span className="min-w-8 text-center text-sm">{qty}</span>
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="px-3 py-3 text-detail hover:text-ink"
+                aria-label="Increase quantity"
+              >
+                <Plus className="size-3.5" strokeWidth={1.5} />
+              </button>
+            </div>
+            <button
+              onClick={() => addToCart(artwork.slug, qty)}
+              className="inline-flex flex-1 items-center justify-center gap-2 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+            >
+              <ShoppingBag className="size-3.5" strokeWidth={1.5} />
+              Add to cart · {formatPrice(artwork.price * qty)}
+            </button>
+            <button
+              onClick={() => toggleFavorite(artwork.slug)}
+              aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+              className={cn(
+                "inline-flex size-12 items-center justify-center border transition-colors",
+                fav
+                  ? "border-clay bg-clay/10 text-clay"
+                  : "border-ink/20 text-ink hover:border-ink",
+              )}
+            >
+              <Heart
+                className="size-4"
+                strokeWidth={1.5}
+                fill={fav ? "currentColor" : "none"}
+              />
+            </button>
+          </div>
           <Link
             to="/contact"
-            className="inline-block self-start border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+            className="text-[11px] uppercase tracking-[0.22em] text-detail underline underline-offset-4 hover:text-ink"
           >
-            Inquire about this work
+            Or inquire about this work
           </Link>
 
           {artist && (
