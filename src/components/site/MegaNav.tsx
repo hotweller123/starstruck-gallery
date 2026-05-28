@@ -299,6 +299,11 @@ export function MegaNav() {
                   onNavigate={() => setMobileOpen(false)}
                 />
 
+                <MobileNavLink to="/favourites" label={`Favourites${favCount ? ` (${favCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/cart" label={`Cart${cartCount ? ` (${cartCount})` : ""}`} onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/sell" label="Sell your work" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/profile" label="Profile" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
               </nav>
 
