@@ -129,10 +129,13 @@ export function MegaNav() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 md:gap-2">
+          <IconLink to="/favourites" label="Favourites" count={favCount} icon={Heart} />
+          <IconLink to="/cart" label="Cart" count={cartCount} icon={ShoppingBag} />
+          <IconLink to="/profile" label="Profile" icon={User} />
           <Link
             to="/contact"
-            className="hidden border border-ink px-5 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-ink transition-colors hover:bg-ink hover:text-canvas md:inline-block"
+            className="ml-2 hidden border border-ink px-5 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-ink transition-colors hover:bg-ink hover:text-canvas md:inline-block"
           >
             Contact
           </Link>
