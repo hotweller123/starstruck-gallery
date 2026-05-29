@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User, Wallet } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useWallet } from "@/lib/wallet";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -130,6 +131,7 @@ export function MegaNav() {
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
+          <WalletNavIcon />
           <IconLink to="/favourites" label="Favourites" count={favCount} icon={Heart} />
           <IconLink to="/cart" label="Cart" count={cartCount} icon={ShoppingBag} />
           <IconLink to="/profile" label="Profile" icon={User} />
@@ -309,6 +311,8 @@ export function MegaNav() {
                   label={`Cart${cartCount ? ` (${cartCount})` : ""}`}
                   onNavigate={() => setMobileOpen(false)}
                 />
+                <MobileNavLink to="/wallet" label="Wallet" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink to="/connect" label="Connect wallet" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/sell" label="Sell your work" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/profile" label="Profile" onNavigate={() => setMobileOpen(false)} />
@@ -422,6 +426,35 @@ function IconLink({ to, label, count, icon: Icon }: { to: string; label: string;
           {count > 99 ? "99+" : count}
         </span>
       )}
+    </Link>
+  );
+}
+
+function WalletNavIcon() {
+  const { connectedWalletId } = useStore();
+  const { getAccount } = useWallet();
+  const account = getAccount(connectedWalletId);
+  if (account) {
+    return (
+      <Link
+        to="/wallet"
+        aria-label="Open wallet"
+        className="ml-1 hidden items-center gap-2 border border-ink/20 px-3 py-1.5 text-[11px] font-medium tracking-[0.18em] text-ink hover:border-ink md:inline-flex"
+        activeProps={{ className: "border-clay text-clay" }}
+      >
+        <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />
+        ${account.balance.toLocaleString()}
+      </Link>
+    );
+  }
+  return (
+    <Link
+      to="/connect"
+      aria-label="Connect wallet"
+      className="relative inline-flex size-10 items-center justify-center text-ink/80 transition-colors hover:text-clay"
+    >
+      <Wallet className="size-[18px]" strokeWidth={ICON_STROKE} />
+      <span className="absolute right-1 top-1.5 size-1.5 rounded-full bg-clay" />
     </Link>
   );
 }

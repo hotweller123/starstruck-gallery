@@ -30,6 +30,7 @@ interface Store {
   cart: CartItem[];
   bids: Bid[];
   listings: UserListing[];
+  connectedWalletId: string | null;
   toggleFavorite: (slug: string) => void;
   isFavorite: (slug: string) => boolean;
   addToCart: (slug: string, qty?: number) => void;
@@ -39,6 +40,8 @@ interface Store {
   placeBid: (lotSlug: string, amount: number) => void;
   addListing: (l: Omit<UserListing, "id" | "createdAt">) => void;
   removeListing: (id: string) => void;
+  connectWallet: (accountId: string) => void;
+  disconnectWallet: () => void;
 }
 
 const StoreCtx = createContext<Store | null>(null);
@@ -50,9 +53,16 @@ interface PersistedState {
   cart: CartItem[];
   bids: Bid[];
   listings: UserListing[];
+  connectedWalletId: string | null;
 }
 
-const empty: PersistedState = { favorites: [], cart: [], bids: [], listings: [] };
+const empty: PersistedState = {
+  favorites: [],
+  cart: [],
+  bids: [],
+  listings: [],
+  connectedWalletId: null,
+};
 
 function load(): PersistedState {
   if (typeof window === "undefined") return empty;
@@ -132,6 +142,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       })),
     removeListing: (id) =>
       setState((s) => ({ ...s, listings: s.listings.filter((l) => l.id !== id) })),
+    connectWallet: (accountId) =>
+      setState((s) => ({ ...s, connectedWalletId: accountId })),
+    disconnectWallet: () => setState((s) => ({ ...s, connectedWalletId: null })),
   };
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
