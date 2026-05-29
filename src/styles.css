@@ -138,6 +138,10 @@
   --w-input: oklch(0 0 0 / 0.35);
   --w-shadow: 0 20px 50px -20px oklch(0 0 0 / 0.6);
 
+  /* Back-compat aliases for older components */
+  --w-accent: var(--w-brand-1);
+  --w-accent-2: var(--w-brand-3);
+
   background-color: var(--w-bg);
   color: var(--w-fg);
   font-family: var(--font-sans);
