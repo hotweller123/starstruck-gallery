@@ -37,10 +37,10 @@ function Inner() {
   if (done !== null) {
     return (
       <div className="mx-auto max-w-md text-center">
-        <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-10 shadow-xl">
+        <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-10 shadow-xl">
           <span
-            className="mx-auto grid size-16 place-items-center rounded-full text-white shadow-lg"
-            style={{ background: "linear-gradient(135deg, var(--w-brand-hi), var(--w-brand))" }}
+            className="mx-auto grid size-16 place-items-center rounded-full border border-[var(--w-border)] text-[var(--w-brand)] shadow-lg"
+            style={{ background: "var(--w-brand-soft)" }}
           >
             <CheckCircle2 className="size-8" strokeWidth={2} />
           </span>
@@ -52,8 +52,8 @@ function Inner() {
           </p>
           <Link
             to="/wallet"
-            className="mt-6 inline-block w-full rounded-2xl px-6 py-3.5 text-sm font-bold text-white shadow-lg"
-            style={{ background: "var(--w-grad-brand)" }}
+            className="mt-6 inline-block w-full rounded-[1.4rem] px-6 py-3.5 text-sm font-bold shadow-lg"
+            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
           >
             Back to wallet
           </Link>
@@ -67,7 +67,7 @@ function Inner() {
       title="Withdraw"
       subtitle={`Available · ${formatMoney(currentAccount?.balance ?? 0)}`}
       icon={<ArrowUpFromLine className="size-6" strokeWidth={2.2} />}
-      tint="linear-gradient(135deg, var(--w-brand-hi), var(--w-brand))"
+      tint="var(--w-brand-soft)"
     >
       <form onSubmit={submit} className="flex flex-col gap-5">
         <div>
@@ -79,7 +79,7 @@ function Inner() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--w-border)] bg-[var(--w-input)] p-4">
+        <div className="rounded-[1.4rem] border border-[var(--w-border)] bg-[var(--w-input)] p-4">
           <div className="flex items-center gap-3">
             <Building2 className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
             <p className="text-sm font-semibold text-[var(--w-fg)]">Bank destination</p>
