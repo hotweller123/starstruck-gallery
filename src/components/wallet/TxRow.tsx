@@ -29,11 +29,9 @@ export function TxRow({ tx }: { tx: WalletTx }) {
   return (
     <div className="flex items-center gap-4 border-b border-[var(--w-border)] py-3.5 last:border-b-0">
       <span
-        className="grid size-10 shrink-0 place-items-center rounded-xl text-white"
+        className="grid size-10 shrink-0 place-items-center rounded-[1rem] border border-[var(--w-border)] text-[var(--w-fg)]"
         style={{
-          background: positive
-            ? "linear-gradient(135deg, var(--w-pos), var(--w-brand-hi))"
-            : "linear-gradient(135deg, var(--w-brand), var(--w-brand-hi))",
+          background: positive ? "var(--w-brand-soft)" : "var(--w-bg-2)",
         }}
       >
         <Icon className="size-4" strokeWidth={2} />
