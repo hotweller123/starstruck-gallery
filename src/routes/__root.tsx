@@ -14,7 +14,7 @@ import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
-import { WalletThemeProvider } from "@/lib/wallet-theme";
+import { WalletThemeProvider, useWalletTheme } from "@/lib/wallet-theme";
 
 function NotFoundComponent() {
   return (
@@ -169,10 +169,11 @@ function RootComponent() {
 }
 
 function WalletRoot({ children }: { children: React.ReactNode }) {
-  const { useWalletTheme } = require("@/lib/wallet-theme") as typeof import("@/lib/wallet-theme");
   const { mode } = useWalletTheme();
   return (
-    <div className={`wallet-theme ${mode === "light" ? "wallet-light" : ""} flex min-h-screen flex-col`}>
+    <div
+      className={`wallet-theme ${mode === "light" ? "wallet-light" : ""} flex min-h-screen flex-col`}
+    >
       {children}
     </div>
   );
