@@ -27,18 +27,19 @@ export function TxRow({ tx }: { tx: WalletTx }) {
   const date = new Date(tx.createdAt);
 
   return (
-    <div className="flex items-center gap-4 border-b border-white/5 py-4 last:border-b-0">
+    <div className="flex items-center gap-4 border-b border-[var(--w-border)] py-3.5 last:border-b-0">
       <span
-        className={`grid size-10 shrink-0 place-items-center rounded-full ${
-          positive
-            ? "bg-[var(--w-accent)]/12 text-[var(--w-accent)]"
-            : "bg-white/5 text-[var(--w-fg)]/80"
-        }`}
+        className="grid size-10 shrink-0 place-items-center rounded-xl text-white"
+        style={{
+          background: positive
+            ? "linear-gradient(135deg, var(--w-mint), var(--w-cyan))"
+            : "linear-gradient(135deg, var(--w-brand-2), var(--w-brand-3))",
+        }}
       >
-        <Icon className="size-4" strokeWidth={1.5} />
+        <Icon className="size-4" strokeWidth={2} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-[var(--w-fg)]">{TX_LABEL[tx.type]}</p>
+        <p className="text-sm font-semibold text-[var(--w-fg)]">{TX_LABEL[tx.type]}</p>
         <p className="truncate text-xs text-[var(--w-muted)]">
           {tx.counterparty ? `${tx.counterparty} · ` : ""}
           {tx.note ?? date.toLocaleString()}
@@ -46,14 +47,14 @@ export function TxRow({ tx }: { tx: WalletTx }) {
       </div>
       <div className="text-right">
         <p
-          className={`font-display text-lg italic ${
-            positive ? "text-[var(--w-accent)]" : "text-[var(--w-fg)]"
+          className={`text-base font-bold tracking-tight ${
+            positive ? "text-[var(--w-mint)]" : "text-[var(--w-fg)]"
           }`}
         >
           {positive ? "+" : "−"}
           {formatMoney(tx.amount)}
         </p>
-        <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--w-muted)]">
           Bal {formatMoney(tx.balanceAfter)}
         </p>
       </div>

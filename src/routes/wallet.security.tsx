@@ -32,55 +32,66 @@ function Inner() {
   };
 
   const regen = () => {
-    if (!confirm("Generating a new token will disconnect the wallet from the site. Continue?"))
+    if (
+      !confirm(
+        "Generating a new token will disconnect the wallet from the site. Continue?",
+      )
+    )
       return;
     if (connectedWalletId === currentAccount.id) disconnectWallet();
     regenerateToken();
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-start gap-3 rounded-2xl border border-[var(--w-accent)]/30 bg-[var(--w-accent)]/5 p-5 text-sm text-[var(--w-fg)]/90">
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-accent)]" strokeWidth={1.4} />
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      <div
+        className="flex items-start gap-3 rounded-2xl border border-[var(--w-border)] p-5 text-sm"
+        style={{
+          background:
+            "linear-gradient(135deg, oklch(0.78 0.15 200 / 0.15), oklch(0.6 0.24 295 / 0.15))",
+        }}
+      >
+        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand-3)]" strokeWidth={2} />
         <div>
-          <p className="font-medium">Demo wallet</p>
+          <p className="font-bold text-[var(--w-fg)]">Demo wallet</p>
           <p className="mt-1 text-[var(--w-muted)]">
-            This is a simulated wallet for exhibition purposes. All data lives in
-            your browser and password storage is not production-grade. Do not use
-            real credentials.
+            Simulated for exhibition purposes. All data lives in your browser
+            and password storage is not production-grade.
           </p>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-6 md:p-8">
-        <h1 className="font-display text-3xl italic">Wallet token</h1>
+      <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--w-fg)]">
+          Wallet token
+        </h1>
         <p className="mt-1 text-sm text-[var(--w-muted)]">
           Paste this token on the site's Connect page to log in to Aethelred.
         </p>
 
-        <div className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/40 px-4 py-4">
-          <code className="truncate font-mono text-base tracking-widest text-[var(--w-accent)]">
+        <div className="mt-5 rounded-2xl border border-[var(--w-border)] bg-[var(--w-input)] p-4">
+          <code className="block break-all font-mono text-base font-semibold tracking-widest text-[var(--w-fg)]">
             {currentAccount.token}
           </code>
-          <div className="flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={copy}
-              className="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-[10px] uppercase tracking-[0.22em] hover:border-[var(--w-accent)]/50 hover:text-[var(--w-accent)]"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
             >
-              {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
-              {copied ? "Copied" : "Copy"}
+              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+              {copied ? "Copied" : "Copy token"}
             </button>
             <button
               onClick={regen}
-              className="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-[10px] uppercase tracking-[0.22em] hover:border-[var(--w-accent)]/50 hover:text-[var(--w-accent)]"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
             >
-              <RefreshCw className="size-3" />
+              <RefreshCw className="size-3.5" />
               Regenerate
             </button>
           </div>
         </div>
 
-        <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
+        <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--w-muted)]">
           Connected to site:{" "}
           <span className="text-[var(--w-fg)]">
             {connectedWalletId === currentAccount.id ? "Yes" : "No"}
@@ -88,19 +99,21 @@ function Inner() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[var(--w-danger)]/30 bg-[var(--w-danger)]/5 p-6 md:p-8">
+      <div className="rounded-3xl border border-[var(--w-danger)]/30 bg-[var(--w-danger)]/5 p-6 md:p-8">
         <div className="flex items-center gap-3">
-          <AlertTriangle className="size-5 text-[var(--w-danger)]" strokeWidth={1.4} />
-          <h2 className="font-display text-2xl italic">Danger zone</h2>
+          <AlertTriangle className="size-5 text-[var(--w-danger)]" strokeWidth={2} />
+          <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">
+            Danger zone
+          </h2>
         </div>
         <p className="mt-2 text-sm text-[var(--w-muted)]">
           Disconnect this wallet from the exhibition site. Your balance and
-          activity stay intact — you can reconnect any time with your token.
+          activity stay intact.
         </p>
         <button
           onClick={() => disconnectWallet()}
           disabled={connectedWalletId !== currentAccount.id}
-          className="mt-5 rounded-lg border border-[var(--w-danger)]/60 bg-[var(--w-danger)]/15 px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] text-[var(--w-danger)] hover:bg-[var(--w-danger)]/25 disabled:opacity-40"
+          className="mt-5 rounded-full border border-[var(--w-danger)]/60 bg-[var(--w-danger)]/15 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[var(--w-danger)] hover:bg-[var(--w-danger)]/25 disabled:opacity-40"
         >
           Disconnect from site
         </button>

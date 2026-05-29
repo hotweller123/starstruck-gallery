@@ -35,31 +35,37 @@ function Inner() {
   const list = filter === "all" ? all : all.filter((t) => t.type === filter);
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-6 md:p-8">
-      <h1 className="font-display text-4xl italic">Activity</h1>
+    <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
+      <h1 className="text-3xl font-extrabold tracking-tight text-[var(--w-fg)]">
+        Activity
+      </h1>
       <p className="mt-1 text-sm text-[var(--w-muted)]">
         Every transaction made with this wallet, including site activity.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {TYPES.map((t) => (
-          <button
-            key={t.value}
-            onClick={() => setFilter(t.value)}
-            className={`rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.22em] transition-colors ${
-              filter === t.value
-                ? "border-[var(--w-accent)] bg-[var(--w-accent)]/15 text-[var(--w-accent)]"
-                : "border-white/10 text-[var(--w-muted)] hover:text-[var(--w-fg)]"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TYPES.map((t) => {
+          const active = filter === t.value;
+          return (
+            <button
+              key={t.value}
+              onClick={() => setFilter(t.value)}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                active
+                  ? "text-white shadow"
+                  : "bg-[var(--w-input)] text-[var(--w-muted)] hover:text-[var(--w-fg)]"
+              }`}
+              style={active ? { background: "var(--w-grad-brand)" } : undefined}
+            >
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-6">
         {list.length === 0 ? (
-          <p className="py-12 text-center text-sm text-[var(--w-muted)]">
+          <p className="py-16 text-center text-sm text-[var(--w-muted)]">
             Nothing here yet.
           </p>
         ) : (
