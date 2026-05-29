@@ -143,7 +143,7 @@ function Dashboard() {
           </h2>
           <Link
             to="/wallet/activity"
-            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--w-brand-2)] hover:underline"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--w-brand)] hover:underline"
           >
             See all
           </Link>
@@ -178,7 +178,7 @@ function Action({
       to={to}
       className="group flex flex-col items-center gap-2 rounded-2xl bg-white/10 px-3 py-4 backdrop-blur transition hover:bg-white/20"
     >
-      <span className="grid size-11 place-items-center rounded-2xl bg-white text-[var(--w-brand-2)] shadow-lg transition group-hover:scale-110">
+      <span className="grid size-11 place-items-center rounded-2xl bg-white text-[var(--w-brand)] shadow-lg transition group-hover:scale-110">
         <Icon className="size-5" strokeWidth={2.2} />
       </span>
       <span className="text-[11px] font-semibold uppercase tracking-wider text-white">

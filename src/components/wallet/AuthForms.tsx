@@ -103,7 +103,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 focus:border-[var(--w-brand-2)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-2)]/30"
+        className="rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand)]/30"
       />
     </label>
   );
