@@ -1,13 +1,9 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "animate.css";
 
 @custom-variant dark (&:is(.dark *));
-
-/*
- * Exhibition design system — Warm Sand palette + Instrument Serif / Work Sans
- * All colors in oklch.
- */
 
 @theme inline {
   --font-display: "Instrument Serif", ui-serif, Georgia, serif;
@@ -46,13 +42,12 @@
 }
 
 :root {
-  /* Warm Sand palette → oklch */
-  --canvas: oklch(0.978 0.008 80);        /* #faf8f5 */
-  --surface: oklch(0.945 0.014 75);       /* #f0ebe3 */
-  --accent: oklch(0.795 0.05 80);         /* #c9b99a */
-  --detail: oklch(0.555 0.04 65);         /* #8b7355 */
-  --ink: oklch(0.305 0.018 60);           /* #3a342d */
-  --clay: oklch(0.57 0.135 38);           /* #a8553a — single warm accent */
+  --canvas: oklch(0.978 0.008 80);
+  --surface: oklch(0.945 0.014 75);
+  --accent: oklch(0.795 0.05 80);
+  --detail: oklch(0.555 0.04 65);
+  --ink: oklch(0.305 0.018 60);
+  --clay: oklch(0.57 0.135 38);
 
   --background: var(--canvas);
   --foreground: var(--ink);
@@ -60,68 +55,42 @@
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
-  html {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    background-color: var(--color-canvas);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-weight: 400;
-  }
-
-  ::selection {
-    background-color: var(--color-clay);
-    color: var(--color-canvas);
-  }
-
-  .font-display {
-    font-family: var(--font-display);
-    font-weight: 400;
-  }
+  * { border-color: var(--color-border); }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { background-color: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); font-weight: 400; }
+  ::selection { background-color: var(--color-clay); color: var(--color-canvas); }
+  .font-display { font-family: var(--font-display); font-weight: 400; }
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
 
-/*
- * Wallet theme — mature, minimal, rounded.
- * Palette: teal + slate, no gradients.
- */
+/* =================================================================
+ * Wallet — dark orange + black. Flat, no gradients.
+ * Inspired by mature fintech (Cash App / Revolut / Phantom).
+ * ================================================================= */
 .wallet-theme {
-  --w-brand: oklch(0.72 0.11 200);
-  --w-brand-hi: oklch(0.79 0.09 196);
-  --w-brand-lo: oklch(0.58 0.1 208);
-  --w-brand-contrast: oklch(0.18 0.02 255);
-  --w-brand-soft: oklch(0.72 0.11 200 / 0.14);
-  --w-grad-brand: var(--w-brand);
-  --w-grad-balance: var(--w-surface-2);
+  --w-brand: oklch(0.62 0.18 45);          /* dark orange */
+  --w-brand-hi: oklch(0.7 0.19 50);
+  --w-brand-lo: oklch(0.5 0.16 40);
+  --w-brand-contrast: oklch(0.07 0 0);
+  --w-brand-soft: oklch(0.62 0.18 45 / 0.16);
+  --w-brand-ring: oklch(0.62 0.18 45 / 0.35);
 
-  --w-pos: oklch(0.74 0.1 180);
-  --w-neg: oklch(0.67 0.13 28);
-  --w-danger: oklch(0.62 0.16 25);
+  --w-pos: oklch(0.78 0.16 145);
+  --w-neg: oklch(0.68 0.18 28);
+  --w-danger: oklch(0.62 0.2 25);
+  --w-info: oklch(0.72 0.12 230);
 
-  --w-bg: oklch(0.21 0.02 255);
-  --w-bg-2: oklch(0.25 0.02 255);
-  --w-surface: oklch(0.27 0.02 255);
-  --w-surface-2: oklch(0.31 0.02 255);
-  --w-fg: oklch(0.97 0.005 220);
-  --w-muted: oklch(0.76 0.01 240);
-  --w-border: oklch(1 0 0 / 0.2);
-  --w-input: oklch(0.23 0.02 255);
-
-  --w-accent: var(--w-brand);
-  --w-accent-2: var(--w-brand-hi);
+  --w-bg: oklch(0.08 0 0);                 /* near-black */
+  --w-bg-2: oklch(0.12 0 0);
+  --w-surface: oklch(0.14 0.005 60);
+  --w-surface-2: oklch(0.17 0.008 50);
+  --w-input: oklch(0.16 0.005 60);
+  --w-fg: oklch(0.98 0 0);
+  --w-muted: oklch(0.66 0.01 60);
+  --w-border: oklch(1 0 0 / 0.08);
+  --w-border-hi: oklch(1 0 0 / 0.16);
 
   background-color: var(--w-bg);
   color: var(--w-fg);
@@ -130,26 +99,52 @@
 }
 
 .wallet-light {
-  --w-bg: oklch(0.97 0.006 220);
-  --w-bg-2: oklch(0.94 0.008 220);
+  --w-brand: oklch(0.58 0.18 42);
+  --w-brand-hi: oklch(0.66 0.19 48);
+  --w-brand-contrast: oklch(1 0 0);
+  --w-brand-soft: oklch(0.58 0.18 42 / 0.12);
+
+  --w-bg: oklch(0.985 0.003 60);
+  --w-bg-2: oklch(0.95 0.005 60);
   --w-surface: oklch(1 0 0);
-  --w-surface-2: oklch(0.965 0.008 220);
-  --w-fg: oklch(0.26 0.02 255);
-  --w-muted: oklch(0.5 0.015 240);
-  --w-border: oklch(0.3 0.02 255 / 0.14);
-  --w-input: oklch(0.955 0.008 220);
+  --w-surface-2: oklch(0.97 0.004 60);
+  --w-input: oklch(0.96 0.005 60);
+  --w-fg: oklch(0.16 0.005 60);
+  --w-muted: oklch(0.48 0.01 60);
+  --w-border: oklch(0.2 0.005 60 / 0.1);
+  --w-border-hi: oklch(0.2 0.005 60 / 0.2);
 }
 
-.wallet-theme .font-display {
-  font-family: var(--font-sans);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  font-style: normal;
+.wallet-theme .font-display { font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.03em; font-style: normal; }
+.wallet-theme ::selection { background: var(--w-brand); color: var(--w-brand-contrast); }
+
+/* Dotted grid background for hero */
+.wallet-dotgrid {
+  background-image: radial-gradient(circle at 1px 1px, var(--w-border-hi) 1px, transparent 0);
+  background-size: 22px 22px;
 }
-.wallet-theme ::selection {
-  background: var(--w-brand);
-  color: var(--w-brand-contrast);
+
+/* Subtle glow ring used on featured cards (single-color, no gradient) */
+.wallet-ring {
+  box-shadow:
+    0 0 0 1px var(--w-border),
+    0 24px 60px -28px oklch(0.62 0.18 45 / 0.55);
 }
-.wallet-grad-text {
-  color: var(--w-brand);
+
+/* Marquee */
+@keyframes w-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
+.wallet-marquee { animation: w-marquee 28s linear infinite; }
+
+/* Subtle pulse for the live dot */
+@keyframes w-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--w-brand-ring); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+.wallet-live-dot { animation: w-pulse 1.8s ease-out infinite; background: var(--w-brand); }
+
+/* Hide scrollbar on horizontal scrollers */
+.wallet-hscroll::-webkit-scrollbar { display: none; }
+.wallet-hscroll { scrollbar-width: none; }
