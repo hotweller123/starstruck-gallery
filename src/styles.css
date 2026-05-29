@@ -70,27 +70,28 @@
  * Inspired by mature fintech (Cash App / Revolut / Phantom).
  * ================================================================= */
 .wallet-theme {
-  --w-brand: oklch(0.62 0.18 45);          /* dark orange */
-  --w-brand-hi: oklch(0.7 0.19 50);
-  --w-brand-lo: oklch(0.5 0.16 40);
-  --w-brand-contrast: oklch(0.07 0 0);
-  --w-brand-soft: oklch(0.62 0.18 45 / 0.16);
-  --w-brand-ring: oklch(0.62 0.18 45 / 0.35);
+  /* Yellow accent on dark blue, with cool grey + white */
+  --w-brand: oklch(0.88 0.17 95);
+  --w-brand-hi: oklch(0.93 0.16 98);
+  --w-brand-lo: oklch(0.8 0.16 90);
+  --w-brand-contrast: oklch(0.2 0.05 260);
+  --w-brand-soft: oklch(0.88 0.17 95 / 0.16);
+  --w-brand-ring: oklch(0.88 0.17 95 / 0.4);
 
-  --w-pos: oklch(0.78 0.16 145);
-  --w-neg: oklch(0.68 0.18 28);
-  --w-danger: oklch(0.62 0.2 25);
-  --w-info: oklch(0.72 0.12 230);
+  --w-pos: oklch(0.82 0.14 150);
+  --w-neg: oklch(0.7 0.16 25);
+  --w-danger: oklch(0.64 0.2 25);
+  --w-info: oklch(0.78 0.12 230);
 
-  --w-bg: oklch(0.08 0 0);                 /* near-black */
-  --w-bg-2: oklch(0.12 0 0);
-  --w-surface: oklch(0.14 0.005 60);
-  --w-surface-2: oklch(0.17 0.008 50);
-  --w-input: oklch(0.16 0.005 60);
-  --w-fg: oklch(0.98 0 0);
-  --w-muted: oklch(0.66 0.01 60);
-  --w-border: oklch(1 0 0 / 0.08);
-  --w-border-hi: oklch(1 0 0 / 0.16);
+  --w-bg: oklch(0.2 0.045 260);
+  --w-bg-2: oklch(0.25 0.045 260);
+  --w-surface: oklch(0.28 0.04 258);
+  --w-surface-2: oklch(0.33 0.038 256);
+  --w-input: oklch(0.3 0.035 258);
+  --w-fg: oklch(0.985 0.005 250);
+  --w-muted: oklch(0.78 0.02 255);
+  --w-border: oklch(0.88 0.02 250 / 0.14);
+  --w-border-hi: oklch(0.92 0.02 250 / 0.24);
 
   background-color: var(--w-bg);
   color: var(--w-fg);
