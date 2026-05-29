@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -22,7 +22,8 @@ export const Route = createFileRoute("/wallet")({
 });
 
 function WalletDashboard() {
-  const isExact = Route.useMatch({ select: (match) => match.pathname === "/wallet" });
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isExact = pathname === "/wallet";
 
   return (
     <WalletShell>
