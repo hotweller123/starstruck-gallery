@@ -11,8 +11,6 @@ import {
   LogOut,
   Wallet as WalletIcon,
   ArrowUpRight,
-  Sun,
-  Moon,
   Copy,
   Check,
   Bell,
@@ -21,8 +19,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useWallet } from "@/lib/wallet";
-import { useWalletTheme } from "@/lib/wallet-theme";
 import { AuthForms } from "./AuthForms";
+
 
 const nav: ReadonlyArray<{
   to: string;
