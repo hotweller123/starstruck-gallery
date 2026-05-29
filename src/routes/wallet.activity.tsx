@@ -20,11 +20,7 @@ const TYPES: Array<{ value: TxType | "all"; label: string }> = [
 ];
 
 function ActivityPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
