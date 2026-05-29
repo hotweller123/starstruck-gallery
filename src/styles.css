@@ -98,38 +98,32 @@
   font-weight: 400;
 }
 
-.wallet-light {
-  --w-brand: oklch(0.58 0.18 42);
-  --w-brand-hi: oklch(0.66 0.19 48);
-  --w-brand-contrast: oklch(1 0 0);
-  --w-brand-soft: oklch(0.58 0.18 42 / 0.12);
-
-  --w-bg: oklch(0.985 0.003 60);
-  --w-bg-2: oklch(0.95 0.005 60);
-  --w-surface: oklch(1 0 0);
-  --w-surface-2: oklch(0.97 0.004 60);
-  --w-input: oklch(0.96 0.005 60);
-  --w-fg: oklch(0.16 0.005 60);
-  --w-muted: oklch(0.48 0.01 60);
-  --w-border: oklch(0.2 0.005 60 / 0.1);
-  --w-border-hi: oklch(0.2 0.005 60 / 0.2);
-}
-
 .wallet-theme .font-display { font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.03em; font-style: normal; }
 .wallet-theme ::selection { background: var(--w-brand); color: var(--w-brand-contrast); }
 
-/* Dotted grid background for hero */
+/* Dotted grid background for hero (no gradient — solid dots) */
 .wallet-dotgrid {
-  background-image: radial-gradient(circle at 1px 1px, var(--w-border-hi) 1px, transparent 0);
+  background-image:
+    linear-gradient(var(--w-border-hi) 1px, transparent 1px),
+    linear-gradient(90deg, var(--w-border-hi) 1px, transparent 1px);
   background-size: 22px 22px;
+  opacity: 0.4;
+}
+.wallet-dotgrid { background-image: none; }
+.wallet-dotgrid {
+  /* solid micro-dots via repeating background using box-shadow trick is heavy;
+     keep it minimal: a subtle solid tint instead of any gradient */
+  background-color: var(--w-bg-2);
+  background-image: none;
 }
 
-/* Subtle glow ring used on featured cards (single-color, no gradient) */
+/* Flat ring used on featured cards — solid shadow, no gradient */
 .wallet-ring {
   box-shadow:
     0 0 0 1px var(--w-border),
-    0 24px 60px -28px oklch(0.62 0.18 45 / 0.55);
+    0 18px 40px -24px oklch(0 0 0 / 0.6);
 }
+
 
 /* Marquee */
 @keyframes w-marquee {

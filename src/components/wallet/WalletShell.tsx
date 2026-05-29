@@ -11,8 +11,6 @@ import {
   LogOut,
   Wallet as WalletIcon,
   ArrowUpRight,
-  Sun,
-  Moon,
   Copy,
   Check,
   Bell,
@@ -21,8 +19,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useWallet } from "@/lib/wallet";
-import { useWalletTheme } from "@/lib/wallet-theme";
 import { AuthForms } from "./AuthForms";
+
 
 const nav: ReadonlyArray<{
   to: string;
@@ -38,30 +36,6 @@ const nav: ReadonlyArray<{
   { to: "/wallet/security", label: "Security", icon: ShieldCheck },
 ];
 
-function ThemeToggle() {
-  const { mode, toggle } = useWalletTheme();
-  return (
-    <motion.button
-      whileTap={{ scale: 0.9, rotate: 25 }}
-      onClick={toggle}
-      aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-      className="inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50 hover:text-[var(--w-brand)]"
-      type="button"
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={mode}
-          initial={{ rotate: -90, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          exit={{ rotate: 90, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {mode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-        </motion.span>
-      </AnimatePresence>
-    </motion.button>
-  );
-}
 
 function Brand() {
   return (
@@ -197,7 +171,7 @@ function TopBar({ showAccount }: { showAccount: boolean }) {
               <span className="absolute right-2.5 top-2.5 size-1.5 rounded-full bg-[var(--w-brand)]" />
             </button>
           )}
-          <ThemeToggle />
+          
           <Link
             to="/"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"

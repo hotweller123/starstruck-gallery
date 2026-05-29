@@ -14,7 +14,7 @@ import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
-import { WalletThemeProvider, useWalletTheme } from "@/lib/wallet-theme";
+
 
 function NotFoundComponent() {
   return (
@@ -147,34 +147,22 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <WalletProvider>
-          <WalletThemeProvider>
-            {isWallet ? (
-              <WalletRoot>
+          {isWallet ? (
+            <div className="wallet-theme flex min-h-screen flex-col">
+              <Outlet />
+            </div>
+          ) : (
+            <div className="flex min-h-screen flex-col bg-canvas">
+              <MegaNav />
+              <main className="flex-1">
                 <Outlet />
-              </WalletRoot>
-            ) : (
-              <div className="flex min-h-screen flex-col bg-canvas">
-                <MegaNav />
-                <main className="flex-1">
-                  <Outlet />
-                </main>
-                <Footer />
-              </div>
-            )}
-          </WalletThemeProvider>
+              </main>
+              <Footer />
+            </div>
+          )}
         </WalletProvider>
       </StoreProvider>
     </QueryClientProvider>
   );
 }
 
-function WalletRoot({ children }: { children: React.ReactNode }) {
-  const { mode } = useWalletTheme();
-  return (
-    <div
-      className={`wallet-theme ${mode === "light" ? "wallet-light" : ""} flex min-h-screen flex-col`}
-    >
-      {children}
-    </div>
-  );
-}
