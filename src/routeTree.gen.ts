@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FavouritesRouteImport } from './routes/favourites'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as BidsRouteImport } from './routes/bids'
 import { Route as AboutRouteImport } from './routes/about'
@@ -21,11 +23,21 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as AuctionsIndexRouteImport } from './routes/auctions.index'
 import { Route as ArtistsIndexRouteImport } from './routes/artists.index'
+import { Route as WalletWithdrawRouteImport } from './routes/wallet.withdraw'
+import { Route as WalletSendRouteImport } from './routes/wallet.send'
+import { Route as WalletSecurityRouteImport } from './routes/wallet.security'
+import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
+import { Route as WalletActivityRouteImport } from './routes/wallet.activity'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
@@ -49,6 +61,11 @@ const FavouritesRoute = FavouritesRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -86,6 +103,31 @@ const ArtistsIndexRoute = ArtistsIndexRouteImport.update({
   path: '/artists/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WalletWithdrawRoute = WalletWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletSendRoute = WalletSendRouteImport.update({
+  id: '/send',
+  path: '/send',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletSecurityRoute = WalletSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletDepositRoute = WalletDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletActivityRoute = WalletActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => WalletRoute,
+} as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   id: '/categories/$slug',
   path: '/categories/$slug',
@@ -112,15 +154,22 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/wallet/activity': typeof WalletActivityRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/security': typeof WalletSecurityRoute
+  '/wallet/send': typeof WalletSendRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
   '/artists/': typeof ArtistsIndexRoute
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -130,15 +179,22 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/wallet/activity': typeof WalletActivityRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/security': typeof WalletSecurityRoute
+  '/wallet/send': typeof WalletSendRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
   '/artists': typeof ArtistsIndexRoute
   '/auctions': typeof AuctionsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -149,15 +205,22 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/wallet/activity': typeof WalletActivityRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/security': typeof WalletSecurityRoute
+  '/wallet/send': typeof WalletSendRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
   '/artists/': typeof ArtistsIndexRoute
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -169,15 +232,22 @@ export interface FileRouteTypes {
     | '/about'
     | '/bids'
     | '/cart'
+    | '/connect'
     | '/contact'
     | '/favourites'
     | '/gallery'
     | '/profile'
     | '/sell'
+    | '/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
     | '/categories/$slug'
+    | '/wallet/activity'
+    | '/wallet/deposit'
+    | '/wallet/security'
+    | '/wallet/send'
+    | '/wallet/withdraw'
     | '/artists/'
     | '/auctions/'
     | '/categories/'
@@ -187,15 +257,22 @@ export interface FileRouteTypes {
     | '/about'
     | '/bids'
     | '/cart'
+    | '/connect'
     | '/contact'
     | '/favourites'
     | '/gallery'
     | '/profile'
     | '/sell'
+    | '/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
     | '/categories/$slug'
+    | '/wallet/activity'
+    | '/wallet/deposit'
+    | '/wallet/security'
+    | '/wallet/send'
+    | '/wallet/withdraw'
     | '/artists'
     | '/auctions'
     | '/categories'
@@ -205,15 +282,22 @@ export interface FileRouteTypes {
     | '/about'
     | '/bids'
     | '/cart'
+    | '/connect'
     | '/contact'
     | '/favourites'
     | '/gallery'
     | '/profile'
     | '/sell'
+    | '/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
     | '/categories/$slug'
+    | '/wallet/activity'
+    | '/wallet/deposit'
+    | '/wallet/security'
+    | '/wallet/send'
+    | '/wallet/withdraw'
     | '/artists/'
     | '/auctions/'
     | '/categories/'
@@ -224,11 +308,13 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   BidsRoute: typeof BidsRoute
   CartRoute: typeof CartRoute
+  ConnectRoute: typeof ConnectRoute
   ContactRoute: typeof ContactRoute
   FavouritesRoute: typeof FavouritesRoute
   GalleryRoute: typeof GalleryRoute
   ProfileRoute: typeof ProfileRoute
   SellRoute: typeof SellRoute
+  WalletRoute: typeof WalletRouteWithChildren
   ArtistsSlugRoute: typeof ArtistsSlugRoute
   ArtworksSlugRoute: typeof ArtworksSlugRoute
   AuctionsSlugRoute: typeof AuctionsSlugRoute
@@ -240,6 +326,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sell': {
       id: '/sell'
       path: '/sell'
@@ -273,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -324,6 +424,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wallet/withdraw': {
+      id: '/wallet/withdraw'
+      path: '/withdraw'
+      fullPath: '/wallet/withdraw'
+      preLoaderRoute: typeof WalletWithdrawRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/send': {
+      id: '/wallet/send'
+      path: '/send'
+      fullPath: '/wallet/send'
+      preLoaderRoute: typeof WalletSendRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/security': {
+      id: '/wallet/security'
+      path: '/security'
+      fullPath: '/wallet/security'
+      preLoaderRoute: typeof WalletSecurityRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/deposit': {
+      id: '/wallet/deposit'
+      path: '/deposit'
+      fullPath: '/wallet/deposit'
+      preLoaderRoute: typeof WalletDepositRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/activity': {
+      id: '/wallet/activity'
+      path: '/activity'
+      fullPath: '/wallet/activity'
+      preLoaderRoute: typeof WalletActivityRouteImport
+      parentRoute: typeof WalletRoute
+    }
     '/categories/$slug': {
       id: '/categories/$slug'
       path: '/categories/$slug'
@@ -355,16 +490,37 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface WalletRouteChildren {
+  WalletActivityRoute: typeof WalletActivityRoute
+  WalletDepositRoute: typeof WalletDepositRoute
+  WalletSecurityRoute: typeof WalletSecurityRoute
+  WalletSendRoute: typeof WalletSendRoute
+  WalletWithdrawRoute: typeof WalletWithdrawRoute
+}
+
+const WalletRouteChildren: WalletRouteChildren = {
+  WalletActivityRoute: WalletActivityRoute,
+  WalletDepositRoute: WalletDepositRoute,
+  WalletSecurityRoute: WalletSecurityRoute,
+  WalletSendRoute: WalletSendRoute,
+  WalletWithdrawRoute: WalletWithdrawRoute,
+}
+
+const WalletRouteWithChildren =
+  WalletRoute._addFileChildren(WalletRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BidsRoute: BidsRoute,
   CartRoute: CartRoute,
+  ConnectRoute: ConnectRoute,
   ContactRoute: ContactRoute,
   FavouritesRoute: FavouritesRoute,
   GalleryRoute: GalleryRoute,
   ProfileRoute: ProfileRoute,
   SellRoute: SellRoute,
+  WalletRoute: WalletRouteWithChildren,
   ArtistsSlugRoute: ArtistsSlugRoute,
   ArtworksSlugRoute: ArtworksSlugRoute,
   AuctionsSlugRoute: AuctionsSlugRoute,
@@ -376,3 +532,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
