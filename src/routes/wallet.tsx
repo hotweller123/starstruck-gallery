@@ -133,7 +133,7 @@ function Dashboard() {
       </div>
 
       {/* Recent activity */}
-      <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-5 md:p-7">
+      <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-5 md:p-7">
         <div className="flex items-baseline justify-between">
           <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">
             Recent activity
@@ -197,7 +197,7 @@ function Stat({
   tint: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] p-4">
+    <div className="rounded-[1.4rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-4">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--w-muted)]">
           {label}
