@@ -94,25 +94,37 @@
   scrollbar-width: none;
 }
 
-/* Wallet theme — scoped, banking-app dark + brass */
+/* Wallet theme — standalone fintech: onyx black + electric violet */
 .wallet-theme {
-  --w-bg: oklch(0.18 0.025 175);          /* deep teal-black */
-  --w-surface: oklch(0.235 0.03 175);     /* lifted card */
-  --w-surface-2: oklch(0.28 0.035 170);
-  --w-fg: oklch(0.96 0.012 90);           /* warm white */
-  --w-muted: oklch(0.7 0.02 170);
-  --w-primary: oklch(0.62 0.13 165);      /* emerald */
-  --w-accent: oklch(0.82 0.13 85);        /* brass / gold */
-  --w-danger: oklch(0.68 0.16 25);
+  --w-bg: oklch(0.135 0.005 280);         /* near-black with violet undertone */
+  --w-surface: oklch(0.185 0.012 280);    /* lifted card */
+  --w-surface-2: oklch(0.235 0.018 280);
+  --w-fg: oklch(0.97 0.003 280);          /* near-white */
+  --w-muted: oklch(0.64 0.015 280);
+  --w-primary: oklch(0.62 0.2 295);       /* deep violet */
+  --w-accent: oklch(0.74 0.17 295);       /* electric violet */
+  --w-accent-2: oklch(0.78 0.13 205);     /* cyan secondary */
+  --w-danger: oklch(0.66 0.2 22);
   --w-grad-balance: radial-gradient(
       120% 140% at 0% 0%,
-      oklch(0.55 0.14 165 / 0.55),
+      oklch(0.55 0.22 295 / 0.55),
       transparent 55%
     ),
-    linear-gradient(135deg, oklch(0.28 0.05 175), oklch(0.22 0.04 180));
+    radial-gradient(
+      100% 120% at 100% 100%,
+      oklch(0.5 0.18 220 / 0.35),
+      transparent 60%
+    ),
+    linear-gradient(135deg, oklch(0.22 0.04 285), oklch(0.16 0.02 280));
+  background-color: var(--w-bg);
   color: var(--w-fg);
   font-family: var(--font-sans);
 }
 .wallet-theme .font-display {
   font-family: var(--font-display);
+}
+/* Selection inside wallet should use the violet accent */
+.wallet-theme ::selection {
+  background-color: var(--w-accent);
+  color: oklch(0.12 0 0);
 }

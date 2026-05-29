@@ -76,6 +76,9 @@ export function Footer() {
             <a href="#" className="text-sm text-detail hover:text-ink">
               Journal
             </a>
+            <Link to="/wallet" className="mt-2 inline-flex items-center gap-1 text-sm text-clay hover:underline">
+              Aethelred Pay ↗
+            </Link>
           </div>
         </div>
       </div>

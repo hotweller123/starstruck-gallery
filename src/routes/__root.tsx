@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -138,18 +139,26 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isWallet = pathname === "/wallet" || pathname.startsWith("/wallet/");
 
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <WalletProvider>
-          <div className="flex min-h-screen flex-col bg-canvas">
-            <MegaNav />
-            <main className="flex-1">
+          {isWallet ? (
+            <div className="wallet-theme flex min-h-screen flex-col">
               <Outlet />
-            </main>
-            <Footer />
-          </div>
+            </div>
+          ) : (
+            <div className="flex min-h-screen flex-col bg-canvas">
+              <MegaNav />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+          )}
         </WalletProvider>
       </StoreProvider>
     </QueryClientProvider>
