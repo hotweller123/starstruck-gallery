@@ -45,6 +45,7 @@ function FavouritesPage() {
           </div>
         )}
       </section>
-    </>
+      </>
+    </WalletGate>
   );
 }
