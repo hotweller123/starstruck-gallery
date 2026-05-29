@@ -36,30 +36,6 @@ const nav: ReadonlyArray<{
   { to: "/wallet/security", label: "Security", icon: ShieldCheck },
 ];
 
-function ThemeToggle() {
-  const { mode, toggle } = useWalletTheme();
-  return (
-    <motion.button
-      whileTap={{ scale: 0.9, rotate: 25 }}
-      onClick={toggle}
-      aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-      className="inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50 hover:text-[var(--w-brand)]"
-      type="button"
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={mode}
-          initial={{ rotate: -90, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          exit={{ rotate: 90, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {mode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-        </motion.span>
-      </AnimatePresence>
-    </motion.button>
-  );
-}
 
 function Brand() {
   return (
