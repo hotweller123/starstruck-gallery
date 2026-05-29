@@ -22,68 +22,57 @@ export function AuthForms() {
   };
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-7 shadow-2xl shadow-black/40">
-      <div className="flex gap-1 rounded-lg bg-black/30 p-1">
-        {(["register", "signin"] as const).map((m) => (
+    <div className="relative">
+      <div
+        className="absolute -inset-1 rounded-3xl opacity-50 blur-2xl"
+        style={{ background: "var(--w-grad-brand)" }}
+        aria-hidden
+      />
+      <div className="relative rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl">
+        <div className="flex gap-1 rounded-full bg-[var(--w-input)] p-1">
+          {(["register", "signin"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={`flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition ${
+                mode === m
+                  ? "text-white shadow"
+                  : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
+              }`}
+              style={mode === m ? { background: "var(--w-grad-brand)" } : undefined}
+            >
+              {m === "register" ? "Create wallet" : "Sign in"}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+          {mode === "register" && (
+            <Field label="Full name" value={name} onChange={setName} placeholder="Eloise Marchand" required />
+          )}
+          <Field label="Email" type="email" value={email} onChange={setEmail} placeholder="you@aethelred.gallery" required />
+          <Field label="Password" type="password" value={password} onChange={setPassword} placeholder="At least 6 characters" required />
+
+          {error && (
+            <p className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)]">
+              {error}
+            </p>
+          )}
+
           <button
-            key={m}
-            type="button"
-            onClick={() => setMode(m)}
-            className={`flex-1 rounded-md px-3 py-2 text-[11px] uppercase tracking-[0.22em] transition-colors ${
-              mode === m
-                ? "bg-[var(--w-accent)] text-black"
-                : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
-            }`}
+            type="submit"
+            className="mt-2 rounded-full px-5 py-3.5 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02]"
+            style={{ background: "var(--w-grad-brand)" }}
           >
-            {m === "register" ? "Create wallet" : "Sign in"}
+            {mode === "register" ? "Create my wallet" : "Sign in"}
           </button>
-        ))}
+        </form>
+
+        <p className="mt-5 text-center text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--w-muted)]">
+          Demo wallet · data stored locally
+        </p>
       </div>
-
-      <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
-        {mode === "register" && (
-          <Field
-            label="Full name"
-            value={name}
-            onChange={setName}
-            placeholder="Eloise Marchand"
-            required
-          />
-        )}
-        <Field
-          label="Email"
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder="you@aethelred.gallery"
-          required
-        />
-        <Field
-          label="Password"
-          type="password"
-          value={password}
-          onChange={setPassword}
-          placeholder="At least 6 characters"
-          required
-        />
-
-        {error && (
-          <p className="rounded-md border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)]">
-            {error}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className="mt-2 rounded-lg bg-[var(--w-accent)] px-5 py-3 text-[11px] uppercase tracking-[0.22em] text-black hover:brightness-110"
-        >
-          {mode === "register" ? "Create my wallet" : "Sign in"}
-        </button>
-      </form>
-
-      <p className="mt-5 text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
-        Demo wallet · data stored locally in this browser
-      </p>
     </div>
   );
 }
@@ -105,7 +94,7 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--w-muted)]">
         {label}
       </span>
       <input
@@ -114,7 +103,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/50 focus:border-[var(--w-accent)] focus:outline-none"
+        className="rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 focus:border-[var(--w-brand-2)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-2)]/30"
       />
     </label>
   );

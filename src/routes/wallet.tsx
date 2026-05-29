@@ -7,6 +7,9 @@ import {
   EyeOff,
   Copy,
   Check,
+  TrendingUp,
+  TrendingDown,
+  ShoppingBag,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { WalletShell } from "@/components/wallet/WalletShell";
@@ -28,7 +31,7 @@ function WalletDashboard() {
 
 function Dashboard() {
   const { currentAccount, txsFor } = useWallet();
-  const [showToken, setShowToken] = useState(false);
+  const [showBal, setShowBal] = useState(true);
   const [copied, setCopied] = useState(false);
   if (!currentAccount) return null;
 
@@ -54,92 +57,106 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {/* Balance card */}
       <div
-        className="relative overflow-hidden rounded-2xl border border-white/5 p-7 md:p-10"
+        className="relative overflow-hidden rounded-3xl p-7 text-white shadow-2xl md:p-9"
         style={{ background: "var(--w-grad-balance)" }}
       >
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--w-muted)]">
+        <div className="absolute -right-12 -top-12 size-56 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-16 -left-10 size-56 rounded-full bg-white/10 blur-3xl" />
+
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
               Total balance
             </p>
-            <p className="mt-3 font-display text-6xl italic text-[var(--w-fg)] md:text-7xl">
-              {formatMoney(currentAccount.balance)}
-            </p>
-            <p className="mt-2 text-xs text-[var(--w-muted)]">
-              {currentAccount.email}
-            </p>
+            <button
+              onClick={() => setShowBal((v) => !v)}
+              className="mt-3 flex items-center gap-3 text-left"
+            >
+              <span className="text-5xl font-extrabold tracking-tight md:text-6xl">
+                {showBal ? formatMoney(currentAccount.balance) : "••••••"}
+              </span>
+              <span className="grid size-7 place-items-center rounded-full bg-white/15 text-white/90">
+                {showBal ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+              </span>
+            </button>
+            <p className="mt-2 text-xs text-white/70">{currentAccount.email}</p>
           </div>
-          <span className="rounded-full border border-[var(--w-accent)]/40 bg-[var(--w-accent)]/15 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-[var(--w-accent)]">
-            Aethelred · USD
-          </span>
         </div>
 
-        {/* Quick actions */}
-        <div className="mt-8 grid grid-cols-2 gap-2 md:grid-cols-4">
-          <QuickAction to="/wallet/deposit" icon={ArrowDownToLine} label="Deposit" />
-          <QuickAction to="/wallet/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
-          <QuickAction to="/wallet/send" icon={Send} label="Send" />
-          <button
-            onClick={() => setShowToken((v) => !v)}
-            className="group flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-[11px] uppercase tracking-[0.22em] text-[var(--w-fg)] hover:border-[var(--w-accent)]/50 hover:text-[var(--w-accent)]"
-          >
-            {showToken ? (
-              <EyeOff className="size-3.5" strokeWidth={1.5} />
-            ) : (
-              <Eye className="size-3.5" strokeWidth={1.5} />
-            )}
-            Token
-          </button>
-        </div>
-
-        {showToken && (
-          <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/40 px-4 py-3">
-            <code className="truncate font-mono text-sm tracking-wider text-[var(--w-accent)]">
+        {/* Token chip */}
+        <button
+          onClick={copy}
+          className="relative mt-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left backdrop-blur transition hover:bg-white/15"
+        >
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/70">
+              Your token
+            </p>
+            <code className="truncate font-mono text-sm font-semibold tracking-wider text-white">
               {currentAccount.token}
             </code>
-            <button
-              onClick={copy}
-              className="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-[var(--w-fg)]/80 hover:text-[var(--w-accent)]"
-            >
-              {copied ? (
-                <Check className="size-3" strokeWidth={2} />
-              ) : (
-                <Copy className="size-3" strokeWidth={1.5} />
-              )}
-              {copied ? "Copied" : "Copy"}
-            </button>
           </div>
-        )}
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">
+            {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+            {copied ? "Copied" : "Copy"}
+          </span>
+        </button>
+
+        {/* Action row */}
+        <div className="relative mt-5 grid grid-cols-3 gap-2">
+          <Action to="/wallet/deposit" icon={ArrowDownToLine} label="Deposit" />
+          <Action to="/wallet/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
+          <Action to="/wallet/send" icon={Send} label="Send" />
+        </div>
       </div>
 
       {/* Stat tiles */}
-      <div className="grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 md:grid-cols-3">
-        <Stat label="Total deposited" value={stats.deposited} positive />
-        <Stat label="Total withdrawn" value={stats.withdrawn} />
-        <Stat label="Spent on site" value={stats.spent} />
+      <div className="grid grid-cols-3 gap-3">
+        <Stat
+          label="Deposited"
+          value={stats.deposited}
+          icon={TrendingUp}
+          tint="var(--w-mint)"
+        />
+        <Stat
+          label="Withdrawn"
+          value={stats.withdrawn}
+          icon={TrendingDown}
+          tint="var(--w-amber)"
+        />
+        <Stat
+          label="Spent"
+          value={stats.spent}
+          icon={ShoppingBag}
+          tint="var(--w-brand-2)"
+        />
       </div>
 
       {/* Recent activity */}
-      <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-6">
+      <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-5 md:p-7">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-2xl italic">Recent activity</h2>
+          <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">
+            Recent activity
+          </h2>
           <Link
             to="/wallet/activity"
-            className="text-[11px] uppercase tracking-[0.22em] text-[var(--w-muted)] hover:text-[var(--w-accent)]"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--w-brand-2)] hover:underline"
           >
-            See all →
+            See all
           </Link>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           {txs.length === 0 ? (
-            <p className="py-10 text-center text-sm text-[var(--w-muted)]">
-              No activity yet. Make your first deposit to get started.
-            </p>
+            <div className="py-12 text-center">
+              <p className="text-sm text-[var(--w-muted)]">
+                No activity yet. Tap Deposit to get started.
+              </p>
+            </div>
           ) : (
-            txs.slice(0, 8).map((t) => <TxRow key={t.id} tx={t} />)
+            txs.slice(0, 6).map((t) => <TxRow key={t.id} tx={t} />)
           )}
         </div>
       </div>
@@ -147,7 +164,7 @@ function Dashboard() {
   );
 }
 
-function QuickAction({
+function Action({
   to,
   icon: Icon,
   label,
@@ -159,10 +176,14 @@ function QuickAction({
   return (
     <Link
       to={to}
-      className="group flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-[11px] uppercase tracking-[0.22em] text-[var(--w-fg)] hover:border-[var(--w-accent)]/50 hover:text-[var(--w-accent)]"
+      className="group flex flex-col items-center gap-2 rounded-2xl bg-white/10 px-3 py-4 backdrop-blur transition hover:bg-white/20"
     >
-      <Icon className="size-3.5" strokeWidth={1.5} />
-      {label}
+      <span className="grid size-11 place-items-center rounded-2xl bg-white text-[var(--w-brand-2)] shadow-lg transition group-hover:scale-110">
+        <Icon className="size-5" strokeWidth={2.2} />
+      </span>
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-white">
+        {label}
+      </span>
     </Link>
   );
 }
@@ -170,22 +191,28 @@ function QuickAction({
 function Stat({
   label,
   value,
-  positive,
+  icon: Icon,
+  tint,
 }: {
   label: string;
   value: number;
-  positive?: boolean;
+  icon: typeof TrendingUp;
+  tint: string;
 }) {
   return (
-    <div className="bg-[var(--w-surface)] p-5">
-      <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
-        {label}
-      </p>
-      <p
-        className={`mt-2 font-display text-3xl italic ${
-          positive ? "text-[var(--w-accent)]" : "text-[var(--w-fg)]"
-        }`}
-      >
+    <div className="rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--w-muted)]">
+          {label}
+        </p>
+        <span
+          className="grid size-7 place-items-center rounded-lg text-white"
+          style={{ backgroundColor: tint }}
+        >
+          <Icon className="size-3.5" strokeWidth={2.2} />
+        </span>
+      </div>
+      <p className="mt-2 text-xl font-bold tracking-tight text-[var(--w-fg)]">
         {formatMoney(value)}
       </p>
     </div>
