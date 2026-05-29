@@ -14,14 +14,20 @@ import {
 import { useWallet, formatMoney } from "@/lib/wallet";
 import { AuthForms } from "./AuthForms";
 
-const nav = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+};
+const nav: NavItem[] = [
   { to: "/wallet", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/wallet/deposit", label: "Deposit", icon: ArrowDownToLine },
   { to: "/wallet/withdraw", label: "Withdraw", icon: ArrowUpFromLine },
   { to: "/wallet/send", label: "Send", icon: Send },
   { to: "/wallet/activity", label: "Activity", icon: ListOrdered },
   { to: "/wallet/security", label: "Security", icon: ShieldCheck },
-] as const;
+];
 
 export function WalletShell({ children }: { children: ReactNode }) {
   const { signedIn, currentAccount, signOut } = useWallet();
