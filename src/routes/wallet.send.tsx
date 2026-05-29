@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { Send } from "lucide-react";
+import { Send, CheckCircle2 } from "lucide-react";
 import { WalletShell } from "@/components/wallet/WalletShell";
+import { FormPage, WAmount, WInput, WSubmit } from "@/components/wallet/FormPage";
 import { useWallet, formatMoney } from "@/lib/wallet";
 
 export const Route = createFileRoute("/wallet/send")({
@@ -35,97 +36,75 @@ function Inner() {
 
   if (done !== null) {
     return (
-      <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-10 text-center">
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--w-accent)]/15 text-[var(--w-accent)]">
-          <Send className="size-6" strokeWidth={1.4} />
-        </span>
-        <h1 className="mt-6 font-display text-4xl italic">
-          {formatMoney(done)} sent
-        </h1>
-        <p className="mt-2 text-sm text-[var(--w-muted)]">
-          New balance {formatMoney(currentAccount?.balance ?? 0)}
-        </p>
-        <Link
-          to="/wallet"
-          className="mt-6 inline-block rounded-lg bg-[var(--w-accent)] px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] text-black hover:brightness-110"
-        >
-          Back to dashboard
-        </Link>
+      <div className="mx-auto max-w-md text-center">
+        <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-10 shadow-xl">
+          <span
+            className="mx-auto grid size-16 place-items-center rounded-full text-white shadow-lg"
+            style={{ background: "var(--w-grad-brand)" }}
+          >
+            <CheckCircle2 className="size-8" strokeWidth={2} />
+          </span>
+          <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
+            {formatMoney(done)} sent
+          </h1>
+          <p className="mt-2 text-sm text-[var(--w-muted)]">
+            New balance {formatMoney(currentAccount?.balance ?? 0)}
+          </p>
+          <Link
+            to="/wallet"
+            className="mt-6 inline-block w-full rounded-2xl px-6 py-3.5 text-sm font-bold text-white shadow-lg"
+            style={{ background: "var(--w-grad-brand)" }}
+          >
+            Back to wallet
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[var(--w-surface)] p-6 md:p-8">
-      <h1 className="font-display text-4xl italic">Send funds</h1>
-      <p className="mt-1 text-sm text-[var(--w-muted)]">
-        Transfer to another Aethelred wallet using its token.
-      </p>
+    <FormPage
+      title="Send funds"
+      subtitle="Transfer to another Aethelred wallet using its token"
+      icon={<Send className="size-6" strokeWidth={2.2} />}
+    >
+      <form onSubmit={submit} className="flex flex-col gap-5">
+        <WInput
+          label="Recipient token"
+          required
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          placeholder="AET-XXXX-XXXX-XXXX"
+          className="font-mono tracking-wider"
+        />
 
-      <form onSubmit={submit} className="mt-8 flex flex-col gap-6">
-        <Field label="Recipient token">
-          <input
-            required
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="AET-XXXX-XXXX-XXXX"
-            className="w-full rounded-lg border border-white/10 bg-black/30 px-4 py-3 font-mono text-sm tracking-wider focus:border-[var(--w-accent)] focus:outline-none"
-          />
-        </Field>
-
-        <Field label="Amount">
-          <div className="flex items-center rounded-lg border border-white/10 bg-black/30">
-            <span className="px-4 text-lg text-[var(--w-muted)]">$</span>
-            <input
-              type="number"
-              min={1}
-              max={currentAccount?.balance ?? 0}
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              className="w-full bg-transparent py-3 pr-4 font-display text-2xl italic focus:outline-none"
-            />
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--w-muted)]">
+            Amount
+          </p>
+          <div className="mt-2">
+            <WAmount value={amount} onChange={setAmount} max={currentAccount?.balance ?? 0} />
           </div>
-        </Field>
+          <p className="mt-2 text-[11px] text-[var(--w-muted)]">
+            Available · {formatMoney(currentAccount?.balance ?? 0)}
+          </p>
+        </div>
 
-        <Field label="Note (optional)">
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="For the framing"
-            className="w-full rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm focus:border-[var(--w-accent)] focus:outline-none"
-          />
-        </Field>
+        <WInput
+          label="Note (optional)"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="For the framing"
+        />
 
         {error && (
-          <p className="rounded-md border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)]">
+          <p className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs font-medium text-[var(--w-danger)]">
             {error}
           </p>
         )}
 
-        <button
-          type="submit"
-          className="self-start rounded-lg bg-[var(--w-accent)] px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-black hover:brightness-110"
-        >
-          Send {formatMoney(amount)}
-        </button>
+        <WSubmit type="submit">Send {formatMoney(amount)}</WSubmit>
       </form>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="flex flex-col gap-2">
-      <span className="text-[10px] uppercase tracking-[0.22em] text-[var(--w-muted)]">
-        {label}
-      </span>
-      {children}
-    </label>
+    </FormPage>
   );
 }
