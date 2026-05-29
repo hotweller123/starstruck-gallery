@@ -44,14 +44,8 @@ function Inner() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
-      <div
-        className="flex items-start gap-3 rounded-2xl border border-[var(--w-border)] p-5 text-sm"
-        style={{
-          background:
-            "linear-gradient(135deg, oklch(0.78 0.15 200 / 0.15), oklch(0.6 0.24 295 / 0.15))",
-        }}
-      >
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand-hi)]" strokeWidth={2} />
+      <div className="flex items-start gap-3 rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-brand-soft)] p-5 text-sm">
+        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand)]" strokeWidth={2} />
         <div>
           <p className="font-bold text-[var(--w-fg)]">Demo wallet</p>
           <p className="mt-1 text-[var(--w-muted)]">
@@ -61,7 +55,7 @@ function Inner() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
+      <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--w-fg)]">
           Wallet token
         </h1>
@@ -69,21 +63,21 @@ function Inner() {
           Paste this token on the site's Connect page to log in to Aethelred.
         </p>
 
-        <div className="mt-5 rounded-2xl border border-[var(--w-border)] bg-[var(--w-input)] p-4">
+        <div className="mt-5 rounded-[1.4rem] border border-[var(--w-border)] bg-[var(--w-input)] p-4">
           <code className="block break-all font-mono text-base font-semibold tracking-widest text-[var(--w-fg)]">
             {currentAccount.token}
           </code>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={copy}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
             >
               {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
               {copied ? "Copied" : "Copy token"}
             </button>
             <button
               onClick={regen}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-4 py-2 text-xs font-semibold text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
             >
               <RefreshCw className="size-3.5" />
               Regenerate
@@ -99,7 +93,7 @@ function Inner() {
         </p>
       </div>
 
-      <div className="rounded-3xl border border-[var(--w-danger)]/30 bg-[var(--w-danger)]/5 p-6 md:p-8">
+      <div className="rounded-[2rem] border border-[var(--w-danger)]/30 bg-[var(--w-danger)]/5 p-6 md:p-8">
         <div className="flex items-center gap-3">
           <AlertTriangle className="size-5 text-[var(--w-danger)]" strokeWidth={2} />
           <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">
