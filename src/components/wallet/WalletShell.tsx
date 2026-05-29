@@ -171,7 +171,7 @@ function TopBar({ showAccount }: { showAccount: boolean }) {
               <span className="absolute right-2.5 top-2.5 size-1.5 rounded-full bg-[var(--w-brand)]" />
             </button>
           )}
-          <ThemeToggle />
+          
           <Link
             to="/"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
