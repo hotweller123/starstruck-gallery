@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ArrowDownToLine, CreditCard, CheckCircle2 } from "lucide-react";
-import { WalletShell } from "@/components/wallet/WalletShell";
 import { FormPage, WAmount, WInput, WSubmit } from "@/components/wallet/FormPage";
 import { useWallet, formatMoney } from "@/lib/wallet";
 
@@ -13,11 +12,7 @@ export const Route = createFileRoute("/wallet/deposit")({
 const PRESETS = [50, 100, 250, 500, 1000];
 
 function DepositPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
@@ -43,7 +38,7 @@ function Inner() {
       title="Deposit"
       subtitle="Add funds to your wallet · simulated"
       icon={<ArrowDownToLine className="size-6" strokeWidth={2.2} />}
-      tint="linear-gradient(135deg, var(--w-pos), var(--w-brand-hi))"
+      tint="var(--w-brand-soft)"
     >
       <form onSubmit={submit} className="flex flex-col gap-5">
         <div>
@@ -59,12 +54,12 @@ function Inner() {
                 type="button"
                 key={p}
                 onClick={() => setAmount(p)}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                className={`rounded-full border border-[var(--w-border)] px-4 py-1.5 text-xs font-semibold transition ${
                   amount === p
-                    ? "text-white shadow"
+                    ? "shadow"
                     : "bg-[var(--w-input)] text-[var(--w-fg)] hover:bg-[var(--w-bg-2)]"
                 }`}
-                style={amount === p ? { background: "var(--w-grad-brand)" } : undefined}
+                style={amount === p ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
               >
                 ${p}
               </button>
@@ -72,7 +67,7 @@ function Inner() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--w-border)] bg-[var(--w-input)] p-4">
+        <div className="rounded-[1.4rem] border border-[var(--w-border)] bg-[var(--w-input)] p-4">
           <div className="flex items-center gap-3">
             <CreditCard className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
             <p className="text-sm font-semibold text-[var(--w-fg)]">
@@ -104,10 +99,10 @@ function Inner() {
 function Success({ amount, balance }: { amount: number; balance: number }) {
   return (
     <div className="mx-auto max-w-md text-center">
-      <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-10 shadow-xl">
+      <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-10 shadow-xl">
         <span
-          className="mx-auto grid size-16 place-items-center rounded-full text-white shadow-lg"
-          style={{ background: "linear-gradient(135deg, var(--w-pos), var(--w-brand-hi))" }}
+          className="mx-auto grid size-16 place-items-center rounded-full border border-[var(--w-border)] text-[var(--w-brand)] shadow-lg"
+          style={{ background: "var(--w-brand-soft)" }}
         >
           <CheckCircle2 className="size-8" strokeWidth={2} />
         </span>
@@ -119,8 +114,8 @@ function Success({ amount, balance }: { amount: number; balance: number }) {
         </p>
         <Link
           to="/wallet"
-          className="mt-6 inline-block w-full rounded-2xl px-6 py-3.5 text-sm font-bold text-white shadow-lg"
-          style={{ background: "var(--w-grad-brand)" }}
+            className="mt-6 inline-block w-full rounded-[1.4rem] px-6 py-3.5 text-sm font-bold shadow-lg"
+            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
         >
           Back to wallet
         </Link>

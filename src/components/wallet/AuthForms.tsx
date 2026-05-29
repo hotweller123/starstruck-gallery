@@ -23,13 +23,8 @@ export function AuthForms() {
 
   return (
     <div className="relative">
-      <div
-        className="absolute -inset-1 rounded-3xl opacity-50 blur-2xl"
-        style={{ background: "var(--w-grad-brand)" }}
-        aria-hidden
-      />
-      <div className="relative rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl">
-        <div className="flex gap-1 rounded-full bg-[var(--w-input)] p-1">
+      <div className="relative rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl">
+        <div className="flex gap-1 rounded-full border border-[var(--w-border)] bg-[var(--w-input)] p-1">
           {(["register", "signin"] as const).map((m) => (
             <button
               key={m}
@@ -37,10 +32,10 @@ export function AuthForms() {
               onClick={() => setMode(m)}
               className={`flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition ${
                 mode === m
-                  ? "text-white shadow"
+                  ? "shadow"
                   : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
               }`}
-              style={mode === m ? { background: "var(--w-grad-brand)" } : undefined}
+              style={mode === m ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
             >
               {m === "register" ? "Create wallet" : "Sign in"}
             </button>
@@ -62,8 +57,8 @@ export function AuthForms() {
 
           <button
             type="submit"
-            className="mt-2 rounded-full px-5 py-3.5 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02]"
-            style={{ background: "var(--w-grad-brand)" }}
+            className="mt-2 rounded-full px-5 py-3.5 text-sm font-bold shadow-lg transition hover:scale-[1.02]"
+            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
           >
             {mode === "register" ? "Create my wallet" : "Sign in"}
           </button>

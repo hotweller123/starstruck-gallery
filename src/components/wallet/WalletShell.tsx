@@ -41,6 +41,7 @@ function ThemeToggle() {
       aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
       title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
       className="inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50 hover:text-[var(--w-brand)]"
+      type="button"
     >
       {mode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
@@ -51,8 +52,8 @@ function Brand() {
   return (
     <Link to="/wallet" className="flex items-center gap-2.5">
       <span
-        className="grid size-10 place-items-center rounded-2xl text-black shadow-lg"
-        style={{ background: "var(--w-grad-brand)" }}
+        className="grid size-10 place-items-center rounded-[1rem] border border-[var(--w-border)] bg-[var(--w-brand)] shadow-lg"
+        style={{ color: "var(--w-brand-contrast)" }}
       >
         <WalletIcon className="size-5" strokeWidth={2.4} />
       </span>
@@ -93,10 +94,11 @@ function AccountChip() {
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] py-1 pl-1 pr-3 text-sm font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
+        type="button"
       >
         <span
-          className="grid size-8 place-items-center rounded-full text-xs font-extrabold text-black"
-          style={{ background: "var(--w-grad-brand)" }}
+          className="grid size-8 place-items-center rounded-full text-xs font-extrabold"
+          style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
         >
           {initials || "A"}
         </span>
@@ -110,7 +112,7 @@ function AccountChip() {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <div className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl">
+          <div className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl">
             <div className="p-4">
               <p className="text-sm font-bold text-[var(--w-fg)]">{currentAccount.name}</p>
               <p className="text-xs text-[var(--w-muted)]">{currentAccount.email}</p>
@@ -121,7 +123,8 @@ function AccountChip() {
               </p>
               <button
                 onClick={copyToken}
-                className="mt-1 flex w-full items-center justify-between gap-2 rounded-lg bg-[var(--w-input)] px-3 py-2 text-left transition hover:bg-[var(--w-bg-2)]"
+              className="mt-1 flex w-full items-center justify-between gap-2 rounded-[1rem] bg-[var(--w-input)] px-3 py-2 text-left transition hover:bg-[var(--w-bg-2)]"
+              type="button"
               >
                 <code className="truncate font-mono text-[11px] text-[var(--w-fg)]">
                   {currentAccount.token}
@@ -177,10 +180,7 @@ export function WalletShell({ children }: { children: ReactNode }) {
         <TopBar showAccount={false} />
         <div className="mx-auto grid w-full max-w-6xl flex-1 gap-12 px-6 py-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-20">
           <div>
-            <span
-              className="inline-block rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.25em] text-black"
-              style={{ background: "var(--w-grad-brand)" }}
-            >
+            <span className="inline-block rounded-full border border-[var(--w-border)] bg-[var(--w-brand-soft)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.25em] text-[var(--w-brand)]">
               New
             </span>
             <h1 className="mt-6 text-5xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
@@ -200,10 +200,7 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 "Every purchase, bid and sale logged here",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-3">
-                  <span
-                    className="mt-1.5 size-2 rounded-full"
-                    style={{ background: "var(--w-grad-brand)" }}
-                  />
+              <span className="mt-1.5 size-2 rounded-full bg-[var(--w-brand)]" />
                   {t}
                 </li>
               ))}
@@ -221,24 +218,24 @@ export function WalletShell({ children }: { children: ReactNode }) {
 
       <div className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 md:px-6 md:pb-10 lg:grid lg:grid-cols-[220px_1fr] lg:gap-8">
         <aside className="hidden lg:block">
-          <nav className="sticky top-24 flex flex-col gap-1 rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] p-2">
+          <nav className="sticky top-24 flex flex-col gap-1 rounded-[1.6rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-2">
             {nav.map(({ to, label, icon: Icon, exact }) => {
               const active = exact ? pathname === to : pathname.startsWith(to);
               return (
                 <Link
                   key={to}
                   to={to}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+                  className={`flex items-center gap-3 rounded-[1rem] px-3 py-2.5 text-sm font-semibold transition ${
                     active
                       ? "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
                       : "text-[var(--w-muted)] hover:bg-[var(--w-bg-2)] hover:text-[var(--w-fg)]"
                   }`}
                 >
                   <span
-                    className={`grid size-8 place-items-center rounded-lg ${
-                      active ? "text-black" : "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
+                    className={`grid size-8 place-items-center rounded-[0.9rem] ${
+                      active ? "" : "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
                     }`}
-                    style={active ? { background: "var(--w-grad-brand)" } : undefined}
+                    style={active ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
                   >
                     <Icon className="size-4" strokeWidth={2.2} />
                   </span>
@@ -253,17 +250,17 @@ export function WalletShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Mobile bottom dock */}
-      <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-md justify-between gap-1 rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)]/95 p-1.5 shadow-2xl backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-md justify-between gap-1 rounded-[1.6rem] border border-[var(--w-border)] bg-[var(--w-surface)]/95 p-1.5 shadow-2xl backdrop-blur-xl lg:hidden">
         {nav.slice(0, 5).map(({ to, label, icon: Icon, exact }) => {
           const active = exact ? pathname === to : pathname.startsWith(to);
           return (
             <Link
               key={to}
               to={to}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2 text-[10px] font-bold transition ${
-                active ? "text-black" : "text-[var(--w-muted)]"
+              className={`flex flex-1 flex-col items-center gap-1 rounded-[1rem] px-2 py-2 text-[10px] font-bold transition ${
+                active ? "" : "text-[var(--w-muted)]"
               }`}
-              style={active ? { background: "var(--w-grad-brand)" } : undefined}
+              style={active ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
             >
               <Icon className="size-4" strokeWidth={2.2} />
               {label}
