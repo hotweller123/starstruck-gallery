@@ -14,7 +14,7 @@ import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
-import { WalletThemeProvider, useWalletTheme } from "@/lib/wallet-theme";
+
 
 function NotFoundComponent() {
   return (
