@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { WalletShell } from "@/components/wallet/WalletShell";
 import { TxRow } from "@/components/wallet/TxRow";
 import { useWallet, TX_LABEL, type TxType } from "@/lib/wallet";
 

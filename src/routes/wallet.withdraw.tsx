@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ArrowUpFromLine, Building2, CheckCircle2 } from "lucide-react";
-import { WalletShell } from "@/components/wallet/WalletShell";
 import { FormPage, WAmount, WInput, WSubmit } from "@/components/wallet/FormPage";
 import { useWallet, formatMoney } from "@/lib/wallet";
 
