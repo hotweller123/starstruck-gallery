@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -13,13 +13,18 @@ import {
   Sun,
   Moon,
   Copy,
+  Check,
 } from "lucide-react";
-import { useState } from "react";
-import { useWallet, formatMoney } from "@/lib/wallet";
+import { useWallet } from "@/lib/wallet";
 import { useWalletTheme } from "@/lib/wallet-theme";
 import { AuthForms } from "./AuthForms";
 
-const nav = [
+const nav: ReadonlyArray<{
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+}> = [
   { to: "/wallet", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/wallet/deposit", label: "Deposit", icon: ArrowDownToLine },
   { to: "/wallet/withdraw", label: "Withdraw", icon: ArrowUpFromLine },
@@ -33,8 +38,9 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      aria-label="Toggle theme"
-      className="inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-fg)] transition hover:scale-105"
+      aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+      title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+      className="inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50 hover:text-[var(--w-brand)]"
     >
       {mode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
@@ -45,39 +51,20 @@ function Brand() {
   return (
     <Link to="/wallet" className="flex items-center gap-2.5">
       <span
-        className="grid size-10 place-items-center rounded-2xl text-white shadow-lg"
+        className="grid size-10 place-items-center rounded-2xl text-black shadow-lg"
         style={{ background: "var(--w-grad-brand)" }}
       >
-        <WalletIcon className="size-5" strokeWidth={2} />
+        <WalletIcon className="size-5" strokeWidth={2.4} />
       </span>
       <div className="leading-tight">
-        <p className="text-base font-bold tracking-tight text-[var(--w-fg)]">
+        <p className="text-base font-extrabold tracking-tight text-[var(--w-fg)]">
           Aethelred Pay
         </p>
-        <p className="text-[9px] font-medium uppercase tracking-[0.22em] text-[var(--w-muted)]">
-          Pocket wallet · v1.0
+        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[var(--w-muted)]">
+          Pocket wallet
         </p>
       </div>
     </Link>
-  );
-}
-
-function TopBar() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-[var(--w-border)] bg-[var(--w-bg)]/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
-        <Brand />
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-medium text-[var(--w-fg)] transition hover:scale-105"
-          >
-            Gallery <ArrowUpRight className="size-3.5" />
-          </Link>
-        </div>
-      </div>
-    </header>
   );
 }
 
@@ -105,10 +92,10 @@ function AccountChip() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] py-1 pl-1 pr-3 text-sm font-medium text-[var(--w-fg)] transition hover:scale-105"
+        className="flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] py-1 pl-1 pr-3 text-sm font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
       >
         <span
-          className="grid size-8 place-items-center rounded-full text-xs font-bold text-white"
+          className="grid size-8 place-items-center rounded-full text-xs font-extrabold text-black"
           style={{ background: "var(--w-grad-brand)" }}
         >
           {initials || "A"}
@@ -125,11 +112,11 @@ function AccountChip() {
           />
           <div className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl">
             <div className="p-4">
-              <p className="text-sm font-semibold text-[var(--w-fg)]">{currentAccount.name}</p>
+              <p className="text-sm font-bold text-[var(--w-fg)]">{currentAccount.name}</p>
               <p className="text-xs text-[var(--w-muted)]">{currentAccount.email}</p>
             </div>
             <div className="border-t border-[var(--w-border)] p-3">
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--w-muted)]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)]">
                 Wallet token
               </p>
               <button
@@ -139,15 +126,16 @@ function AccountChip() {
                 <code className="truncate font-mono text-[11px] text-[var(--w-fg)]">
                   {currentAccount.token}
                 </code>
-                <Copy className="size-3.5 shrink-0 text-[var(--w-muted)]" />
+                {copied ? (
+                  <Check className="size-3.5 shrink-0 text-[var(--w-brand)]" />
+                ) : (
+                  <Copy className="size-3.5 shrink-0 text-[var(--w-muted)]" />
+                )}
               </button>
-              {copied && (
-                <p className="mt-1 text-[10px] text-[var(--w-brand-1)]">Copied!</p>
-              )}
             </div>
             <button
               onClick={signOut}
-              className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
+              className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
             >
               <LogOut className="size-4" />
               Sign out
@@ -159,20 +147,38 @@ function AccountChip() {
   );
 }
 
+function TopBar({ showAccount }: { showAccount: boolean }) {
+  return (
+    <header className="sticky top-0 z-40 border-b border-[var(--w-border)] bg-[var(--w-bg)]/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
+        <Brand />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link
+            to="/"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
+          >
+            Gallery <ArrowUpRight className="size-3.5" />
+          </Link>
+          {showAccount && <AccountChip />}
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export function WalletShell({ children }: { children: ReactNode }) {
   const { signedIn, currentAccount } = useWallet();
-  const { mode } = useWalletTheme();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const themeClass = mode === "light" ? "wallet-light" : "";
 
   if (!signedIn || !currentAccount) {
     return (
-      <div className={`${themeClass} flex min-h-screen flex-col bg-[var(--w-bg)] text-[var(--w-fg)]`}>
-        <TopBar />
+      <>
+        <TopBar showAccount={false} />
         <div className="mx-auto grid w-full max-w-6xl flex-1 gap-12 px-6 py-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-20">
           <div>
             <span
-              className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-white"
+              className="inline-block rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.25em] text-black"
               style={{ background: "var(--w-grad-brand)" }}
             >
               New
@@ -205,29 +211,14 @@ export function WalletShell({ children }: { children: ReactNode }) {
           </div>
           <AuthForms />
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className={`${themeClass} flex min-h-screen flex-col bg-[var(--w-bg)] text-[var(--w-fg)]`}>
-      <header className="sticky top-0 z-40 border-b border-[var(--w-border)] bg-[var(--w-bg)]/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
-          <Brand />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Link
-              to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-medium text-[var(--w-fg)] transition hover:scale-105"
-            >
-              Gallery <ArrowUpRight className="size-3.5" />
-            </Link>
-            <AccountChip />
-          </div>
-        </div>
-      </header>
+    <>
+      <TopBar showAccount />
 
-      {/* Desktop sidebar + content */}
       <div className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 md:px-6 md:pb-10 lg:grid lg:grid-cols-[220px_1fr] lg:gap-8">
         <aside className="hidden lg:block">
           <nav className="sticky top-24 flex flex-col gap-1 rounded-2xl border border-[var(--w-border)] bg-[var(--w-surface)] p-2">
@@ -237,7 +228,7 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                     active
                       ? "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
                       : "text-[var(--w-muted)] hover:bg-[var(--w-bg-2)] hover:text-[var(--w-fg)]"
@@ -245,11 +236,11 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 >
                   <span
                     className={`grid size-8 place-items-center rounded-lg ${
-                      active ? "text-white" : "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
+                      active ? "text-black" : "bg-[var(--w-bg-2)] text-[var(--w-fg)]"
                     }`}
                     style={active ? { background: "var(--w-grad-brand)" } : undefined}
                   >
-                    <Icon className="size-4" strokeWidth={2} />
+                    <Icon className="size-4" strokeWidth={2.2} />
                   </span>
                   {label}
                 </Link>
@@ -269,21 +260,17 @@ export function WalletShell({ children }: { children: ReactNode }) {
             <Link
               key={to}
               to={to}
-              className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition ${
-                active ? "text-white" : "text-[var(--w-muted)]"
+              className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2 text-[10px] font-bold transition ${
+                active ? "text-black" : "text-[var(--w-muted)]"
               }`}
               style={active ? { background: "var(--w-grad-brand)" } : undefined}
             >
-              <Icon className="size-4" strokeWidth={2} />
+              <Icon className="size-4" strokeWidth={2.2} />
               {label}
             </Link>
           );
         })}
       </nav>
-
-      <footer className="hidden border-t border-[var(--w-border)] px-6 py-6 text-center text-[10px] font-medium uppercase tracking-[0.25em] text-[var(--w-muted)] md:block">
-        Aethelred Pay · Simulated wallet · {new Date().getFullYear()}
-      </footer>
-    </div>
+    </>
   );
 }

@@ -51,7 +51,7 @@ function Inner() {
             "linear-gradient(135deg, oklch(0.78 0.15 200 / 0.15), oklch(0.6 0.24 295 / 0.15))",
         }}
       >
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand-3)]" strokeWidth={2} />
+        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand-hi)]" strokeWidth={2} />
         <div>
           <p className="font-bold text-[var(--w-fg)]">Demo wallet</p>
           <p className="mt-1 text-[var(--w-muted)]">

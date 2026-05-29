@@ -32,8 +32,8 @@ export function TxRow({ tx }: { tx: WalletTx }) {
         className="grid size-10 shrink-0 place-items-center rounded-xl text-white"
         style={{
           background: positive
-            ? "linear-gradient(135deg, var(--w-mint), var(--w-cyan))"
-            : "linear-gradient(135deg, var(--w-brand-2), var(--w-brand-3))",
+            ? "linear-gradient(135deg, var(--w-pos), var(--w-brand-hi))"
+            : "linear-gradient(135deg, var(--w-brand), var(--w-brand-hi))",
         }}
       >
         <Icon className="size-4" strokeWidth={2} />
@@ -48,7 +48,7 @@ export function TxRow({ tx }: { tx: WalletTx }) {
       <div className="text-right">
         <p
           className={`text-base font-bold tracking-tight ${
-            positive ? "text-[var(--w-mint)]" : "text-[var(--w-fg)]"
+            positive ? "text-[var(--w-pos)]" : "text-[var(--w-fg)]"
           }`}
         >
           {positive ? "+" : "−"}
