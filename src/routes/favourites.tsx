@@ -4,6 +4,7 @@ import { useStore } from "@/lib/store";
 import { artworks } from "@/data/artworks";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { PageHeader } from "@/components/site/PageHeader";
+import { WalletGate } from "@/components/site/WalletGate";
 
 export const Route = createFileRoute("/favourites")({
   component: FavouritesPage,
@@ -17,7 +18,8 @@ function FavouritesPage() {
   const items = artworks.filter((a) => favorites.includes(a.slug));
 
   return (
-    <>
+    <WalletGate>
+      <>
       <PageHeader
         eyebrow="Your collection"
         title="Favourites"
