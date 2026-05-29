@@ -14,6 +14,7 @@ import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
+import { WalletThemeProvider } from "@/lib/wallet-theme";
 
 function NotFoundComponent() {
   return (
@@ -146,19 +147,21 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <WalletProvider>
-          {isWallet ? (
-            <div className="wallet-theme flex min-h-screen flex-col">
-              <Outlet />
-            </div>
-          ) : (
-            <div className="flex min-h-screen flex-col bg-canvas">
-              <MegaNav />
-              <main className="flex-1">
+          <WalletThemeProvider>
+            {isWallet ? (
+              <div className="wallet-theme flex min-h-screen flex-col">
                 <Outlet />
-              </main>
-              <Footer />
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="flex min-h-screen flex-col bg-canvas">
+                <MegaNav />
+                <main className="flex-1">
+                  <Outlet />
+                </main>
+                <Footer />
+              </div>
+            )}
+          </WalletThemeProvider>
         </WalletProvider>
       </StoreProvider>
     </QueryClientProvider>
