@@ -19,14 +19,19 @@ import { useWallet } from "@/lib/wallet";
 import { useWalletTheme } from "@/lib/wallet-theme";
 import { AuthForms } from "./AuthForms";
 
-const nav = [
+const nav: ReadonlyArray<{
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+}> = [
   { to: "/wallet", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/wallet/deposit", label: "Deposit", icon: ArrowDownToLine },
   { to: "/wallet/withdraw", label: "Withdraw", icon: ArrowUpFromLine },
   { to: "/wallet/send", label: "Send", icon: Send },
   { to: "/wallet/activity", label: "Activity", icon: ListOrdered },
   { to: "/wallet/security", label: "Security", icon: ShieldCheck },
-] as const;
+];
 
 function ThemeToggle() {
   const { mode, toggle } = useWalletTheme();
