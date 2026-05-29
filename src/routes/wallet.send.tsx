@@ -11,11 +11,7 @@ export const Route = createFileRoute("/wallet/send")({
 });
 
 function SendPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
