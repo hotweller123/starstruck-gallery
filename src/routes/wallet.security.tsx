@@ -11,11 +11,7 @@ export const Route = createFileRoute("/wallet/security")({
 });
 
 function SecurityPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
