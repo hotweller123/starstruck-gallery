@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User } from "lucide-react";
+import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User, Wallet } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useWallet } from "@/lib/wallet";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";
@@ -130,6 +131,7 @@ export function MegaNav() {
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
+          <WalletNavIcon />
           <IconLink to="/favourites" label="Favourites" count={favCount} icon={Heart} />
           <IconLink to="/cart" label="Cart" count={cartCount} icon={ShoppingBag} />
           <IconLink to="/profile" label="Profile" icon={User} />
