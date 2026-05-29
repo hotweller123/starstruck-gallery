@@ -7,6 +7,7 @@ import {
   Banknote,
   Tag,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { formatMoney, TX_LABEL, txSign, type WalletTx } from "@/lib/wallet";
 
 const ICONS = {
@@ -27,11 +28,18 @@ export function TxRow({ tx }: { tx: WalletTx }) {
   const date = new Date(tx.createdAt);
 
   return (
-    <div className="flex items-center gap-4 border-b border-[var(--w-border)] py-3.5 last:border-b-0">
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25 }}
+      whileHover={{ x: 2 }}
+      className="flex items-center gap-4 border-b border-[var(--w-border)] py-3.5 last:border-b-0"
+    >
       <span
-        className="grid size-10 shrink-0 place-items-center rounded-[1rem] border border-[var(--w-border)] text-[var(--w-fg)]"
+        className="grid size-10 shrink-0 place-items-center rounded-[1rem] border border-[var(--w-border)]"
         style={{
           background: positive ? "var(--w-brand-soft)" : "var(--w-bg-2)",
+          color: positive ? "var(--w-brand)" : "var(--w-fg)",
         }}
       >
         <Icon className="size-4" strokeWidth={2} />
@@ -46,16 +54,16 @@ export function TxRow({ tx }: { tx: WalletTx }) {
       <div className="text-right">
         <p
           className={`text-base font-bold tracking-tight ${
-            positive ? "text-[var(--w-pos)]" : "text-[var(--w-fg)]"
+            positive ? "text-[var(--w-brand)]" : "text-[var(--w-fg)]"
           }`}
         >
           {positive ? "+" : "−"}
           {formatMoney(tx.amount)}
         </p>
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--w-muted)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--w-muted)]">
           Bal {formatMoney(tx.balanceAfter)}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
