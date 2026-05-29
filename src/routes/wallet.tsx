@@ -119,19 +119,19 @@ function Dashboard() {
           label="Deposited"
           value={stats.deposited}
           icon={TrendingUp}
-          tint="var(--w-mint)"
+          tint="var(--w-pos)"
         />
         <Stat
           label="Withdrawn"
           value={stats.withdrawn}
           icon={TrendingDown}
-          tint="var(--w-amber)"
+          tint="var(--w-brand)"
         />
         <Stat
           label="Spent"
           value={stats.spent}
           icon={ShoppingBag}
-          tint="var(--w-brand-2)"
+          tint="var(--w-neg)"
         />
       </div>
 
