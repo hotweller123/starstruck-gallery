@@ -13,11 +13,7 @@ export const Route = createFileRoute("/wallet/deposit")({
 const PRESETS = [50, 100, 250, 500, 1000];
 
 function DepositPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
