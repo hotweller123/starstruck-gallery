@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AlertTriangle, Copy, Check, RefreshCw, ShieldCheck } from "lucide-react";
-import { WalletShell } from "@/components/wallet/WalletShell";
 import { useWallet } from "@/lib/wallet";
 import { useStore } from "@/lib/store";
 
