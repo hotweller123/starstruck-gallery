@@ -11,11 +11,7 @@ export const Route = createFileRoute("/wallet/withdraw")({
 });
 
 function WithdrawPage() {
-  return (
-    <WalletShell>
-      <Inner />
-    </WalletShell>
-  );
+  return <Inner />;
 }
 
 function Inner() {
