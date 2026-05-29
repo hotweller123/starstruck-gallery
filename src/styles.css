@@ -93,3 +93,26 @@
 .no-scrollbar {
   scrollbar-width: none;
 }
+
+/* Wallet theme — scoped, banking-app dark + brass */
+.wallet-theme {
+  --w-bg: oklch(0.18 0.025 175);          /* deep teal-black */
+  --w-surface: oklch(0.235 0.03 175);     /* lifted card */
+  --w-surface-2: oklch(0.28 0.035 170);
+  --w-fg: oklch(0.96 0.012 90);           /* warm white */
+  --w-muted: oklch(0.7 0.02 170);
+  --w-primary: oklch(0.62 0.13 165);      /* emerald */
+  --w-accent: oklch(0.82 0.13 85);        /* brass / gold */
+  --w-danger: oklch(0.68 0.16 25);
+  --w-grad-balance: radial-gradient(
+      120% 140% at 0% 0%,
+      oklch(0.55 0.14 165 / 0.55),
+      transparent 55%
+    ),
+    linear-gradient(135deg, oklch(0.28 0.05 175), oklch(0.22 0.04 180));
+  color: var(--w-fg);
+  font-family: var(--font-sans);
+}
+.wallet-theme .font-display {
+  font-family: var(--font-display);
+}
