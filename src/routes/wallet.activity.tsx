@@ -35,7 +35,7 @@ function Inner() {
   const list = filter === "all" ? all : all.filter((t) => t.type === filter);
 
   return (
-    <div className="rounded-3xl border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
+    <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
       <h1 className="text-3xl font-extrabold tracking-tight text-[var(--w-fg)]">
         Activity
       </h1>
@@ -50,12 +50,12 @@ function Inner() {
             <button
               key={t.value}
               onClick={() => setFilter(t.value)}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+              className={`rounded-full border border-[var(--w-border)] px-4 py-1.5 text-xs font-semibold transition ${
                 active
-                  ? "text-white shadow"
+                  ? "shadow"
                   : "bg-[var(--w-input)] text-[var(--w-muted)] hover:text-[var(--w-fg)]"
               }`}
-              style={active ? { background: "var(--w-grad-brand)" } : undefined}
+              style={active ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
             >
               {t.label}
             </button>
