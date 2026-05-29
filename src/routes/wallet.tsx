@@ -41,7 +41,7 @@ function Dashboard() {
     for (const t of txs) {
       if (t.type === "deposit") deposited += t.amount;
       else if (t.type === "withdraw") withdrawn += t.amount;
-      else if (txSign(t.type) < 0 && t.type !== "withdraw") spent += t.amount;
+      else if (txSign(t.type) < 0) spent += t.amount;
     }
     return { deposited, withdrawn, spent };
   }, [txs]);
