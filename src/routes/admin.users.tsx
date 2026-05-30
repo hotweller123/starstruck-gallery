@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, UserPlus, Shield } from "lucide-react";
+import { Search, UserPlus, Shield, ChevronRight } from "lucide-react";
 import { DataTable, SectionHeader, StatusChip } from "@/components/admin/primitives";
 import {
   adminUsers as seedUsers,
