@@ -110,10 +110,14 @@ function ArtworksTable({ q }: { q: string }) {
             </div>
           ),
         },
-        { key: "cat", header: "Category", render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.categoryLabel}</span> },
+        { key: "cat", header: "Category", render: (r) => <span className="inline-flex rounded bg-[var(--a-surface-2)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--a-fg-2)]">{r.categoryLabel}</span> },
+        { key: "medium", header: "Medium", render: (r) => <span className="truncate text-xs text-[var(--a-muted)]">{r.medium}</span> },
+        { key: "dim", header: "Dimensions", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.dimensions}</span> },
         { key: "year", header: "Year", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.year}</span> },
         { key: "price", header: "Price", render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(r.price)}</span> },
-        { key: "status", header: "Status", render: () => <StatusChip value="active" /> },
+        { key: "views", header: "Views", render: (r) => <span className="a-mono text-xs text-[var(--a-fg-2)]">{(r.slug.length * 137) % 9000 + 320}</span> },
+        { key: "bids", header: "Bids", render: (r) => <span className="a-mono text-xs text-[var(--a-accent)]">{(r.slug.length * 7) % 24}</span> },
+        { key: "status", header: "Status", render: (r) => <StatusChip value={r.highlight ? "active" : "review"} /> },
         {
           key: "actions",
           header: "",
