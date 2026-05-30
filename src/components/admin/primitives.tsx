@@ -1,4 +1,5 @@
-import { type ReactNode } from "react";
+import { type KeyboardEvent, type ReactNode } from "react";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
@@ -155,12 +156,26 @@ export function DataTable<T extends { id: string }>({
   rows,
   empty = "No records.",
   onRowClick,
+  getRowLink,
 }: {
   columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string }[];
   rows: T[];
   empty?: string;
   onRowClick?: (row: T) => void;
+  getRowLink?: (row: T) => Pick<LinkProps, "to" | "params" | "search" | "hash" | "state">;
 }) {
+  function handleRowKeyDown(event: KeyboardEvent<HTMLTableRowElement>, row: T) {
+    if (event.target instanceof HTMLElement) {
+      const interactive = event.target.closest("a,button,input,select,textarea,[role='button']");
+      if (interactive) return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick?.(row);
+    }
+  }
+
   return (
     <div className="overflow-hidden rounded-md border border-[var(--a-border)]">
       <div className="overflow-x-auto a-scrollbar">
@@ -189,15 +204,30 @@ export function DataTable<T extends { id: string }>({
                 <tr
                   key={row.id}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={onRowClick ? (event) => handleRowKeyDown(event, row) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
                   className={`transition hover:bg-[var(--a-surface-2)]/70 ${onRowClick ? "a-row-link" : ""} ${
                     i % 2 === 0 ? "bg-[var(--a-surface)]/40" : "bg-transparent"
                   }`}
                 >
-                  {columns.map((c) => (
-                    <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
-                      {c.render(row)}
-                    </td>
-                  ))}
+                  {columns.map((c, columnIndex) => {
+                    const rowLink = columnIndex === 0 ? getRowLink?.(row) : undefined;
+
+                    return (
+                      <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
+                        {rowLink ? (
+                          <Link
+                            {...rowLink}
+                            className="group/table-row-link -m-4 block rounded-sm p-4 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--a-accent)]"
+                          >
+                            {c.render(row)}
+                          </Link>
+                        ) : (
+                          c.render(row)
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}
