@@ -154,10 +154,12 @@ export function DataTable<T extends { id: string }>({
   columns,
   rows,
   empty = "No records.",
+  onRowClick,
 }: {
   columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string }[];
   rows: T[];
   empty?: string;
+  onRowClick?: (row: T) => void;
 }) {
   return (
     <div className="overflow-hidden rounded-md border border-[var(--a-border)]">
@@ -186,7 +188,8 @@ export function DataTable<T extends { id: string }>({
               rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`transition hover:bg-[var(--a-surface-2)]/60 ${
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={`transition hover:bg-[var(--a-surface-2)]/70 ${onRowClick ? "a-row-link" : ""} ${
                     i % 2 === 0 ? "bg-[var(--a-surface)]/40" : "bg-transparent"
                   }`}
                 >
