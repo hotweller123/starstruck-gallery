@@ -203,3 +203,15 @@ function IconBtn({ icon: Icon, danger }: { icon: typeof Star; danger?: boolean }
     </button>
   );
 }
+
+function ExhibitKpi({ icon: Icon, label, value, accent }: { icon: typeof Palette; label: string; value: string; accent?: boolean }) {
+  return (
+    <div className={`a-card-elev p-3.5 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}>
+      <div className="flex items-center justify-between">
+        <p className="a-eyebrow">{label}</p>
+        <Icon className={`size-4 ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-muted)]"}`} />
+      </div>
+      <p className={`font-display mt-1.5 text-xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}>{value}</p>
+    </div>
+  );
+}
