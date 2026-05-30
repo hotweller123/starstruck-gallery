@@ -152,6 +152,7 @@ export function fmtDateTime(iso: string) {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "UTC",
   });
 }
 
