@@ -79,22 +79,24 @@ function UsersAdmin() {
 
       <DataTable
         rows={rows}
+        onRowClick={(u) => navigate({ to: "/admin/users/$id", params: { id: u.id } })}
         columns={[
           { key: "user", header: "User", render: (u) => (
             <div className="flex items-center gap-2.5">
-              <span className="grid size-8 place-items-center rounded-md text-[11px] font-bold text-[var(--a-accent-ink)]" style={{ background: u.avatar }}>
+              <span className="grid size-9 place-items-center rounded-md text-[11px] font-bold text-[var(--a-accent-ink)] shadow" style={{ background: u.avatar }}>
                 {u.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
               </span>
               <div>
                 <p className="text-xs font-semibold text-[var(--a-fg)]">{u.name}</p>
-                <p className="text-[10px] text-[var(--a-muted)]">{u.email}</p>
+                <p className="a-mono text-[10px] text-[var(--a-muted)]">{u.email}</p>
               </div>
             </div>
           ) },
           { key: "role", header: "Role", render: (u) => (
             <select
               value={u.role}
-              onChange={(e) => setUserRole(u.id, e.target.value as UserRole)}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => { e.stopPropagation(); setUserRole(u.id, e.target.value as UserRole); }}
               className="rounded-md border border-[var(--a-border)] bg-[var(--a-input)] px-2 py-1 text-xs text-[var(--a-fg)] focus:border-[var(--a-border-hi)]"
             >
               <option value="user">User</option>
@@ -103,9 +105,19 @@ function UsersAdmin() {
             </select>
           ) },
           { key: "status", header: "Status", render: (u) => <StatusChip value={u.status} /> },
-          { key: "bal", header: "Balance", render: (u) => <span className="a-mono text-xs text-[var(--a-fg)]">{fmtMoney(u.balance)}</span> },
+          { key: "bal", header: "Balance", render: (u) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(u.balance)}</span> },
           { key: "joined", header: "Joined", render: (u) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.joined)}</span> },
           { key: "last", header: "Last seen", render: (u) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.lastSeen)}</span> },
+          { key: "view", header: "", className: "w-[60px] text-right",
+            render: (u) => (
+              <Link
+                to="/admin/users/$id" params={{ id: u.id }}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 rounded-md border border-[var(--a-border)] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)] hover:text-[var(--a-fg)]"
+              >
+                View <ChevronRight className="size-3" />
+              </Link>
+            ) },
         ]}
       />
     </div>
