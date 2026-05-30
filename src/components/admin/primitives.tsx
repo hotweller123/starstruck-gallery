@@ -1,4 +1,5 @@
-import { type ReactNode } from "react";
+import { type KeyboardEvent, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
@@ -56,7 +57,11 @@ export function KpiTile({
   const positive = delta >= 0;
   const formatted =
     format === "currency"
-      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
+      ? new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(value)
       : new Intl.NumberFormat("en-US").format(value);
 
   return (
@@ -108,17 +113,19 @@ function Sparkline({ positive }: { positive: boolean }) {
 
 /* ---------------- StatusChip ---------------- */
 const STATUS_STYLES: Record<string, string> = {
-  active:    "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
+  active: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   completed: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
-  pending:   "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
-  review:    "bg-[var(--a-info)]/18 text-[var(--a-info)]",
+  pending: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
+  review: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   suspended: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
-  failed:    "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
+  failed: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
 };
 export function StatusChip({ value }: { value: string }) {
   const cls = STATUS_STYLES[value] || "bg-[var(--a-surface-2)] text-[var(--a-muted)]";
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cls}`}
+    >
       <span className="size-1.5 rounded-full bg-current" />
       {value}
     </span>
@@ -142,7 +149,9 @@ export function SectionHeader({
         <h1 className="font-display mt-1 text-3xl font-extrabold tracking-tight text-[var(--a-fg)]">
           {title}
         </h1>
-        {description && <p className="mt-1 max-w-xl text-sm text-[var(--a-muted)]">{description}</p>}
+        {description && (
+          <p className="mt-1 max-w-xl text-sm text-[var(--a-muted)]">{description}</p>
+        )}
       </div>
       {action}
     </div>
@@ -155,12 +164,32 @@ export function DataTable<T extends { id: string }>({
   rows,
   empty = "No records.",
   onRowClick,
+  getRowLink,
 }: {
-  columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string }[];
+  columns: {
+    key: string;
+    header: string;
+    render: (row: T) => ReactNode;
+    className?: string;
+    rowLink?: boolean;
+  }[];
   rows: T[];
   empty?: string;
   onRowClick?: (row: T) => void;
+  getRowLink?: (row: T) => { to: string; params?: Record<string, string> };
 }) {
+  function handleRowKeyDown(event: KeyboardEvent<HTMLTableRowElement>, row: T) {
+    if (event.target instanceof HTMLElement) {
+      const interactive = event.target.closest("a,button,input,select,textarea,[role='button']");
+      if (interactive) return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick?.(row);
+    }
+  }
+
   return (
     <div className="overflow-hidden rounded-md border border-[var(--a-border)]">
       <div className="overflow-x-auto a-scrollbar">
@@ -180,7 +209,10 @@ export function DataTable<T extends { id: string }>({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-[var(--a-muted)]">
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-10 text-center text-sm text-[var(--a-muted)]"
+                >
                   {empty}
                 </td>
               </tr>
@@ -189,15 +221,35 @@ export function DataTable<T extends { id: string }>({
                 <tr
                   key={row.id}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={onRowClick ? (event) => handleRowKeyDown(event, row) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
                   className={`transition hover:bg-[var(--a-surface-2)]/70 ${onRowClick ? "a-row-link" : ""} ${
                     i % 2 === 0 ? "bg-[var(--a-surface)]/40" : "bg-transparent"
                   }`}
                 >
-                  {columns.map((c) => (
-                    <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
-                      {c.render(row)}
-                    </td>
-                  ))}
+                  {columns.map((c) => {
+                    const rowLink = getRowLink?.(row);
+                    const shouldWrapWithLink = Boolean(rowLink) && c.rowLink !== false;
+
+                    return (
+                      <td
+                        key={c.key}
+                        className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}
+                      >
+                        {shouldWrapWithLink && rowLink ? (
+                          <Link
+                            to={rowLink.to as never}
+                            params={rowLink.params as never}
+                            className="group/table-row-link -m-4 block rounded-sm p-4 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--a-accent)]"
+                          >
+                            {c.render(row)}
+                          </Link>
+                        ) : (
+                          c.render(row)
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}
@@ -234,9 +286,13 @@ export function TabBar({
           >
             {t.label}
             {typeof t.count === "number" && (
-              <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[9px] ${
-                isActive ? "bg-[var(--a-accent-ink)]/15 text-[var(--a-accent-ink)]" : "bg-[var(--a-bg-2)] text-[var(--a-muted)]"
-              }`}>
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[9px] ${
+                  isActive
+                    ? "bg-[var(--a-accent-ink)]/15 text-[var(--a-accent-ink)]"
+                    : "bg-[var(--a-bg-2)] text-[var(--a-muted)]"
+                }`}
+              >
                 {t.count}
               </span>
             )}
