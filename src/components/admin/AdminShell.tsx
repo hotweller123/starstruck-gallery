@@ -39,7 +39,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full text-[var(--a-fg)]">
       {/* Desktop sidebar */}
       <aside
-        className={`hidden shrink-0 border-r border-[var(--a-border)] bg-[var(--a-bg-2)] md:sticky md:top-0 md:h-screen md:overflow-y-auto md:overflow-x-hidden ${
+        className={`hidden shrink-0 border-r border-[var(--a-border)] bg-[var(--a-bg-2)] md:block md:sticky md:top-0 md:h-screen md:overflow-y-auto md:overflow-x-hidden ${
           collapsed ? "md:w-[68px]" : "md:w-[244px]"
         } transition-[width] duration-200`}
       >
