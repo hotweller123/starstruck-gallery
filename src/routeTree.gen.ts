@@ -35,12 +35,12 @@ import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAccountRouteImport } from './routes/admin.account'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 
 const WalletRoute = WalletRouteImport.update({
@@ -173,11 +173,6 @@ const AdminWalletRoute = AdminWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -203,10 +198,15 @@ const AdminAccountRoute = AdminAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminUsersRoute,
+  id: '/users/$id',
+  path: '/users/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -227,7 +227,6 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -243,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -261,7 +261,6 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -277,6 +276,7 @@ export interface FileRoutesByTo {
   '/auctions': typeof AuctionsIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -297,7 +297,6 @@ export interface FileRoutesById {
   '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -313,6 +312,7 @@ export interface FileRoutesById {
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -334,7 +334,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/exhibition'
     | '/admin/settings'
-    | '/admin/users'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -350,6 +349,7 @@ export interface FileRouteTypes {
     | '/auctions/'
     | '/categories/'
     | '/admin/users/$id'
+    | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -368,7 +368,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/exhibition'
     | '/admin/settings'
-    | '/admin/users'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -384,6 +383,7 @@ export interface FileRouteTypes {
     | '/auctions'
     | '/categories'
     | '/admin/users/$id'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -403,7 +403,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/exhibition'
     | '/admin/settings'
-    | '/admin/users'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -419,6 +418,7 @@ export interface FileRouteTypes {
     | '/auctions/'
     | '/categories/'
     | '/admin/users/$id'
+    | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -627,13 +627,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWalletRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -669,27 +662,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users/$id': {
       id: '/admin/users/$id'
-      path: '/$id'
+      path: '/users/$id'
       fullPath: '/admin/users/$id'
       preLoaderRoute: typeof AdminUsersIdRouteImport
-      parentRoute: typeof AdminUsersRoute
+      parentRoute: typeof AdminRoute
     }
   }
 }
-
-interface AdminUsersRouteChildren {
-  AdminUsersIdRoute: typeof AdminUsersIdRoute
-}
-
-const AdminUsersRouteChildren: AdminUsersRouteChildren = {
-  AdminUsersIdRoute: AdminUsersIdRoute,
-}
-
-const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
-  AdminUsersRouteChildren,
-)
 
 interface AdminRouteChildren {
   AdminAccountRoute: typeof AdminAccountRoute
@@ -697,9 +685,10 @@ interface AdminRouteChildren {
   AdminContentRoute: typeof AdminContentRoute
   AdminExhibitionRoute: typeof AdminExhibitionRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminWalletRoute: typeof AdminWalletRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminUsersIdRoute: typeof AdminUsersIdRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -708,9 +697,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContentRoute: AdminContentRoute,
   AdminExhibitionRoute: AdminExhibitionRoute,
   AdminSettingsRoute: AdminSettingsRoute,
-  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminWalletRoute: AdminWalletRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminUsersIdRoute: AdminUsersIdRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -758,3 +748,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
