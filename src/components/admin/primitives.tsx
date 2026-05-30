@@ -57,7 +57,11 @@ export function KpiTile({
   const positive = delta >= 0;
   const formatted =
     format === "currency"
-      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
+      ? new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(value)
       : new Intl.NumberFormat("en-US").format(value);
 
   return (
@@ -109,17 +113,19 @@ function Sparkline({ positive }: { positive: boolean }) {
 
 /* ---------------- StatusChip ---------------- */
 const STATUS_STYLES: Record<string, string> = {
-  active:    "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
+  active: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   completed: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
-  pending:   "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
-  review:    "bg-[var(--a-info)]/18 text-[var(--a-info)]",
+  pending: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
+  review: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   suspended: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
-  failed:    "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
+  failed: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
 };
 export function StatusChip({ value }: { value: string }) {
   const cls = STATUS_STYLES[value] || "bg-[var(--a-surface-2)] text-[var(--a-muted)]";
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cls}`}
+    >
       <span className="size-1.5 rounded-full bg-current" />
       {value}
     </span>
@@ -143,7 +149,9 @@ export function SectionHeader({
         <h1 className="font-display mt-1 text-3xl font-extrabold tracking-tight text-[var(--a-fg)]">
           {title}
         </h1>
-        {description && <p className="mt-1 max-w-xl text-sm text-[var(--a-muted)]">{description}</p>}
+        {description && (
+          <p className="mt-1 max-w-xl text-sm text-[var(--a-muted)]">{description}</p>
+        )}
       </div>
       {action}
     </div>
@@ -158,7 +166,13 @@ export function DataTable<T extends { id: string }>({
   onRowClick,
   getRowLink,
 }: {
-  columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string; rowLink?: boolean }[];
+  columns: {
+    key: string;
+    header: string;
+    render: (row: T) => ReactNode;
+    className?: string;
+    rowLink?: boolean;
+  }[];
   rows: T[];
   empty?: string;
   onRowClick?: (row: T) => void;
@@ -195,7 +209,10 @@ export function DataTable<T extends { id: string }>({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-[var(--a-muted)]">
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-10 text-center text-sm text-[var(--a-muted)]"
+                >
                   {empty}
                 </td>
               </tr>
@@ -215,7 +232,10 @@ export function DataTable<T extends { id: string }>({
                     const shouldWrapWithLink = Boolean(rowLink) && c.rowLink !== false;
 
                     return (
-                      <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
+                      <td
+                        key={c.key}
+                        className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}
+                      >
                         {shouldWrapWithLink && rowLink ? (
                           <Link
                             to={rowLink.to as never}
@@ -266,9 +286,13 @@ export function TabBar({
           >
             {t.label}
             {typeof t.count === "number" && (
-              <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[9px] ${
-                isActive ? "bg-[var(--a-accent-ink)]/15 text-[var(--a-accent-ink)]" : "bg-[var(--a-bg-2)] text-[var(--a-muted)]"
-              }`}>
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[9px] ${
+                  isActive
+                    ? "bg-[var(--a-accent-ink)]/15 text-[var(--a-accent-ink)]"
+                    : "bg-[var(--a-bg-2)] text-[var(--a-muted)]"
+                }`}
+              >
                 {t.count}
               </span>
             )}

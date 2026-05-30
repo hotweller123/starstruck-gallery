@@ -20,14 +20,14 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
-  { to: "/admin",            label: "Overview",    icon: LayoutDashboard, exact: true },
-  { to: "/admin/exhibition", label: "Exhibition",  icon: Palette },
-  { to: "/admin/wallet",     label: "Wallet ops",  icon: Wallet },
-  { to: "/admin/users",      label: "Users & roles", icon: Users },
-  { to: "/admin/content",    label: "Site content", icon: FileText },
-  { to: "/admin/analytics",  label: "Analytics",   icon: BarChart3 },
-  { to: "/admin/account",    label: "Admin account", icon: UserCog },
-  { to: "/admin/settings",   label: "Settings",    icon: Settings },
+  { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/admin/exhibition", label: "Exhibition", icon: Palette },
+  { to: "/admin/wallet", label: "Wallet ops", icon: Wallet },
+  { to: "/admin/users", label: "Users & roles", icon: Users },
+  { to: "/admin/content", label: "Site content", icon: FileText },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/account", label: "Admin account", icon: UserCog },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -43,7 +43,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
           collapsed ? "w-[68px]" : "w-[244px]"
         } transition-[width] duration-200`}
       >
-        <SidebarInner collapsed={collapsed} pathname={pathname} onToggle={() => setCollapsed((v) => !v)} />
+        <SidebarInner
+          collapsed={collapsed}
+          pathname={pathname}
+          onToggle={() => setCollapsed((v) => !v)}
+        />
       </aside>
 
       {/* Mobile drawer */}
@@ -51,12 +55,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
         {mobileOpen && (
           <>
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
               className="fixed inset-0 z-40 bg-black/60 md:hidden"
             />
             <motion.aside
-              initial={{ x: -260 }} animate={{ x: 0 }} exit={{ x: -260 }}
+              initial={{ x: -260 }}
+              animate={{ x: 0 }}
+              exit={{ x: -260 }}
               transition={{ type: "spring", damping: 24, stiffness: 220 }}
               className="fixed inset-y-0 left-0 z-50 w-[244px] border-r border-[var(--a-border)] bg-[var(--a-bg-2)] md:hidden"
             >
@@ -115,7 +123,10 @@ function SidebarInner({
           </button>
         )}
         {onClose && (
-          <button onClick={onClose} className="grid size-7 place-items-center rounded-md text-[var(--a-muted)] hover:bg-[var(--a-surface)]">
+          <button
+            onClick={onClose}
+            className="grid size-7 place-items-center rounded-md text-[var(--a-muted)] hover:bg-[var(--a-surface)]"
+          >
             <X className="size-4" />
           </button>
         )}
@@ -125,7 +136,9 @@ function SidebarInner({
         {!collapsed && <p className="a-eyebrow px-3 pb-2 pt-1">Workspace</p>}
         <ul className="space-y-0.5">
           {NAV.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
+            const active = item.exact
+              ? pathname === item.to
+              : pathname === item.to || pathname.startsWith(item.to + "/");
             const Icon = item.icon;
             return (
               <li key={item.to}>
@@ -172,7 +185,10 @@ function SidebarInner({
 function Topbar({ onMenu }: { onMenu: () => void }) {
   return (
     <header className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-[var(--a-border)] bg-[var(--a-bg)]/85 px-4 backdrop-blur md:px-8">
-      <button onClick={onMenu} className="grid size-9 place-items-center rounded-md text-[var(--a-muted)] hover:bg-[var(--a-surface)] md:hidden">
+      <button
+        onClick={onMenu}
+        className="grid size-9 place-items-center rounded-md text-[var(--a-muted)] hover:bg-[var(--a-surface)] md:hidden"
+      >
         <Menu className="size-5" />
       </button>
 
@@ -194,7 +210,10 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[var(--a-accent)]" />
       </button>
 
-      <Link to="/admin/account" className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3 transition hover:bg-[var(--a-surface-2)]">
+      <Link
+        to="/admin/account"
+        className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3 transition hover:bg-[var(--a-surface-2)]"
+      >
         <span className="grid size-7 place-items-center rounded bg-[var(--a-accent)] text-[11px] font-bold text-[var(--a-accent-ink)]">
           AD
         </span>
