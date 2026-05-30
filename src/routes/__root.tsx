@@ -142,12 +142,17 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isWallet = pathname === "/wallet" || pathname.startsWith("/wallet/");
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <WalletProvider>
-          {isWallet ? (
+          {isAdmin ? (
+            <div className="admin-theme min-h-screen">
+              <Outlet />
+            </div>
+          ) : isWallet ? (
             <div className="wallet-theme flex min-h-screen flex-col">
               <Outlet />
             </div>
@@ -165,4 +170,5 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
 
