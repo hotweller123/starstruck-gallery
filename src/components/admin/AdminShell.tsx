@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
-const NAV = [
+const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin",            label: "Overview",    icon: LayoutDashboard, exact: true },
   { to: "/admin/exhibition", label: "Exhibition",  icon: Palette },
   { to: "/admin/wallet",     label: "Wallet ops",  icon: Wallet },
@@ -26,7 +26,7 @@ const NAV = [
   { to: "/admin/content",    label: "Site content", icon: FileText },
   { to: "/admin/analytics",  label: "Analytics",   icon: BarChart3 },
   { to: "/admin/settings",   label: "Settings",    icon: Settings },
-] as const;
+];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
