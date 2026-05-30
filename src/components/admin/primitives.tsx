@@ -210,13 +210,13 @@ export function DataTable<T extends { id: string }>({
                     i % 2 === 0 ? "bg-[var(--a-surface)]/40" : "bg-transparent"
                   }`}
                 >
-                  {columns.map((c, columnIndex) => {
+                  {columns.map((c) => {
                     const rowLink = getRowLink?.(row);
-                    const shouldWrapWithLink = Boolean(rowLink) && c.rowLink !== false && columnIndex < columns.length;
+                    const shouldWrapWithLink = Boolean(rowLink) && c.rowLink !== false;
 
                     return (
                       <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
-                        {shouldWrapWithLink ? (
+                        {shouldWrapWithLink && rowLink ? (
                           <Link
                             to={rowLink.to as never}
                             params={rowLink.params as never}
