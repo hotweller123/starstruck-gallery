@@ -15,6 +15,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Shield,
+  UserCog,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -25,6 +26,7 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/users",      label: "Users & roles", icon: Users },
   { to: "/admin/content",    label: "Site content", icon: FileText },
   { to: "/admin/analytics",  label: "Analytics",   icon: BarChart3 },
+  { to: "/admin/account",    label: "Admin account", icon: UserCog },
   { to: "/admin/settings",   label: "Settings",    icon: Settings },
 ];
 
@@ -192,7 +194,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[var(--a-accent)]" />
       </button>
 
-      <div className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3">
+      <Link to="/admin/account" className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3 transition hover:bg-[var(--a-surface-2)]">
         <span className="grid size-7 place-items-center rounded bg-[var(--a-accent)] text-[11px] font-bold text-[var(--a-accent-ink)]">
           AD
         </span>
@@ -200,7 +202,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
           <p className="text-[11px] font-semibold text-[var(--a-fg)]">Avery Doss</p>
           <p className="text-[10px] text-[var(--a-muted)]">Super admin</p>
         </div>
-      </div>
+      </Link>
     </header>
   );
 }

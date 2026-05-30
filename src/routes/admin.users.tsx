@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, UserPlus, Shield, ChevronRight } from "lucide-react";
 import { DataTable, SectionHeader, StatusChip } from "@/components/admin/primitives";
@@ -18,7 +18,6 @@ function UsersAdmin() {
   const [users, setUsers] = useState<AdminUser[]>(seedUsers);
   const [q, setQ] = useState("");
   const [role, setRole] = useState<"all" | UserRole>("all");
-  const navigate = useNavigate();
 
   const rows = users
     .filter((u) => role === "all" || u.role === role)
@@ -79,7 +78,7 @@ function UsersAdmin() {
 
       <DataTable
         rows={rows}
-        onRowClick={(u) => navigate({ to: "/admin/users/$id", params: { id: u.id } })}
+        getRowLink={(u) => ({ to: "/admin/users/$id", params: { id: u.id } })}
         columns={[
           { key: "user", header: "User", render: (u) => (
             <div className="flex items-center gap-2.5">
@@ -92,7 +91,7 @@ function UsersAdmin() {
               </div>
             </div>
           ) },
-          { key: "role", header: "Role", render: (u) => (
+          { key: "role", header: "Role", rowLink: false, render: (u) => (
             <select
               value={u.role}
               onClick={(e) => e.stopPropagation()}
@@ -108,7 +107,7 @@ function UsersAdmin() {
           { key: "bal", header: "Balance", render: (u) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(u.balance)}</span> },
           { key: "joined", header: "Joined", render: (u) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.joined)}</span> },
           { key: "last", header: "Last seen", render: (u) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.lastSeen)}</span> },
-          { key: "view", header: "", className: "w-[60px] text-right",
+          { key: "view", header: "", rowLink: false, className: "w-[60px] text-right",
             render: (u) => (
               <Link
                 to="/admin/users/$id" params={{ id: u.id }}
