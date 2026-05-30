@@ -149,36 +149,36 @@
  * Deep navy canvas, cool surfaces, white text, yellow accent.
  * ================================================================= */
 .admin-theme {
-  /* Mature midnight palette — indigo navy with plum undertone */
-  --a-bg:        oklch(0.16 0.028 268);
-  --a-bg-2:      oklch(0.198 0.03 268);
-  --a-surface:   oklch(0.232 0.032 268);
-  --a-surface-2: oklch(0.272 0.034 266);
-  --a-elev:      oklch(0.32 0.036 264);
-  --a-input:     oklch(0.245 0.03 268);
+  /* Slate-900 family — Tailwind slate, polished */
+  --a-bg:        oklch(0.218 0.035 257);   /* slate-900  ~#0f172a */
+  --a-bg-2:      oklch(0.255 0.034 257);   /* slate-850 */
+  --a-surface:   oklch(0.292 0.033 257);   /* slate-800  ~#1e293b */
+  --a-surface-2: oklch(0.345 0.032 257);   /* slate-700  ~#334155 */
+  --a-elev:      oklch(0.395 0.03 257);
+  --a-input:     oklch(0.275 0.032 257);
 
-  --a-fg:        oklch(0.975 0.006 80);
-  --a-fg-2:      oklch(0.89 0.012 80);
-  --a-muted:     oklch(0.72 0.018 260);
-  --a-faint:     oklch(0.55 0.022 262);
+  --a-fg:        oklch(0.985 0.005 250);   /* slate-50 */
+  --a-fg-2:      oklch(0.92 0.012 250);    /* slate-200 */
+  --a-muted:     oklch(0.74 0.022 255);    /* slate-400 */
+  --a-faint:     oklch(0.56 0.025 257);    /* slate-500 */
 
-  --a-border:    oklch(0.92 0.02 250 / 0.085);
-  --a-border-hi: oklch(0.95 0.02 250 / 0.18);
+  --a-border:    oklch(0.92 0.02 250 / 0.10);
+  --a-border-hi: oklch(0.95 0.02 250 / 0.22);
 
-  /* Champagne gold — refined, lower chroma than bright yellow */
-  --a-accent:      oklch(0.82 0.11 86);
-  --a-accent-hi:   oklch(0.88 0.105 88);
-  --a-accent-ink:  oklch(0.16 0.028 268);
-  --a-accent-soft: oklch(0.82 0.11 86 / 0.14);
+  /* Warm amber — the perfect counterpoint to slate */
+  --a-accent:      oklch(0.82 0.13 76);
+  --a-accent-hi:   oklch(0.88 0.125 78);
+  --a-accent-ink:  oklch(0.218 0.035 257);
+  --a-accent-soft: oklch(0.82 0.13 76 / 0.14);
 
-  /* Secondary — deep plum for variety */
-  --a-accent-2:    oklch(0.62 0.13 340);
-  --a-accent-2-soft: oklch(0.62 0.13 340 / 0.16);
+  /* Secondary — soft sky / cool azure for variety */
+  --a-accent-2:      oklch(0.72 0.11 235);
+  --a-accent-2-soft: oklch(0.72 0.11 235 / 0.16);
 
-  --a-info:        oklch(0.7 0.08 210);
-  --a-pos:         oklch(0.78 0.12 158);
-  --a-neg:         oklch(0.68 0.16 25);
-  --a-warn:        oklch(0.8 0.12 75);
+  --a-info:    oklch(0.72 0.11 235);
+  --a-pos:     oklch(0.78 0.12 158);   /* emerald */
+  --a-neg:     oklch(0.68 0.17 25);    /* rose */
+  --a-warn:    oklch(0.82 0.13 76);    /* amber */
 
   background-color: var(--a-bg);
   color: var(--a-fg);
@@ -186,8 +186,8 @@
   font-weight: 400;
   letter-spacing: -0.005em;
   background-image:
-    radial-gradient(1200px 600px at 12% -10%, oklch(0.62 0.13 340 / 0.08), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, oklch(0.82 0.11 86 / 0.05), transparent 65%);
+    radial-gradient(1100px 600px at 10% -10%, oklch(0.72 0.11 235 / 0.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 8%, oklch(0.82 0.13 76 / 0.07), transparent 65%);
   background-attachment: fixed;
 }
 
