@@ -158,7 +158,7 @@ export function DataTable<T extends { id: string }>({
   onRowClick,
   getRowLink,
 }: {
-  columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string }[];
+  columns: { key: string; header: string; render: (row: T) => ReactNode; className?: string; rowLink?: boolean }[];
   rows: T[];
   empty?: string;
   onRowClick?: (row: T) => void;
@@ -211,11 +211,12 @@ export function DataTable<T extends { id: string }>({
                   }`}
                 >
                   {columns.map((c, columnIndex) => {
-                    const rowLink = columnIndex === 0 ? getRowLink?.(row) : undefined;
+                    const rowLink = getRowLink?.(row);
+                    const shouldWrapWithLink = Boolean(rowLink) && c.rowLink !== false && columnIndex < columns.length;
 
                     return (
                       <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
-                        {rowLink ? (
+                        {shouldWrapWithLink ? (
                           <Link
                             to={rowLink.to as never}
                             params={rowLink.params as never}
