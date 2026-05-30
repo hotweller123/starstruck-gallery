@@ -18,6 +18,7 @@ function UsersAdmin() {
   const [users, setUsers] = useState<AdminUser[]>(seedUsers);
   const [q, setQ] = useState("");
   const [role, setRole] = useState<"all" | UserRole>("all");
+  const navigate = useNavigate();
 
   const rows = users
     .filter((u) => role === "all" || u.role === role)
