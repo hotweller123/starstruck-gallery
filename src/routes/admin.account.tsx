@@ -117,7 +117,7 @@ function AdminAccountPage() {
                 <Upload className="size-3.5" /> Upload wallet details
               </button>
             </DialogTrigger>
-            <DialogContent className="border border-[var(--a-border-hi)] bg-[var(--a-bg-2)] text-[var(--a-fg)] sm:max-w-[560px]">
+            <DialogContent className="admin-theme border border-[var(--a-border-hi)] bg-[#111111] text-[var(--a-fg)] shadow-2xl sm:max-w-[560px]">
               <DialogHeader>
                 <DialogTitle className="font-display text-2xl font-extrabold tracking-tight text-[var(--a-fg)]">
                   Add crypto wallet details

@@ -10,7 +10,7 @@ import {
   type AdminUser,
 } from "@/data/admin-mock";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/admin/users/")({
   component: UsersAdmin,
 });
 
