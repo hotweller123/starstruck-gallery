@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Search, Eye, EyeOff, Star, Trash2, Palette, Users as UsersIcon, Gavel, Layers, TrendingUp, Edit3 } from "lucide-react";
 import {
-  BentoCard,
   DataTable,
   SectionHeader,
   StatusChip,
