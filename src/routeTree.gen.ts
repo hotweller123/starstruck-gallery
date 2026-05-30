@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as AuctionsIndexRouteImport } from './routes/auctions.index'
 import { Route as ArtistsIndexRouteImport } from './routes/artists.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WalletWithdrawRouteImport } from './routes/wallet.withdraw'
 import { Route as WalletSendRouteImport } from './routes/wallet.send'
 import { Route as WalletSecurityRouteImport } from './routes/wallet.security'
@@ -33,6 +34,12 @@ import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
+import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
+import { Route as AdminContentRouteImport } from './routes/admin.content'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
@@ -109,6 +116,11 @@ const ArtistsIndexRoute = ArtistsIndexRouteImport.update({
   path: '/artists/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const WalletWithdrawRoute = WalletWithdrawRouteImport.update({
   id: '/withdraw',
   path: '/withdraw',
@@ -154,11 +166,41 @@ const ArtistsSlugRoute = ArtistsSlugRouteImport.update({
   path: '/artists/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminWalletRoute = AdminWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminExhibitionRoute = AdminExhibitionRouteImport.update({
+  id: '/exhibition',
+  path: '/exhibition',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContentRoute = AdminContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
   '/connect': typeof ConnectRoute
@@ -168,6 +210,12 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/content': typeof AdminContentRoute
+  '/admin/exhibition': typeof AdminExhibitionRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -177,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/wallet/security': typeof WalletSecurityRoute
   '/wallet/send': typeof WalletSendRoute
   '/wallet/withdraw': typeof WalletWithdrawRoute
+  '/admin/': typeof AdminIndexRoute
   '/artists/': typeof ArtistsIndexRoute
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -184,7 +233,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
   '/connect': typeof ConnectRoute
@@ -194,6 +242,12 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/content': typeof AdminContentRoute
+  '/admin/exhibition': typeof AdminExhibitionRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -203,6 +257,7 @@ export interface FileRoutesByTo {
   '/wallet/security': typeof WalletSecurityRoute
   '/wallet/send': typeof WalletSendRoute
   '/wallet/withdraw': typeof WalletWithdrawRoute
+  '/admin': typeof AdminIndexRoute
   '/artists': typeof ArtistsIndexRoute
   '/auctions': typeof AuctionsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -211,7 +266,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bids': typeof BidsRoute
   '/cart': typeof CartRoute
   '/connect': typeof ConnectRoute
@@ -221,6 +276,12 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/content': typeof AdminContentRoute
+  '/admin/exhibition': typeof AdminExhibitionRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
@@ -230,6 +291,7 @@ export interface FileRoutesById {
   '/wallet/security': typeof WalletSecurityRoute
   '/wallet/send': typeof WalletSendRoute
   '/wallet/withdraw': typeof WalletWithdrawRoute
+  '/admin/': typeof AdminIndexRoute
   '/artists/': typeof ArtistsIndexRoute
   '/auctions/': typeof AuctionsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -249,6 +311,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/analytics'
+    | '/admin/content'
+    | '/admin/exhibition'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -258,6 +326,7 @@ export interface FileRouteTypes {
     | '/wallet/security'
     | '/wallet/send'
     | '/wallet/withdraw'
+    | '/admin/'
     | '/artists/'
     | '/auctions/'
     | '/categories/'
@@ -265,7 +334,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/admin'
     | '/bids'
     | '/cart'
     | '/connect'
@@ -275,6 +343,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/analytics'
+    | '/admin/content'
+    | '/admin/exhibition'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -284,6 +358,7 @@ export interface FileRouteTypes {
     | '/wallet/security'
     | '/wallet/send'
     | '/wallet/withdraw'
+    | '/admin'
     | '/artists'
     | '/auctions'
     | '/categories'
@@ -301,6 +376,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/analytics'
+    | '/admin/content'
+    | '/admin/exhibition'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
@@ -310,6 +391,7 @@ export interface FileRouteTypes {
     | '/wallet/security'
     | '/wallet/send'
     | '/wallet/withdraw'
+    | '/admin/'
     | '/artists/'
     | '/auctions/'
     | '/categories/'
@@ -318,7 +400,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BidsRoute: typeof BidsRoute
   CartRoute: typeof CartRoute
   ConnectRoute: typeof ConnectRoute
@@ -444,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/wallet/withdraw': {
       id: '/wallet/withdraw'
       path: '/withdraw'
@@ -507,8 +596,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/wallet': {
+      id: '/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AdminWalletRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/exhibition': {
+      id: '/admin/exhibition'
+      path: '/exhibition'
+      fullPath: '/admin/exhibition'
+      preLoaderRoute: typeof AdminExhibitionRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/content': {
+      id: '/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AdminContentRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminContentRoute: typeof AdminContentRoute
+  AdminExhibitionRoute: typeof AdminExhibitionRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminWalletRoute: typeof AdminWalletRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminContentRoute: AdminContentRoute,
+  AdminExhibitionRoute: AdminExhibitionRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminWalletRoute: AdminWalletRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface WalletRouteChildren {
   WalletActivityRoute: typeof WalletActivityRoute
@@ -532,7 +685,7 @@ const WalletRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   BidsRoute: BidsRoute,
   CartRoute: CartRoute,
   ConnectRoute: ConnectRoute,
