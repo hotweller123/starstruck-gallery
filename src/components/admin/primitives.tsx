@@ -1,5 +1,5 @@
 import { type KeyboardEvent, type ReactNode } from "react";
-import { Link, type LinkProps } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
@@ -162,7 +162,7 @@ export function DataTable<T extends { id: string }>({
   rows: T[];
   empty?: string;
   onRowClick?: (row: T) => void;
-  getRowLink?: (row: T) => Pick<LinkProps, "to" | "params" | "search" | "hash" | "state">;
+  getRowLink?: (row: T) => { to: string; params?: Record<string, string> };
 }) {
   function handleRowKeyDown(event: KeyboardEvent<HTMLTableRowElement>, row: T) {
     if (event.target instanceof HTMLElement) {
@@ -217,7 +217,8 @@ export function DataTable<T extends { id: string }>({
                       <td key={c.key} className={`border-b border-[var(--a-border)]/60 px-4 py-3 align-middle ${c.className ?? ""}`}>
                         {rowLink ? (
                           <Link
-                            {...rowLink}
+                            to={rowLink.to as never}
+                            params={rowLink.params as never}
                             className="group/table-row-link -m-4 block rounded-sm p-4 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--a-accent)]"
                           >
                             {c.render(row)}
