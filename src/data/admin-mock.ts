@@ -152,3 +152,76 @@ export function fmtDateTime(iso: string) {
     minute: "2-digit",
   });
 }
+
+/* ---------------- Per-user activity helpers ---------------- */
+import { artworks as _aw } from "./artworks";
+
+export interface UserBid {
+  id: string; lotTitle: string; lotSlug: string; amount: number; status: "leading" | "outbid" | "won" | "lost"; at: string;
+}
+export interface UserOrder {
+  id: string; artworkTitle: string; artworkSlug: string; image: string; amount: number; status: "delivered" | "shipped" | "processing" | "refunded"; at: string;
+}
+export interface UserFavourite { slug: string; title: string; artist: string; image: string; price: number; }
+export interface UserNote { id: string; author: string; body: string; at: string; }
+
+export function getUserActivity(userId: string) {
+  const idx = adminUsers.findIndex((u) => u.id === userId);
+  if (idx < 0) return null;
+  const user = adminUsers[idx];
+  const pick = <T,>(arr: T[], n: number, offset = 0) =>
+    Array.from({ length: n }, (_, i) => arr[(idx * 3 + offset + i * 2) % arr.length]);
+
+  const bidArts = pick(_aw, 4);
+  const bids: UserBid[] = bidArts.map((a, i) => ({
+    id: `bid_${idx}_${i}`,
+    lotTitle: a.title,
+    lotSlug: a.slug,
+    amount: Math.round(a.price * (0.5 + ((i + idx) % 5) * 0.1)),
+    status: (["leading", "outbid", "won", "lost"] as const)[(idx + i) % 4],
+    at: isoDaysAgo(((i + 1) * 2 + idx) % 20),
+  }));
+
+  const orderArts = pick(_aw, 3, 5);
+  const orders: UserOrder[] = orderArts.map((a, i) => ({
+    id: `ord_${idx}_${i}`,
+    artworkTitle: a.title,
+    artworkSlug: a.slug,
+    image: a.image,
+    amount: a.price,
+    status: (["delivered", "shipped", "processing", "refunded"] as const)[(idx + i) % 4],
+    at: isoDaysAgo(((i + 1) * 7 + idx) % 90),
+  }));
+
+  const favArts = pick(_aw, 6, 9);
+  const favourites: UserFavourite[] = favArts.map((a) => ({
+    slug: a.slug, title: a.title, artist: a.artist, image: a.image, price: a.price,
+  }));
+
+  const userTxs = adminTxs.filter((_, i) => (i + idx) % 4 !== 0).slice(0, 14).map((t) => ({ ...t, user: user.name, email: user.email }));
+
+  const wallet = {
+    available: user.balance,
+    pending: Math.round(user.balance * 0.18),
+    inEscrow: Math.round(user.balance * 0.32),
+    lifetimeIn: Math.round(user.balance * 4.5),
+    lifetimeOut: Math.round(user.balance * 2.1),
+    feesPaid: Math.round(user.balance * 0.07),
+    accountNumber: `AE-${1000 + idx}-${(idx * 7919) % 9000 + 1000}`,
+    kycLevel: user.status === "pending" ? "Tier 1 · review" : user.status === "suspended" ? "Suspended" : "Tier 2 · verified",
+    twoFactor: idx % 3 !== 0,
+    devices: 1 + (idx % 3),
+  };
+
+  const series = Array.from({ length: 14 }).map((_, i) => ({
+    day: `D${i + 1}`,
+    balance: Math.max(120, Math.round(user.balance * (0.6 + Math.sin((i + idx) / 2) * 0.2 + (i / 14) * 0.4))),
+  }));
+
+  const notes: UserNote[] = [
+    { id: "n1", author: "Avery Doss", body: "KYC docs verified manually. Cleared for higher withdrawal tier.", at: isoDaysAgo(3) },
+    { id: "n2", author: "System", body: "Login from new device (Lisbon, PT).", at: isoDaysAgo(8) },
+  ];
+
+  return { user, bids, orders, favourites, txs: userTxs, wallet, series, notes };
+}

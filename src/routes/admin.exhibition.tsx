@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Search, Eye, EyeOff, Star, Trash2 } from "lucide-react";
+import { Plus, Search, Eye, EyeOff, Star, Trash2, Palette, Users as UsersIcon, Gavel, Layers, TrendingUp, Edit3 } from "lucide-react";
 import {
   DataTable,
   SectionHeader,
@@ -23,17 +23,35 @@ function ExhibitionAdmin() {
   const [tab, setTab] = useState<Tab>("artworks");
   const [q, setQ] = useState("");
 
+  const totalValue = artworks.reduce((s, a) => s + a.price, 0);
+  const avgPrice = Math.round(totalValue / artworks.length);
+  const liveLots = auctionLots.length;
+
   return (
     <div className="mx-auto max-w-[1440px]">
       <SectionHeader
         title="Exhibition"
-        description="Manage artworks, artists, live auctions and category taxonomy."
+        description="Manage artworks, artists, live auctions and category taxonomy across the gallery."
         action={
-          <button className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]">
-            <Plus className="size-3.5" /> New {tab.slice(0, -1)}
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
+              <Edit3 className="size-3.5" /> Bulk edit
+            </button>
+            <button className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]">
+              <Plus className="size-3.5" /> New {tab.slice(0, -1)}
+            </button>
+          </div>
         }
       />
+
+      {/* KPI strip */}
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+        <ExhibitKpi icon={Palette}    label="Artworks"     value={artworks.length.toString()} />
+        <ExhibitKpi icon={UsersIcon}  label="Artists"      value={artists.length.toString()} />
+        <ExhibitKpi icon={Gavel}      label="Live lots"    value={liveLots.toString()} accent />
+        <ExhibitKpi icon={Layers}     label="Categories"   value={categories.length.toString()} />
+        <ExhibitKpi icon={TrendingUp} label="Avg. price"   value={fmtMoney(avgPrice)} />
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabBar
@@ -91,10 +109,14 @@ function ArtworksTable({ q }: { q: string }) {
             </div>
           ),
         },
-        { key: "cat", header: "Category", render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.categoryLabel}</span> },
+        { key: "cat", header: "Category", render: (r) => <span className="inline-flex rounded bg-[var(--a-surface-2)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--a-fg-2)]">{r.categoryLabel}</span> },
+        { key: "medium", header: "Medium", render: (r) => <span className="truncate text-xs text-[var(--a-muted)]">{r.medium}</span> },
+        { key: "dim", header: "Dimensions", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.dimensions}</span> },
         { key: "year", header: "Year", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.year}</span> },
         { key: "price", header: "Price", render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(r.price)}</span> },
-        { key: "status", header: "Status", render: () => <StatusChip value="active" /> },
+        { key: "views", header: "Views", render: (r) => <span className="a-mono text-xs text-[var(--a-fg-2)]">{(r.slug.length * 137) % 9000 + 320}</span> },
+        { key: "bids", header: "Bids", render: (r) => <span className="a-mono text-xs text-[var(--a-accent)]">{(r.slug.length * 7) % 24}</span> },
+        { key: "status", header: "Status", render: (r) => <StatusChip value={r.highlight ? "active" : "review"} /> },
         {
           key: "actions",
           header: "",
@@ -182,5 +204,17 @@ function IconBtn({ icon: Icon, danger }: { icon: typeof Star; danger?: boolean }
     >
       <Icon className="size-3.5" />
     </button>
+  );
+}
+
+function ExhibitKpi({ icon: Icon, label, value, accent }: { icon: typeof Palette; label: string; value: string; accent?: boolean }) {
+  return (
+    <div className={`a-card-elev p-3.5 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}>
+      <div className="flex items-center justify-between">
+        <p className="a-eyebrow">{label}</p>
+        <Icon className={`size-4 ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-muted)]"}`} />
+      </div>
+      <p className={`font-display mt-1.5 text-xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}>{value}</p>
+    </div>
   );
 }

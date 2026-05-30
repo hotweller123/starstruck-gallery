@@ -149,36 +149,46 @@
  * Deep navy canvas, cool surfaces, white text, yellow accent.
  * ================================================================= */
 .admin-theme {
-  --a-bg:        oklch(0.18 0.04 258);
-  --a-bg-2:      oklch(0.22 0.042 258);
-  --a-surface:   oklch(0.255 0.04 258);
-  --a-surface-2: oklch(0.295 0.038 256);
-  --a-elev:      oklch(0.33 0.036 256);
-  --a-input:     oklch(0.27 0.035 258);
+  /* Mature midnight palette — indigo navy with plum undertone */
+  --a-bg:        oklch(0.16 0.028 268);
+  --a-bg-2:      oklch(0.198 0.03 268);
+  --a-surface:   oklch(0.232 0.032 268);
+  --a-surface-2: oklch(0.272 0.034 266);
+  --a-elev:      oklch(0.32 0.036 264);
+  --a-input:     oklch(0.245 0.03 268);
 
-  --a-fg:        oklch(0.985 0.005 250);
-  --a-fg-2:      oklch(0.9 0.012 250);
-  --a-muted:     oklch(0.74 0.022 255);
-  --a-faint:     oklch(0.58 0.025 258);
+  --a-fg:        oklch(0.975 0.006 80);
+  --a-fg-2:      oklch(0.89 0.012 80);
+  --a-muted:     oklch(0.72 0.018 260);
+  --a-faint:     oklch(0.55 0.022 262);
 
-  --a-border:    oklch(0.92 0.02 250 / 0.10);
-  --a-border-hi: oklch(0.95 0.02 250 / 0.20);
+  --a-border:    oklch(0.92 0.02 250 / 0.085);
+  --a-border-hi: oklch(0.95 0.02 250 / 0.18);
 
-  --a-accent:    oklch(0.9 0.16 95);
-  --a-accent-hi: oklch(0.95 0.15 98);
-  --a-accent-ink: oklch(0.2 0.04 258);
-  --a-accent-soft: oklch(0.9 0.16 95 / 0.14);
+  /* Champagne gold — refined, lower chroma than bright yellow */
+  --a-accent:      oklch(0.82 0.11 86);
+  --a-accent-hi:   oklch(0.88 0.105 88);
+  --a-accent-ink:  oklch(0.16 0.028 268);
+  --a-accent-soft: oklch(0.82 0.11 86 / 0.14);
 
-  --a-pos:       oklch(0.82 0.14 150);
-  --a-neg:       oklch(0.7 0.18 25);
-  --a-warn:      oklch(0.82 0.14 70);
-  --a-info:      oklch(0.78 0.12 230);
+  /* Secondary — deep plum for variety */
+  --a-accent-2:    oklch(0.62 0.13 340);
+  --a-accent-2-soft: oklch(0.62 0.13 340 / 0.16);
+
+  --a-info:        oklch(0.7 0.08 210);
+  --a-pos:         oklch(0.78 0.12 158);
+  --a-neg:         oklch(0.68 0.16 25);
+  --a-warn:        oklch(0.8 0.12 75);
 
   background-color: var(--a-bg);
   color: var(--a-fg);
   font-family: var(--font-sans);
   font-weight: 400;
   letter-spacing: -0.005em;
+  background-image:
+    radial-gradient(1200px 600px at 12% -10%, oklch(0.62 0.13 340 / 0.08), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, oklch(0.82 0.11 86 / 0.05), transparent 65%);
+  background-attachment: fixed;
 }
 
 .admin-theme .font-display { font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.03em; font-style: normal; }
@@ -186,7 +196,14 @@
 .admin-theme ::selection   { background: var(--a-accent); color: var(--a-accent-ink); }
 .admin-theme .a-eyebrow    { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--a-muted); }
 .admin-theme .a-card       { background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 14px; }
-.admin-theme .a-card-elev  { background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 14px; box-shadow: 0 1px 0 0 var(--a-border-hi) inset, 0 20px 50px -28px oklch(0 0 0 / 0.6); }
+.admin-theme .a-card-elev  {
+  background:
+    linear-gradient(180deg, oklch(1 0 0 / 0.025), transparent 40%),
+    var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: 14px;
+  box-shadow: 0 1px 0 0 var(--a-border-hi) inset, 0 24px 60px -32px oklch(0 0 0 / 0.7);
+}
 .admin-theme .a-grid-bg {
   background-image:
     linear-gradient(var(--a-border) 1px, transparent 1px),
@@ -195,6 +212,7 @@
 }
 .admin-theme .a-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
 .admin-theme .a-scrollbar::-webkit-scrollbar-thumb { background: var(--a-border-hi); border-radius: 4px; }
+.admin-theme .a-row-link { cursor: pointer; }
 
 @keyframes a-blink {
   0%, 100% { opacity: 1; }
