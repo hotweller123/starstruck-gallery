@@ -228,3 +228,84 @@ export function getUserActivity(userId: string) {
 
   return { user, bids, orders, favourites, txs: userTxs, wallet, series, notes };
 }
+
+export interface AdminProfile {
+  name: string;
+  email: string;
+  role: string;
+  staffId: string;
+  location: string;
+  lastLogin: string;
+  lastPasswordReset: string;
+  approvalLimit: number;
+  walletReviewQueue: number;
+  exhibitionFlags: number;
+  twoFactor: boolean;
+  trustedDevices: number;
+  teams: string[];
+  permissions: string[];
+  avatar: string;
+}
+
+export interface AdminCryptoWallet {
+  id: string;
+  label: string;
+  asset: string;
+  network: string;
+  address: string;
+  provider?: string;
+  memo?: string;
+  fileName?: string;
+  status: "active" | "review";
+  addedAt: string;
+}
+
+export const adminProfile: AdminProfile = {
+  name: "Avery Doss",
+  email: "avery.doss@aethelred.art",
+  role: "Super admin",
+  staffId: "ADM-014",
+  location: "London, UK",
+  lastLogin: isoDaysAgo(1),
+  lastPasswordReset: isoDaysAgo(19),
+  approvalLimit: 250000,
+  walletReviewQueue: 12,
+  exhibitionFlags: 4,
+  twoFactor: true,
+  trustedDevices: 3,
+  teams: ["Exhibition ops", "Wallet risk", "Content governance"],
+  permissions: [
+    "Approve withdrawals",
+    "Release escrow",
+    "Suspend accounts",
+    "Override exhibition lots",
+    "Publish editorial blocks",
+    "Review flagged bids",
+  ],
+  avatar: "#e8d48a",
+};
+
+export const adminCryptoWallets: AdminCryptoWallet[] = [
+  {
+    id: "cw_1",
+    label: "Treasury settlement wallet",
+    asset: "USDT",
+    network: "Ethereum",
+    address: "0x84f8c2c51fc9a1c8b1d3f9c15a7258bd2b3102ad",
+    provider: "Fireblocks",
+    memo: "Primary ops rail",
+    fileName: "treasury-wallet-proof.pdf",
+    status: "active",
+    addedAt: isoDaysAgo(14),
+  },
+  {
+    id: "cw_2",
+    label: "Collector payout reserve",
+    asset: "BTC",
+    network: "Bitcoin",
+    address: "bc1q3mzun7f2r6vw7sj8ec0k5p4u0w86wsd5u9e4vh",
+    provider: "Ledger Enterprise",
+    status: "review",
+    addedAt: isoDaysAgo(5),
+  },
+];
