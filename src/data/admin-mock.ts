@@ -45,8 +45,10 @@ const seedNames = [
   "Sven Holm", "Lila Rashid", "Onyeka Eze", "Aria Volkov", "Idris Bah",
 ];
 
+// Fixed epoch so SSR and client render identical timestamps (no hydration mismatch).
+const EPOCH = Date.UTC(2026, 4, 30, 12, 0, 0); // 2026-05-30T12:00:00Z
 function isoDaysAgo(d: number) {
-  return new Date(Date.now() - d * 864e5).toISOString();
+  return new Date(EPOCH - d * 864e5).toISOString();
 }
 
 export const adminUsers: AdminUser[] = seedNames.map((name, i) => {
