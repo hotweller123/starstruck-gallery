@@ -24,17 +24,35 @@ function ExhibitionAdmin() {
   const [tab, setTab] = useState<Tab>("artworks");
   const [q, setQ] = useState("");
 
+  const totalValue = artworks.reduce((s, a) => s + a.price, 0);
+  const avgPrice = Math.round(totalValue / artworks.length);
+  const liveLots = auctionLots.length;
+
   return (
     <div className="mx-auto max-w-[1440px]">
       <SectionHeader
         title="Exhibition"
-        description="Manage artworks, artists, live auctions and category taxonomy."
+        description="Manage artworks, artists, live auctions and category taxonomy across the gallery."
         action={
-          <button className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]">
-            <Plus className="size-3.5" /> New {tab.slice(0, -1)}
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
+              <Edit3 className="size-3.5" /> Bulk edit
+            </button>
+            <button className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]">
+              <Plus className="size-3.5" /> New {tab.slice(0, -1)}
+            </button>
+          </div>
         }
       />
+
+      {/* KPI strip */}
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+        <ExhibitKpi icon={Palette}    label="Artworks"     value={artworks.length.toString()} />
+        <ExhibitKpi icon={UsersIcon}  label="Artists"      value={artists.length.toString()} />
+        <ExhibitKpi icon={Gavel}      label="Live lots"    value={liveLots.toString()} accent />
+        <ExhibitKpi icon={Layers}     label="Categories"   value={categories.length.toString()} />
+        <ExhibitKpi icon={TrendingUp} label="Avg. price"   value={fmtMoney(avgPrice)} />
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabBar
