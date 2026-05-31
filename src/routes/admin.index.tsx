@@ -11,9 +11,6 @@ import {
 } from "recharts";
 import {
   ArrowUpRight,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
   CircleDot,
   Coins,
   Gavel,
@@ -30,13 +27,11 @@ import {
 } from "@/components/admin/primitives";
 import {
   adminActivity,
-  adminUsers,
   fmtMoney,
   overviewKpis,
   pendingKyc,
   pendingWithdrawals,
   revenueSeries,
-  systemHealth,
 } from "@/data/admin-mock";
 import { artworks } from "@/data/artworks";
 
@@ -230,73 +225,18 @@ function AdminOverview() {
             )}
           </ul>
         </BentoCard>
-
-        {/* System health */}
-        <BentoCard
-          className="lg:col-span-7"
-          eyebrow="Infrastructure"
-          title="System health"
-          delay={0.28}
-        >
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {systemHealth.map((s) => (
-              <div key={s.label} className="rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-3">
-                <div className="flex items-center justify-between">
-                  <p className="a-eyebrow">{s.label}</p>
-                  {s.ok ? <CheckCircle2 className="size-3.5 text-[var(--a-pos)]" /> : <AlertTriangle className="size-3.5 text-[var(--a-warn)]" />}
-                </div>
-                <p className="a-mono mt-1.5 text-sm font-bold text-[var(--a-fg)]">{s.value}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-3">
-            <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--a-muted)]">
-              <span>Storage usage</span>
-              <span className="a-mono text-[var(--a-fg)]">428 GB / 1 TB</span>
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--a-surface-2)]">
-              <div className="h-full rounded-full bg-[var(--a-accent)]" style={{ width: "42.8%" }} />
-            </div>
-          </div>
-        </BentoCard>
-
-        {/* Quick stats footer */}
-        <BentoCard
-          className="lg:col-span-5"
-          eyebrow="Snapshot"
-          title="Catalog summary"
-          delay={0.3}
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <MiniStat icon={PaletteIcon} label="Artworks" value={artworks.length.toString()} />
-            <MiniStat icon={UserPlus} label="Total users" value={adminUsers.length.toString()} />
-            <MiniStat icon={Gavel} label="Active lots" value="27" />
-            <MiniStat icon={ShoppingBag} label="Orders · 7d" value="142" />
-          </div>
-        </BentoCard>
       </div>
     </div>
   );
 }
 
 const ACTIVITY_ICON = {
-  deposit:  Coins,
+  deposit: Coins,
   withdraw: CircleDollarSign,
-  signup:   UserPlus,
-  bid:      Gavel,
-  sale:     ShoppingBag,
-  listing:  PaletteIcon,
+  signup: UserPlus,
+  bid: Gavel,
+  sale: ShoppingBag,
+  listing: PaletteIcon,
 } as const;
 
-function MiniStat({ icon: Icon, label, value }: { icon: typeof Coins; label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-3">
-      <div className="flex items-center justify-between">
-        <Icon className="size-4 text-[var(--a-accent)]" />
-        <CircleDot className="size-3 text-[var(--a-faint)]" />
-      </div>
-      <p className="font-display mt-2 text-2xl font-extrabold text-[var(--a-fg)]">{value}</p>
-      <p className="text-[10px] uppercase tracking-wider text-[var(--a-muted)]">{label}</p>
-    </div>
-  );
-}
+void CircleDot;

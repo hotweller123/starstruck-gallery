@@ -35,11 +35,7 @@ import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
-import { Route as AdminContentRouteImport } from './routes/admin.content'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as AdminAccountRouteImport } from './routes/admin.account'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 
@@ -173,29 +169,9 @@ const AdminWalletRoute = AdminWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminExhibitionRoute = AdminExhibitionRouteImport.update({
   id: '/exhibition',
   path: '/exhibition',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentRoute = AdminContentRouteImport.update({
-  id: '/content',
-  path: '/content',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAccountRoute = AdminAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
@@ -222,11 +198,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
-  '/admin/account': typeof AdminAccountRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -256,11 +228,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
-  '/admin/account': typeof AdminAccountRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -292,11 +260,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
-  '/admin/account': typeof AdminAccountRoute
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/content': typeof AdminContentRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
@@ -329,11 +293,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
-    | '/admin/account'
-    | '/admin/analytics'
-    | '/admin/content'
     | '/admin/exhibition'
-    | '/admin/settings'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -363,11 +323,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
-    | '/admin/account'
-    | '/admin/analytics'
-    | '/admin/content'
     | '/admin/exhibition'
-    | '/admin/settings'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -398,11 +354,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
-    | '/admin/account'
-    | '/admin/analytics'
-    | '/admin/content'
     | '/admin/exhibition'
-    | '/admin/settings'
     | '/admin/wallet'
     | '/artists/$slug'
     | '/artworks/$slug'
@@ -627,39 +579,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWalletRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/exhibition': {
       id: '/admin/exhibition'
       path: '/exhibition'
       fullPath: '/admin/exhibition'
       preLoaderRoute: typeof AdminExhibitionRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/content': {
-      id: '/admin/content'
-      path: '/content'
-      fullPath: '/admin/content'
-      preLoaderRoute: typeof AdminContentRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/account': {
-      id: '/admin/account'
-      path: '/account'
-      fullPath: '/admin/account'
-      preLoaderRoute: typeof AdminAccountRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/users/': {
@@ -680,11 +604,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
-  AdminAccountRoute: typeof AdminAccountRoute
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminContentRoute: typeof AdminContentRoute
   AdminExhibitionRoute: typeof AdminExhibitionRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminWalletRoute: typeof AdminWalletRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminUsersIdRoute: typeof AdminUsersIdRoute
@@ -692,11 +612,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAccountRoute: AdminAccountRoute,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminContentRoute: AdminContentRoute,
   AdminExhibitionRoute: AdminExhibitionRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
   AdminWalletRoute: AdminWalletRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminUsersIdRoute: AdminUsersIdRoute,
