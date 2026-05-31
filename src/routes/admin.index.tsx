@@ -218,6 +218,13 @@ function AdminOverview() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{u.name}</p>
                     <p className="text-[10px] text-[var(--a-muted)]">Submitted {u.submitted}</p>
+                  </div>
+                  <button className="rounded border border-[var(--a-border-hi)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">Open</button>
+                </li>
+              ))
+            )}
+          </ul>
+        </BentoCard>
       </div>
     </div>
   );
