@@ -12,6 +12,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Shield,
+  UserCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -20,6 +21,7 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/exhibition", label: "Exhibition", icon: Palette },
   { to: "/admin/wallet", label: "Wallet ops", icon: Wallet },
   { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/account", label: "Account", icon: UserCircle },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
