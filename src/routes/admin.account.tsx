@@ -326,7 +326,6 @@ function AdminAccountPage() {
           setActiveWallet(null);
         }}
       />
-    </div>
     </>
   );
 }
