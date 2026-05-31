@@ -126,7 +126,9 @@ function AdminAccountPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <>
+      <div className="mx-auto w-full max-w-6xl space-y-6">
+
 
         {/* Header */}
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -325,6 +327,7 @@ function AdminAccountPage() {
         }}
       />
     </div>
+    </>
   );
 }
 
