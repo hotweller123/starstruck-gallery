@@ -11,9 +11,9 @@ import {
   Truck, RotateCcw,
 } from "lucide-react";
 import {
-  BentoCard, DataTable, SectionHeader, StatusChip,
+  BentoCard, DataTable, StatusChip,
 } from "@/components/admin/primitives";
-import { RecordSheet, type FieldDef, type OperationDef } from "@/components/admin/RecordSheet";
+import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
 import {
   getUserActivity, fmtMoney, fmtDateTime,
   type UserBid, type UserOrder, type UserFavourite, type UserNote,
