@@ -16,7 +16,6 @@ import {
   Check,
   Pencil,
 } from "lucide-react";
-import { AdminShell } from "@/components/admin/AdminShell";
 import { BentoCard } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
 
