@@ -16,7 +16,6 @@ import {
   Check,
   Pencil,
 } from "lucide-react";
-import { AdminShell } from "@/components/admin/AdminShell";
 import { BentoCard } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
 
@@ -127,8 +126,10 @@ function AdminAccountPage() {
   }
 
   return (
-    <AdminShell>
+    <>
       <div className="mx-auto w-full max-w-6xl space-y-6">
+
+
         {/* Header */}
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -325,7 +326,7 @@ function AdminAccountPage() {
           setActiveWallet(null);
         }}
       />
-    </AdminShell>
+    </>
   );
 }
 
