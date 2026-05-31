@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -550,7 +550,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 /* run a setup fn whenever `open` flips to true */
-import { useEffect, useRef } from "react";
 function useStateSync(open: boolean, fn: () => void) {
   const ran = useRef(false);
   useEffect(() => {

@@ -36,6 +36,7 @@ import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
 import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
+import { Route as AdminAccountRouteImport } from './routes/admin.account'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 
@@ -174,6 +175,11 @@ const AdminExhibitionRoute = AdminExhibitionRouteImport.update({
   path: '/exhibition',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAccountRoute = AdminAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/account': typeof AdminAccountRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/account': typeof AdminAccountRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
+  '/admin/account': typeof AdminAccountRoute
   '/admin/exhibition': typeof AdminExhibitionRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/artists/$slug': typeof ArtistsSlugRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/account'
     | '/admin/exhibition'
     | '/admin/wallet'
     | '/artists/$slug'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/account'
     | '/admin/exhibition'
     | '/admin/wallet'
     | '/artists/$slug'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sell'
     | '/wallet'
+    | '/admin/account'
     | '/admin/exhibition'
     | '/admin/wallet'
     | '/artists/$slug'
@@ -586,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminExhibitionRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/account': {
+      id: '/admin/account'
+      path: '/account'
+      fullPath: '/admin/account'
+      preLoaderRoute: typeof AdminAccountRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users/': {
       id: '/admin/users/'
       path: '/users'
@@ -604,6 +623,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAccountRoute: typeof AdminAccountRoute
   AdminExhibitionRoute: typeof AdminExhibitionRoute
   AdminWalletRoute: typeof AdminWalletRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -612,6 +632,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountRoute: AdminAccountRoute,
   AdminExhibitionRoute: AdminExhibitionRoute,
   AdminWalletRoute: AdminWalletRoute,
   AdminIndexRoute: AdminIndexRoute,
