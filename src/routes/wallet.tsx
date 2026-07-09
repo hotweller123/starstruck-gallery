@@ -146,9 +146,33 @@ function Dashboard() {
 
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
+<<<<<<< HEAD
         <Stat label="Deposited" value={stats.deposited} icon={TrendingUp} tint="var(--w-brand)" delay={0.05} />
         <Stat label="Withdrawn" value={stats.withdrawn} icon={TrendingDown} tint="var(--w-fg)" delay={0.1} />
         <Stat label="Spent" value={stats.spent} icon={ShoppingBag} tint="var(--w-neg)" delay={0.15} />
+=======
+        <Stat
+          label="Deposited"
+          value={stats.deposited}
+          icon={TrendingUp}
+          tint="var(--w-brand)"
+          delay={0.05}
+        />
+        <Stat
+          label="Withdrawn"
+          value={stats.withdrawn}
+          icon={TrendingDown}
+          tint="var(--w-fg)"
+          delay={0.1}
+        />
+        <Stat
+          label="Spent"
+          value={stats.spent}
+          icon={ShoppingBag}
+          tint="var(--w-neg)"
+          delay={0.15}
+        />
+>>>>>>> 49a1b1e (updated)
       </div>
 
       {/* Discover row */}
@@ -209,6 +233,7 @@ function Dashboard() {
   );
 }
 
+<<<<<<< HEAD
 function Action({
   to,
   icon: Icon,
@@ -218,6 +243,9 @@ function Action({
   icon: typeof Send;
   label: string;
 }) {
+=======
+function Action({ to, icon: Icon, label }: { to: string; icon: typeof Send; label: string }) {
+>>>>>>> 49a1b1e (updated)
   return (
     <Link to={to} className="group">
       <motion.div
@@ -313,9 +341,13 @@ function DiscoverCard({
           </span>
           <ArrowUpRight className="size-4 text-[var(--w-muted)]" />
         </div>
+<<<<<<< HEAD
         <p className="mt-3 text-sm font-extrabold tracking-tight text-[var(--w-fg)]">
           {title}
         </p>
+=======
+        <p className="mt-3 text-sm font-extrabold tracking-tight text-[var(--w-fg)]">{title}</p>
+>>>>>>> 49a1b1e (updated)
         <p className="text-xs text-[var(--w-muted)]">{desc}</p>
       </motion.div>
     </Link>

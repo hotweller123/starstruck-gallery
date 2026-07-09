@@ -2,6 +2,17 @@ import { type ReactNode, useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Pencil, Save, RotateCcw, type LucideIcon } from "lucide-react";
+<<<<<<< HEAD
+=======
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+  SelectGroup,
+} from "../ui/select";
+>>>>>>> 49a1b1e (updated)
 
 /**
  * Generic admin record viewer / editor.
@@ -105,6 +116,12 @@ export function RecordSheet<T extends { id: string }>({
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="admin-theme fixed inset-0 z-50 flex flex-col bg-[#0f0f10] text-[var(--a-fg)] md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[88vh] md:w-[min(960px,94vw)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:border md:border-[var(--a-border-hi)] md:shadow-2xl"
               >
+<<<<<<< HEAD
+=======
+                <DialogPrimitive.Description className="sr-only">
+                  {title} details panel
+                </DialogPrimitive.Description>
+>>>>>>> 49a1b1e (updated)
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3 border-b border-[var(--a-border)] px-5 py-4 md:px-6">
                   <div className="min-w-0">
@@ -141,12 +158,19 @@ export function RecordSheet<T extends { id: string }>({
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {fields.map((f) => {
                           const value = getValue(f.key);
+<<<<<<< HEAD
                           const isEditing = editing && f.editable !== false && f.kind !== "readonly";
                           return (
                             <div
                               key={f.key}
                               className={f.span === 2 ? "sm:col-span-2" : undefined}
                             >
+=======
+                          const isEditing =
+                            editing && f.editable !== false && f.kind !== "readonly";
+                          return (
+                            <div key={f.key} className={f.span === 2 ? "sm:col-span-2" : undefined}>
+>>>>>>> 49a1b1e (updated)
                               <label className="a-eyebrow mb-1.5 block">{f.label}</label>
                               {isEditing ? (
                                 <EditField
@@ -186,10 +210,17 @@ export function RecordSheet<T extends { id: string }>({
                             op.tone === "danger"
                               ? "border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] hover:bg-[var(--a-neg)]/20"
                               : op.tone === "success"
+<<<<<<< HEAD
                               ? "border-[var(--a-pos)]/30 bg-[var(--a-pos)]/10 text-[var(--a-pos)] hover:bg-[var(--a-pos)]/20"
                               : op.tone === "primary"
                               ? "border-transparent bg-[var(--a-accent)] text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
                               : "border-[var(--a-border)] bg-[var(--a-surface)] text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]";
+=======
+                                ? "border-[var(--a-pos)]/30 bg-[var(--a-pos)]/10 text-[var(--a-pos)] hover:bg-[var(--a-pos)]/20"
+                                : op.tone === "primary"
+                                  ? "border-transparent bg-[var(--a-accent)] text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
+                                  : "border-[var(--a-border)] bg-[var(--a-surface)] text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]";
+>>>>>>> 49a1b1e (updated)
                           return (
                             <button
                               key={op.id}
@@ -249,8 +280,17 @@ function ViewField<T>({ field, value, row }: { field: FieldDef<T>; value: unknow
     value === null || value === undefined || value === ""
       ? "—"
       : field.kind === "money" && typeof value === "number"
+<<<<<<< HEAD
       ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
       : String(value);
+=======
+        ? new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+          }).format(value)
+        : String(value);
+>>>>>>> 49a1b1e (updated)
   return (
     <div className="break-words rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] px-3 py-2 text-sm text-[var(--a-fg)]">
       {display}
@@ -282,6 +322,7 @@ function EditField({
   }
   if (kind === "select" && options) {
     return (
+<<<<<<< HEAD
       <select
         className={cls}
         value={(value as string) ?? ""}
@@ -293,6 +334,22 @@ function EditField({
           </option>
         ))}
       </select>
+=======
+      <Select onValueChange={(e) => onChange(e)} value={(value as string) ?? ""}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {options.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+>>>>>>> 49a1b1e (updated)
     );
   }
   return (

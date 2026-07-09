@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState } from "react";
+=======
+import { ReactHTMLElement, useState } from "react";
+>>>>>>> 49a1b1e (updated)
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Gavel, Heart, ShieldCheck, Mail, MapPin } from "lucide-react";
 import {
@@ -36,9 +40,13 @@ export const Route = createFileRoute("/auctions/$slug")({
 function AuctionLotPage() {
   const { lot } = Route.useLoaderData();
   const seller = getSeller(lot.sellerSlug);
+<<<<<<< HEAD
   const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter(
     (l) => l.slug !== lot.slug,
   );
+=======
+  const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter((l) => l.slug !== lot.slug);
+>>>>>>> 49a1b1e (updated)
 
   // Side rail: this lot's own images + first image of each other seller lot
   const railImages = [
@@ -64,7 +72,11 @@ function AuctionLotPage() {
 
   const minBid = lot.currentBid + 100;
   const { placeBid, toggleFavorite, isFavorite } = useStore();
+<<<<<<< HEAD
   const [bidAmount, setBidAmount] = useState(minBid);
+=======
+  const [bidAmount, setBidAmount] = useState(0);
+>>>>>>> 49a1b1e (updated)
   const fav = isFavorite(lot.slug);
 
   const submitBid = () => {
@@ -76,6 +88,20 @@ function AuctionLotPage() {
     alert(`Bid of ${formatBid(bidAmount)} placed on Lot ${lot.lotNumber}.`);
   };
 
+<<<<<<< HEAD
+=======
+  const getNum = (num: number) => {
+    return num.toLocaleString();
+  };
+
+  const setNum = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const checkNum = value.split(",").join("");
+    const convertNum = parseInt(checkNum);
+    setBidAmount(convertNum || 0);
+  };
+
+>>>>>>> 49a1b1e (updated)
   return (
     <article>
       <div className="mx-auto max-w-7xl px-6 pt-12">
@@ -102,9 +128,13 @@ function AuctionLotPage() {
                   onClick={() => setActiveIdx(i)}
                   className={cn(
                     "group relative aspect-square overflow-hidden bg-surface outline outline-1 -outline-offset-1 transition-all",
+<<<<<<< HEAD
                     isActive
                       ? "outline-ink"
                       : "outline-ink/10 hover:outline-ink/40",
+=======
+                    isActive ? "outline-ink" : "outline-ink/10 hover:outline-ink/40",
+>>>>>>> 49a1b1e (updated)
                   )}
                   aria-label={img.label}
                   title={img.label}
@@ -168,17 +198,25 @@ function AuctionLotPage() {
             )}
           </div>
 
+<<<<<<< HEAD
           <p className="text-base leading-relaxed text-ink/80">
             {lot.description}
           </p>
+=======
+          <p className="text-base leading-relaxed text-ink/80">{lot.description}</p>
+>>>>>>> 49a1b1e (updated)
 
           {/* Live bid panel */}
           <div className="border border-ink/15 bg-surface/50 p-6">
             <div className="flex items-baseline justify-between">
               <div>
+<<<<<<< HEAD
                 <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
                   Current bid
                 </p>
+=======
+                <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Current bid</p>
+>>>>>>> 49a1b1e (updated)
                 <p className="mt-1 font-display text-4xl italic text-ink">
                   {formatBid(lot.currentBid)}
                 </p>
@@ -206,9 +244,13 @@ function AuctionLotPage() {
             </div>
 
             <div className="mt-6 border-t border-ink/10 pt-6">
+<<<<<<< HEAD
               <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
                 Closes in
               </p>
+=======
+              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Closes in</p>
+>>>>>>> 49a1b1e (updated)
               <div className="mt-3">
                 <Countdown endsAt={lot.endsAt} size="md" />
               </div>
@@ -218,9 +260,15 @@ function AuctionLotPage() {
               <div className="flex flex-1 items-center border border-ink/20 bg-canvas">
                 <span className="px-3 text-sm text-detail">$</span>
                 <input
+<<<<<<< HEAD
                   type="number"
                   value={bidAmount}
                   onChange={(e) => setBidAmount(Number(e.target.value))}
+=======
+                  type="text"
+                  value={getNum(bidAmount ?? 0)}
+                  onChange={(e) => setNum(e)}
+>>>>>>> 49a1b1e (updated)
                   min={minBid}
                   step={100}
                   className="w-full bg-transparent py-3 pr-3 text-base text-ink focus:outline-none"
@@ -251,13 +299,19 @@ function AuctionLotPage() {
             </div>
             <p className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-detail">
               <ShieldCheck className="size-3.5" strokeWidth={1.5} />
+<<<<<<< HEAD
               Min next bid {formatBid(minBid)} · Buyer's premium 12% · Auctioned lots cannot be added to cart
+=======
+              Min next bid {formatBid(minBid)} · Buyer's premium 12% · Auctioned lots cannot be
+              added to cart
+>>>>>>> 49a1b1e (updated)
             </p>
           </div>
 
           {/* Specifications */}
           <dl className="grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10">
             <div className="bg-canvas p-5">
+<<<<<<< HEAD
               <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
                 Medium
               </dt>
@@ -285,6 +339,25 @@ function AuctionLotPage() {
               <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
                 Provenance
               </dt>
+=======
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Medium</dt>
+              <dd className="mt-2 text-sm">{lot.medium}</dd>
+            </div>
+            <div className="bg-canvas p-5">
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Dimensions</dt>
+              <dd className="mt-2 text-sm">{lot.dimensions}</dd>
+            </div>
+            <div className="bg-canvas p-5">
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Year</dt>
+              <dd className="mt-2 text-sm">{lot.year}</dd>
+            </div>
+            <div className="bg-canvas p-5">
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Condition</dt>
+              <dd className="mt-2 text-sm">{lot.condition}</dd>
+            </div>
+            <div className="col-span-2 bg-canvas p-5">
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Provenance</dt>
+>>>>>>> 49a1b1e (updated)
               <dd className="mt-2 text-sm">{lot.provenance}</dd>
             </div>
           </dl>
@@ -292,9 +365,13 @@ function AuctionLotPage() {
           {/* Seller card */}
           {seller && (
             <div className="border border-ink/10 p-6">
+<<<<<<< HEAD
               <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
                 Consigned by
               </p>
+=======
+              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Consigned by</p>
+>>>>>>> 49a1b1e (updated)
               <div className="mt-4 flex items-start gap-4">
                 <SmartImage
                   src={seller.portrait}
@@ -312,9 +389,13 @@ function AuctionLotPage() {
                   </p>
                 </div>
               </div>
+<<<<<<< HEAD
               <p className="mt-4 text-sm leading-relaxed text-ink/75">
                 {seller.short}
               </p>
+=======
+              <p className="mt-4 text-sm leading-relaxed text-ink/75">{seller.short}</p>
+>>>>>>> 49a1b1e (updated)
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link
                   to="/artists/$slug"

@@ -53,7 +53,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
+<<<<<<< HEAD
               className="fixed inset-0 z-40 bg-black/60 md:hidden"
+=======
+              className="fixed inset-0 z-40 bg-black/60 md:hidden backdrop-blur-xs"
+>>>>>>> 49a1b1e (updated)
             />
             <motion.aside
               initial={{ x: -260 }}
@@ -95,8 +99,27 @@ function SidebarInner({
   onClose?: () => void;
 }) {
   return (
+<<<<<<< HEAD
     <div className="flex h-full flex-col">
       <div className="flex h-[60px] items-center justify-between border-b border-[var(--a-border)] px-4">
+=======
+    <div className="flex h-full flex-col relative">
+      {onToggle && (
+        <button
+          onClick={onToggle}
+          className="hidden absolute top-1/2 -right-1 bg-[var(--a-accent)] z-10 size-7 place-items-center  text-[var(--a-muted)] group text-slate-800 md:grid rounded-full rounded-r-none"
+          aria-label="Toggle sidebar"
+        >
+          {collapsed ? (
+            <ChevronsRight className="size-4.5 group-hover:size-5 transistion-all duration-300" />
+          ) : (
+            <ChevronsLeft className="size-4.5 group-hover:size-5 transistion-all duration-300" />
+          )}
+        </button>
+      )}
+
+      <div className="flex h-[60px]  items-center justify-between border-b border-[var(--a-border)] px-4">
+>>>>>>> 49a1b1e (updated)
         <Link to="/admin" className="flex items-center gap-2 min-w-0">
           <span className="grid size-8 shrink-0 place-items-center rounded-md bg-[var(--a-accent)] text-[var(--a-accent-ink)]">
             <Shield className="size-4" strokeWidth={2.4} />
@@ -107,6 +130,7 @@ function SidebarInner({
             </span>
           )}
         </Link>
+<<<<<<< HEAD
         {onToggle && (
           <button
             onClick={onToggle}
@@ -116,6 +140,9 @@ function SidebarInner({
             {collapsed ? <ChevronsRight className="size-4" /> : <ChevronsLeft className="size-4" />}
           </button>
         )}
+=======
+
+>>>>>>> 49a1b1e (updated)
         {onClose && (
           <button
             onClick={onClose}
@@ -146,7 +173,11 @@ function SidebarInner({
                   }`}
                 >
                   {active && (
+<<<<<<< HEAD
                     <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r bg-[var(--a-accent)]" />
+=======
+                    <span className="absolute left-0 top-1/2 h-5 w-0.75 -translate-y-1/2 rounded-r bg-[var(--a-accent)]" />
+>>>>>>> 49a1b1e (updated)
                   )}
                   <Icon className="size-4 shrink-0" strokeWidth={2} />
                   {!collapsed && <span className="truncate font-medium">{item.label}</span>}
@@ -193,7 +224,11 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
           className="h-9 w-full rounded-md border border-[var(--a-border)] bg-[var(--a-input)] pl-9 pr-3 text-sm text-[var(--a-fg)] placeholder:text-[var(--a-faint)] outline-none focus:border-[var(--a-border-hi)]"
         />
       </div>
+<<<<<<< HEAD
       <div className="flex-1 md:hidden" />
+=======
+      <div className="flex-1 " />
+>>>>>>> 49a1b1e (updated)
 
       <span className="hidden items-center gap-1.5 rounded-full border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-muted)] sm:inline-flex">
         <span className="size-1.5 rounded-full bg-[var(--a-warn)] a-live" /> Mock env

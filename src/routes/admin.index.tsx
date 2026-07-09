@@ -19,12 +19,16 @@ import {
   ShoppingBag,
   CircleDollarSign,
 } from "lucide-react";
+<<<<<<< HEAD
 import {
   BentoCard,
   KpiTile,
   SectionHeader,
   StatusChip,
 } from "@/components/admin/primitives";
+=======
+import { BentoCard, KpiTile, SectionHeader, StatusChip } from "@/components/admin/primitives";
+>>>>>>> 49a1b1e (updated)
 import {
   adminActivity,
   fmtMoney,
@@ -40,9 +44,13 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminOverview() {
+<<<<<<< HEAD
   const topArtworks = [...artworks]
     .sort((a, b) => b.price - a.price)
     .slice(0, 5);
+=======
+  const topArtworks = [...artworks].sort((a, b) => b.price - a.price).slice(0, 5);
+>>>>>>> 49a1b1e (updated)
 
   return (
     <div className="mx-auto max-w-[1440px]">
@@ -63,10 +71,39 @@ function AdminOverview() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+<<<<<<< HEAD
         <KpiTile label="Platform revenue" value={overviewKpis.revenue.value} delta={overviewKpis.revenue.delta} delay={0.0} />
         <KpiTile label="Wallet volume · 24h" value={overviewKpis.volume24h.value} delta={overviewKpis.volume24h.delta} delay={0.05} />
         <KpiTile label="Active auctions" value={overviewKpis.activeAuctions.value} delta={overviewKpis.activeAuctions.delta} format="number" delay={0.1} />
         <KpiTile label="New users" value={overviewKpis.newUsers.value} delta={overviewKpis.newUsers.delta} format="number" delay={0.15} />
+=======
+        <KpiTile
+          label="Platform revenue"
+          value={overviewKpis.revenue.value}
+          delta={overviewKpis.revenue.delta}
+          delay={0.0}
+        />
+        <KpiTile
+          label="Wallet volume · 24h"
+          value={overviewKpis.volume24h.value}
+          delta={overviewKpis.volume24h.delta}
+          delay={0.05}
+        />
+        <KpiTile
+          label="Active auctions"
+          value={overviewKpis.activeAuctions.value}
+          delta={overviewKpis.activeAuctions.delta}
+          format="number"
+          delay={0.1}
+        />
+        <KpiTile
+          label="New users"
+          value={overviewKpis.newUsers.value}
+          delta={overviewKpis.newUsers.delta}
+          format="number"
+          delay={0.15}
+        />
+>>>>>>> 49a1b1e (updated)
       </div>
 
       {/* Bento grid */}
@@ -79,8 +116,17 @@ function AdminOverview() {
           delay={0.18}
           action={
             <div className="flex items-center gap-3 text-[10px] font-semibold text-[var(--a-muted)]">
+<<<<<<< HEAD
               <span className="flex items-center gap-1.5"><span className="size-2 rounded-sm bg-[var(--a-accent)]" /> Revenue</span>
               <span className="flex items-center gap-1.5"><span className="size-2 rounded-sm bg-[var(--a-info)]" /> Volume</span>
+=======
+              <span className="flex items-center gap-1.5">
+                <span className="size-2 rounded-sm bg-[var(--a-accent)]" /> Revenue
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-2 rounded-sm bg-[var(--a-info)]" /> Volume
+              </span>
+>>>>>>> 49a1b1e (updated)
             </div>
           }
         >
@@ -98,6 +144,7 @@ function AdminOverview() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="var(--a-border)" vertical={false} />
+<<<<<<< HEAD
                 <XAxis dataKey="day" stroke="var(--a-faint)" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis stroke="var(--a-faint)" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={48} />
                 <Tooltip
@@ -106,6 +153,45 @@ function AdminOverview() {
                 />
                 <Area type="monotone" dataKey="volume" stroke="var(--a-info)" strokeWidth={1.6} fill="url(#g-vol)" />
                 <Area type="monotone" dataKey="revenue" stroke="var(--a-accent)" strokeWidth={2} fill="url(#g-rev)" />
+=======
+                <XAxis
+                  dataKey="day"
+                  stroke="var(--a-faint)"
+                  tick={{ fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="var(--a-faint)"
+                  tick={{ fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={false}
+                  width={48}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--a-bg-2)",
+                    border: "1px solid var(--a-border-hi)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: "var(--a-muted)" }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="volume"
+                  stroke="var(--a-info)"
+                  strokeWidth={1.6}
+                  fill="url(#g-vol)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="var(--a-accent)"
+                  strokeWidth={2}
+                  fill="url(#g-rev)"
+                />
+>>>>>>> 49a1b1e (updated)
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -117,7 +203,15 @@ function AdminOverview() {
           eyebrow="Live"
           title="Activity feed"
           delay={0.2}
+<<<<<<< HEAD
           action={<span className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-pos)]"><span className="size-1.5 rounded-full bg-[var(--a-pos)] a-live" /> LIVE</span>}
+=======
+          action={
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-pos)]">
+              <span className="size-1.5 rounded-full bg-[var(--a-pos)] a-live" /> LIVE
+            </span>
+          }
+>>>>>>> 49a1b1e (updated)
         >
           <ul className="space-y-3">
             {adminActivity.map((e) => {
@@ -151,11 +245,23 @@ function AdminOverview() {
           eyebrow="Trending"
           title="Top performing artworks"
           delay={0.22}
+<<<<<<< HEAD
           action={<Link to="/admin/exhibition" className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent)] hover:underline">View all <ArrowUpRight className="size-3" /></Link>}
+=======
+          action={
+            <Link
+              to="/admin/exhibition"
+              className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent)] hover:underline"
+            >
+              View all <ArrowUpRight className="size-3" />
+            </Link>
+          }
+>>>>>>> 49a1b1e (updated)
         >
           <ul className="divide-y divide-[var(--a-border)]">
             {topArtworks.map((a, i) => (
               <li key={a.slug} className="flex items-center gap-3 py-2.5">
+<<<<<<< HEAD
                 <span className="a-mono w-6 text-center text-[11px] font-bold text-[var(--a-muted)]">{String(i + 1).padStart(2, "0")}</span>
                 <img src={a.image} alt={a.title} className="size-10 rounded-md object-cover" />
                 <div className="min-w-0 flex-1">
@@ -163,6 +269,21 @@ function AdminOverview() {
                   <p className="truncate text-[10px] text-[var(--a-muted)]">{a.artist} · {a.categoryLabel}</p>
                 </div>
                 <p className="a-mono text-xs font-bold text-[var(--a-accent)]">{fmtMoney(a.price)}</p>
+=======
+                <span className="a-mono w-6 text-center text-[11px] font-bold text-[var(--a-muted)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <img src={a.image} alt={a.title} className="size-10 rounded-md object-cover" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{a.title}</p>
+                  <p className="truncate text-[10px] text-[var(--a-muted)]">
+                    {a.artist} · {a.categoryLabel}
+                  </p>
+                </div>
+                <p className="a-mono text-xs font-bold text-[var(--a-accent)]">
+                  {fmtMoney(a.price)}
+                </p>
+>>>>>>> 49a1b1e (updated)
               </li>
             ))}
           </ul>
@@ -174,13 +295,25 @@ function AdminOverview() {
           eyebrow="Queue"
           title="Pending withdrawals"
           delay={0.24}
+<<<<<<< HEAD
           action={<Link to="/admin/wallet" className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent)] hover:underline">Open <ArrowUpRight className="size-3" /></Link>}
+=======
+          action={
+            <Link
+              to="/admin/wallet"
+              className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent)] hover:underline"
+            >
+              Open <ArrowUpRight className="size-3" />
+            </Link>
+          }
+>>>>>>> 49a1b1e (updated)
         >
           <ul className="space-y-2.5">
             {pendingWithdrawals.length === 0 ? (
               <li className="py-8 text-center text-xs text-[var(--a-muted)]">All clear.</li>
             ) : (
               pendingWithdrawals.slice(0, 5).map((tx) => (
+<<<<<<< HEAD
                 <li key={tx.id} className="flex items-center justify-between gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{tx.user}</p>
@@ -191,6 +324,29 @@ function AdminOverview() {
                     <div className="mt-1 flex gap-1">
                       <button className="rounded bg-[var(--a-pos)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)] hover:bg-[var(--a-pos)]/25">OK</button>
                       <button className="rounded bg-[var(--a-neg)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-neg)] hover:bg-[var(--a-neg)]/25">Reject</button>
+=======
+                <li
+                  key={tx.id}
+                  className="flex items-center justify-between gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{tx.user}</p>
+                    <p className="a-mono truncate text-[10px] text-[var(--a-muted)]">
+                      {tx.id} · {tx.method}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                      {fmtMoney(tx.amount)}
+                    </p>
+                    <div className="mt-1 flex gap-1">
+                      <button className="rounded bg-[var(--a-pos)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)] hover:bg-[var(--a-pos)]/25">
+                        OK
+                      </button>
+                      <button className="rounded bg-[var(--a-neg)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-neg)] hover:bg-[var(--a-neg)]/25">
+                        Reject
+                      </button>
+>>>>>>> 49a1b1e (updated)
                     </div>
                   </div>
                 </li>
@@ -200,12 +356,16 @@ function AdminOverview() {
         </BentoCard>
 
         {/* Pending KYC */}
+<<<<<<< HEAD
         <BentoCard
           className="lg:col-span-3"
           eyebrow="Review"
           title="Pending KYC"
           delay={0.26}
         >
+=======
+        <BentoCard className="lg:col-span-3" eyebrow="Review" title="Pending KYC" delay={0.26}>
+>>>>>>> 49a1b1e (updated)
           <ul className="space-y-2.5">
             {pendingKyc.length === 0 ? (
               <li className="py-8 text-center text-xs text-[var(--a-muted)]">No submissions.</li>
@@ -213,13 +373,27 @@ function AdminOverview() {
               pendingKyc.map((u) => (
                 <li key={u.id} className="flex items-center gap-2.5">
                   <span className="grid size-8 place-items-center rounded-md bg-[var(--a-surface-2)] text-[11px] font-bold text-[var(--a-accent)]">
+<<<<<<< HEAD
                     {u.name.split(" ").map((s) => s[0]).join("").slice(0, 2)}
+=======
+                    {u.name
+                      .split(" ")
+                      .map((s) => s[0])
+                      .join("")
+                      .slice(0, 2)}
+>>>>>>> 49a1b1e (updated)
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{u.name}</p>
                     <p className="text-[10px] text-[var(--a-muted)]">Submitted {u.submitted}</p>
                   </div>
+<<<<<<< HEAD
                   <button className="rounded border border-[var(--a-border-hi)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">Open</button>
+=======
+                  <button className="rounded border border-[var(--a-border-hi)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
+                    Open
+                  </button>
+>>>>>>> 49a1b1e (updated)
                 </li>
               ))
             )}

@@ -5,12 +5,19 @@ export function Footer() {
     <footer className="border-t border-ink/10 px-6 py-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-16 md:flex-row md:justify-between">
         <div className="max-w-sm">
+<<<<<<< HEAD
           <h2 className="font-display text-3xl italic text-ink">
             Aethelred Gallery
           </h2>
           <p className="mt-5 text-sm leading-relaxed text-detail">
             A digital sanctuary for the appreciation of modern thought and
             traditional craft. New works released seasonally.
+=======
+          <h2 className="font-display text-3xl italic text-ink">Aethelred Gallery</h2>
+          <p className="mt-5 text-sm leading-relaxed text-detail">
+            A digital sanctuary for the appreciation of modern thought and traditional craft. New
+            works released seasonally.
+>>>>>>> 49a1b1e (updated)
           </p>
           <form
             className="mt-8 flex items-center border-b border-ink/30 pb-2"
@@ -39,10 +46,14 @@ export function Footer() {
             <Link to="/gallery" className="text-sm text-detail hover:text-ink">
               Gallery
             </Link>
+<<<<<<< HEAD
             <Link
               to="/categories"
               className="text-sm text-detail hover:text-ink"
             >
+=======
+            <Link to="/categories" className="text-sm text-detail hover:text-ink">
+>>>>>>> 49a1b1e (updated)
               Categories
             </Link>
             <Link to="/artists" className="text-sm text-detail hover:text-ink">
@@ -76,7 +87,14 @@ export function Footer() {
             <a href="#" className="text-sm text-detail hover:text-ink">
               Journal
             </a>
+<<<<<<< HEAD
             <Link to="/wallet" className="mt-2 inline-flex items-center gap-1 text-sm text-clay hover:underline">
+=======
+            <Link
+              to="/wallet"
+              className="mt-2 inline-flex items-center gap-1 text-sm text-clay hover:underline"
+            >
+>>>>>>> 49a1b1e (updated)
               Aethelred Pay ↗
             </Link>
           </div>

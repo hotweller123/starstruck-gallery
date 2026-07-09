@@ -1,12 +1,20 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+<<<<<<< HEAD
 import { artworks, filterOptions } from "@/data/artworks";
+=======
+import { artworks as mockArtworks, filterOptions, Artwork } from "@/data/artworks";
+>>>>>>> 49a1b1e (updated)
 import { MasonryGallery } from "@/components/site/MasonryGallery";
 import { CategoryChips } from "@/components/site/CategoryChips";
 import { PageHeader } from "@/components/site/PageHeader";
 import { FilterDrawer } from "@/components/site/FilterDrawer";
 import { ActiveFilterChips } from "@/components/site/ActiveFilterChips";
 import { makeDefaultFilters, type Filters } from "@/components/site/filters-types";
+<<<<<<< HEAD
+=======
+import { useArtworkContext } from "@/lib/useMetArtworksStore";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
@@ -22,10 +30,17 @@ export const Route = createFileRoute("/gallery")({
   }),
 });
 
+<<<<<<< HEAD
 function applyFilters(f: Filters) {
   return artworks.filter((a) => {
     if (a.price < f.priceMin || a.price > f.priceMax) return false;
     if (f.category.length && !f.category.includes(a.category)) return false;
+=======
+function applyFilters(f: Filters, artworks: Artwork[]) {
+  return artworks.filter((a) => {
+    if (a.price < f.priceMin || a.price > f.priceMax) return false;
+    if (f.category.length && !f.category.some((fc) => fc == a.category)) return false;
+>>>>>>> 49a1b1e (updated)
     if (f.size.length && !f.size.includes(a.sizeCategory)) return false;
     if (f.orientation.length && !f.orientation.includes(a.orientation)) return false;
     if (f.medium.length && !f.medium.includes(a.medium)) return false;
@@ -44,7 +59,12 @@ function GalleryPage() {
     makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
   );
 
+<<<<<<< HEAD
   const filtered = useMemo(() => applyFilters(filters), [filters]);
+=======
+  const { artworks } = useArtworkContext();
+  const filtered = useMemo(() => applyFilters(filters, artworks), [filters, artworks]);
+>>>>>>> 49a1b1e (updated)
 
   return (
     <>
@@ -76,7 +96,11 @@ function GalleryPage() {
       </div>
 
       <section className="mx-auto max-w-7xl px-6 pb-32 pt-6">
+<<<<<<< HEAD
         <MasonryGallery artworks={filtered} />
+=======
+        <MasonryGallery artworks={filtered.slice(0, 20)} />
+>>>>>>> 49a1b1e (updated)
       </section>
     </>
   );

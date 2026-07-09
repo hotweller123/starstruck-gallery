@@ -1,9 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useStore } from "@/lib/store";
+<<<<<<< HEAD
 import { artworks, formatPrice, getArtworkBySlug } from "@/data/artworks";
 import { PageHeader } from "@/components/site/PageHeader";
 import { SmartImage } from "@/components/site/SmartImage";
+=======
+import { formatPrice, getArtworkBySlug } from "@/data/artworks";
+import { PageHeader } from "@/components/site/PageHeader";
+import { SmartImage } from "@/components/site/SmartImage";
+import { useArtworkContext } from "@/lib/useMetArtworksStore";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -11,11 +18,24 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
+<<<<<<< HEAD
   const { cart, setQuantity, removeFromCart, clearCart } = useStore();
 
   const rows = cart
     .map((c) => ({ item: c, artwork: getArtworkBySlug(c.slug) }))
     .filter((r): r is { item: typeof r.item; artwork: NonNullable<typeof r.artwork> } => !!r.artwork);
+=======
+  const { artworks } = useArtworkContext();
+  const { cart, setQuantity, removeFromCart, clearCart } = useStore();
+
+  const rows = cart
+    .map((c) => ({ item: c, artwork: getArtworkBySlug(c.slug, artworks) }))
+    .filter(
+      (r): r is { item: typeof r.item; artwork: NonNullable<typeof r.artwork> } => !!r.artwork,
+    );
+
+  console.log(rows);
+>>>>>>> 49a1b1e (updated)
 
   const subtotal = rows.reduce((s, r) => s + r.artwork.price * r.item.quantity, 0);
   const shipping = rows.length ? 95 : 0;
@@ -136,8 +156,12 @@ function CartPage() {
                 Proceed to checkout
               </button>
               <p className="mt-3 text-center text-[10px] uppercase tracking-[0.22em] text-detail">
+<<<<<<< HEAD
                 {rows.length} {rows.length === 1 ? "work" : "works"} · of{" "}
                 {artworks.length} on view
+=======
+                {rows.length} {rows.length === 1 ? "work" : "works"} · of {artworks.length} on view
+>>>>>>> 49a1b1e (updated)
               </p>
             </aside>
           </div>

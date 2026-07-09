@@ -55,7 +55,55 @@ export const categories: Category[] = [
     description:
       "Vessels and ceramic objects that sit between the functional and the contemplative.",
   },
+<<<<<<< HEAD
 ];
 
 export const getCategory = (slug: string) =>
   categories.find((c) => c.slug === slug);
+=======
+  {
+    slug: "calligraphy",
+    label: "Calligraphy",
+    description:
+      "The disciplined art of beautiful writing — ink, breath and gesture held in perfect tension on the page.",
+  },
+  {
+    slug: "drawings",
+    label: "Drawings",
+    description:
+      "Works on paper that privilege line, mark and the directness of the hand above all else.",
+  },
+  {
+    slug: "horology",
+    label: "Horology",
+    description:
+      "Timepieces and instruments that turn the measurement of duration into mechanical poetry.",
+  },
+  {
+    slug: "codices",
+    label: "Codices",
+    description:
+      "Hand-bound books and manuscripts in which image, text and material form a single contemplative object.",
+  },
+  {
+    slug: "wallpaper",
+    label: "Wallpaper",
+    description:
+      "Large-scale printed and painted surfaces made to transform the room rather than merely decorate it.",
+  },
+  {
+    slug: "paintings",
+    label: "Paintings",
+    description:
+      "Works in oil, pigment and mixed media that explore surface, colour, light and the long patience of the hand.",
+  },
+  {
+    slug: "ceramics-porcelain",
+    label: "Porcelain",
+    description:
+      "Fine porcelain vessels and objects fired to translucency, precision and quiet luminosity.",
+  },
+];
+
+export const getCategory = (slug: string) => categories.find((c) => c.slug === slug);
+>>>>>>> 49a1b1e (updated)

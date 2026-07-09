@@ -20,11 +20,15 @@ export function FaqAccordion() {
         </div>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((f, i) => (
+<<<<<<< HEAD
             <AccordionItem
               key={i}
               value={`item-${i}`}
               className="border-b border-ink/10"
             >
+=======
+            <AccordionItem key={i} value={`item-${i}`} className="border-b border-ink/10">
+>>>>>>> 49a1b1e (updated)
               <AccordionTrigger className="py-6 text-left font-display text-xl italic text-ink hover:no-underline">
                 {f.q}
               </AccordionTrigger>

@@ -14,7 +14,15 @@ export function Nav() {
   return (
     <nav className="sticky top-0 z-50 border-b border-ink/5 bg-canvas/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-7">
+<<<<<<< HEAD
         <Link to="/" className="font-display text-2xl italic tracking-tight text-ink" onClick={() => setOpen(false)}>
+=======
+        <Link
+          to="/"
+          className="font-display text-2xl italic tracking-tight text-ink"
+          onClick={() => setOpen(false)}
+        >
+>>>>>>> 49a1b1e (updated)
           Aethelred
         </Link>
 
@@ -38,8 +46,20 @@ export function Nav() {
           >
             Contact
           </Link>
+<<<<<<< HEAD
           <button type="button" aria-label="Toggle menu" className="md:hidden" onClick={() => setOpen((v) => !v)}>
             <span className="block text-[11px] font-medium uppercase tracking-[0.22em]">{open ? "Close" : "Menu"}</span>
+=======
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            className="md:hidden"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="block text-[11px] font-medium uppercase tracking-[0.22em]">
+              {open ? "Close" : "Menu"}
+            </span>
+>>>>>>> 49a1b1e (updated)
           </button>
         </div>
       </div>

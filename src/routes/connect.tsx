@@ -50,6 +50,7 @@ function ConnectPage() {
             <div>
               <div className="flex items-center gap-3 border-b border-ink/10 pb-5">
                 <CheckCircle2 className="size-5 text-clay" strokeWidth={1.4} />
+<<<<<<< HEAD
                 <p className="text-[11px] uppercase tracking-[0.3em] text-clay">
                   Wallet connected
                 </p>
@@ -62,6 +63,14 @@ function ConnectPage() {
               <p className="font-display text-4xl italic">
                 {formatMoney(connected.balance)}
               </p>
+=======
+                <p className="text-[11px] uppercase tracking-[0.3em] text-clay">Wallet connected</p>
+              </div>
+              <p className="mt-6 font-display text-3xl italic">{connected.name}</p>
+              <p className="text-sm text-detail">{connected.email}</p>
+              <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">Balance</p>
+              <p className="font-display text-4xl italic">{formatMoney(connected.balance)}</p>
+>>>>>>> 49a1b1e (updated)
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -90,9 +99,13 @@ function ConnectPage() {
                 <span className="grid size-10 place-items-center bg-clay/10 text-clay">
                   <KeyRound className="size-4" strokeWidth={1.5} />
                 </span>
+<<<<<<< HEAD
                 <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
                   Wallet token
                 </p>
+=======
+                <p className="text-[10px] uppercase tracking-[0.3em] text-detail">Wallet token</p>
+>>>>>>> 49a1b1e (updated)
               </div>
 
               <input
@@ -133,8 +146,12 @@ function ConnectPage() {
           </div>
           <ol className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-ink/85">
             <Step n={1} title="Create a wallet">
+<<<<<<< HEAD
               Sign up for a free Aethelred Wallet — it lives alongside the
               exhibition.
+=======
+              Sign up for a free Aethelred Wallet — it lives alongside the exhibition.
+>>>>>>> 49a1b1e (updated)
             </Step>
             <Step n={2} title="Copy your token">
               In Wallet → Security, copy your unique{" "}
@@ -144,8 +161,12 @@ function ConnectPage() {
               Paste the token above. The site is unlocked instantly.
             </Step>
             <Step n={4} title="Bid, buy, sell">
+<<<<<<< HEAD
               Auctions, checkout, and listings all flow through your wallet
               balance.
+=======
+              Auctions, checkout, and listings all flow through your wallet balance.
+>>>>>>> 49a1b1e (updated)
             </Step>
           </ol>
         </aside>
@@ -160,6 +181,7 @@ function useWalletAccount(id: string) {
   return getAccount(id);
 }
 
+<<<<<<< HEAD
 function Step({
   n,
   title,
@@ -169,6 +191,9 @@ function Step({
   title: string;
   children: React.ReactNode;
 }) {
+=======
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+>>>>>>> 49a1b1e (updated)
   return (
     <li className="flex gap-4">
       <span className="grid size-7 shrink-0 place-items-center rounded-full border border-ink/20 font-display text-sm italic">

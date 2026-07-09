@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
+<<<<<<< HEAD
 import {
   Sheet,
   SheetContent,
@@ -7,15 +8,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+=======
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+>>>>>>> 49a1b1e (updated)
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { filterOptions, formatPrice } from "@/data/artworks";
 import { categories } from "@/data/categories";
+<<<<<<< HEAD
 import {
   type Filters,
   type MultiKey,
   makeDefaultFilters,
 } from "./filters-types";
+=======
+import { type Filters, type MultiKey, makeDefaultFilters } from "./filters-types";
+>>>>>>> 49a1b1e (updated)
 
 interface Props {
   value: Filters;
@@ -38,9 +46,13 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
   const toggle = <T extends string>(key: MultiKey, item: T) => {
     setDraft((d) => {
       const arr = d[key] as unknown as T[];
+<<<<<<< HEAD
       const next = arr.includes(item)
         ? arr.filter((x) => x !== item)
         : [...arr, item];
+=======
+      const next = arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
+>>>>>>> 49a1b1e (updated)
       return { ...d, [key]: next } as Filters;
     });
   };
@@ -88,6 +100,7 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
     </div>
   );
 
+<<<<<<< HEAD
   const Section = ({
     title,
     children,
@@ -99,6 +112,11 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
       <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">
         {title}
       </h3>
+=======
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <section className="border-t border-ink/10 py-6 first:border-t-0 first:pt-0">
+      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">{title}</h3>
+>>>>>>> 49a1b1e (updated)
       {children}
     </section>
   );
@@ -119,21 +137,36 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
         className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden bg-canvas p-0 sm:w-[440px] sm:max-w-[440px]"
       >
         <SheetHeader className="flex flex-row items-center justify-between border-b border-ink/10 px-6 py-5">
+<<<<<<< HEAD
           <SheetTitle className="font-display text-2xl italic">
             Refine the view
           </SheetTitle>
           <button
+=======
+          <SheetTitle className="font-display text-2xl italic">Refine the view</SheetTitle>
+          {/* <button
+>>>>>>> 49a1b1e (updated)
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close"
             className="text-detail hover:text-ink"
           >
             <X className="size-5" />
+<<<<<<< HEAD
           </button>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <Section title={`Price · ${formatPrice(draft.priceMin)} — ${formatPrice(draft.priceMax)}`}>
+=======
+          </button> */}
+        </SheetHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          <Section
+            title={`Price · ${formatPrice(draft.priceMin)} — ${formatPrice(draft.priceMax)}`}
+          >
+>>>>>>> 49a1b1e (updated)
             <Slider
               value={[draft.priceMin, draft.priceMax]}
               min={filterOptions.priceMin}
@@ -150,9 +183,13 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
               options={categories.map((c) => c.slug)}
               selected={draft.category}
               onToggle={(v) => toggle("category", v)}
+<<<<<<< HEAD
               transform={(v) =>
                 categories.find((c) => c.slug === v)?.label ?? v
               }
+=======
+              transform={(v) => categories.find((c) => c.slug === v)?.label ?? v}
+>>>>>>> 49a1b1e (updated)
             />
           </Section>
 
@@ -227,9 +264,13 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
               <span className="text-sm text-ink">Show curator's picks only</span>
               <Switch
                 checked={draft.highlight}
+<<<<<<< HEAD
                 onCheckedChange={(v) =>
                   setDraft((d) => ({ ...d, highlight: !!v }))
                 }
+=======
+                onCheckedChange={(v) => setDraft((d) => ({ ...d, highlight: !!v }))}
+>>>>>>> 49a1b1e (updated)
               />
             </label>
           </Section>

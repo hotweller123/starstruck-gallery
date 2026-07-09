@@ -115,8 +115,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
+<<<<<<< HEAD
   const currentAccount =
     state.accounts.find((a) => a.id === state.currentAccountId) ?? null;
+=======
+  const currentAccount = state.accounts.find((a) => a.id === state.currentAccountId) ?? null;
+>>>>>>> 49a1b1e (updated)
 
   const pushTx = (
     s: State,
@@ -152,7 +156,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         id: uid(),
         email: e,
         name: name.trim(),
+<<<<<<< HEAD
         passwordHash: hash(password),
+=======
+        passwordHash: password,
+>>>>>>> 49a1b1e (updated)
         token: makeToken(),
         balance: 0,
         createdAt: new Date().toISOString(),
@@ -168,7 +176,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     signIn: ({ email, password }) => {
       const e = email.trim().toLowerCase();
       const acc = state.accounts.find((a) => a.email === e);
+<<<<<<< HEAD
       if (!acc || acc.passwordHash !== hash(password))
+=======
+      if (!acc || acc.passwordHash !== password)
+>>>>>>> 49a1b1e (updated)
         return { ok: false, error: "Invalid email or password." };
       setState((s) => ({ ...s, currentAccountId: acc.id }));
       return { ok: true };
@@ -185,9 +197,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const newBal = acc.balance + amount;
         return {
           ...s,
+<<<<<<< HEAD
           accounts: s.accounts.map((a) =>
             a.id === acc.id ? { ...a, balance: newBal } : a,
           ),
+=======
+          accounts: s.accounts.map((a) => (a.id === acc.id ? { ...a, balance: newBal } : a)),
+>>>>>>> 49a1b1e (updated)
           transactions: [
             pushTx(s, acc.id, "deposit", amount, newBal, note ?? "Card deposit"),
             ...s.transactions,
@@ -200,17 +216,25 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     withdraw: (amount, note) => {
       if (!currentAccount) return { ok: false, error: "Sign in first." };
       if (amount <= 0) return { ok: false, error: "Amount must be positive." };
+<<<<<<< HEAD
       if (currentAccount.balance < amount)
         return { ok: false, error: "Insufficient funds." };
+=======
+      if (currentAccount.balance < amount) return { ok: false, error: "Insufficient funds." };
+>>>>>>> 49a1b1e (updated)
       setState((s) => {
         const acc = s.accounts.find((a) => a.id === currentAccount.id);
         if (!acc) return s;
         const newBal = acc.balance - amount;
         return {
           ...s,
+<<<<<<< HEAD
           accounts: s.accounts.map((a) =>
             a.id === acc.id ? { ...a, balance: newBal } : a,
           ),
+=======
+          accounts: s.accounts.map((a) => (a.id === acc.id ? { ...a, balance: newBal } : a)),
+>>>>>>> 49a1b1e (updated)
           transactions: [
             pushTx(s, acc.id, "withdraw", amount, newBal, note ?? "Bank withdrawal"),
             ...s.transactions,
@@ -223,6 +247,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     transfer: (toToken, amount, note) => {
       if (!currentAccount) return { ok: false, error: "Sign in first." };
       if (amount <= 0) return { ok: false, error: "Amount must be positive." };
+<<<<<<< HEAD
       const to = state.accounts.find(
         (a) => a.token === toToken.trim().toUpperCase(),
       );
@@ -231,6 +256,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         return { ok: false, error: "Can't transfer to yourself." };
       if (currentAccount.balance < amount)
         return { ok: false, error: "Insufficient funds." };
+=======
+      const to = state.accounts.find((a) => a.token === toToken.trim().toUpperCase());
+      if (!to) return { ok: false, error: "Recipient token not found." };
+      if (to.id === currentAccount.id) return { ok: false, error: "Can't transfer to yourself." };
+      if (currentAccount.balance < amount) return { ok: false, error: "Insufficient funds." };
+>>>>>>> 49a1b1e (updated)
       setState((s) => {
         const from = s.accounts.find((a) => a.id === currentAccount.id);
         const recipient = s.accounts.find((a) => a.id === to.id);
@@ -259,14 +290,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     debitAccount: (accountId, amount, type, note) => {
       const acc = state.accounts.find((a) => a.id === accountId);
       if (!acc) return { ok: false, error: "Wallet not found." };
+<<<<<<< HEAD
       if (acc.balance < amount)
         return { ok: false, error: "Insufficient wallet balance." };
+=======
+      if (acc.balance < amount) return { ok: false, error: "Insufficient wallet balance." };
+>>>>>>> 49a1b1e (updated)
       setState((s) => {
         const a = s.accounts.find((x) => x.id === accountId);
         if (!a) return s;
         const newBal = a.balance - amount;
         return {
           ...s,
+<<<<<<< HEAD
           accounts: s.accounts.map((x) =>
             x.id === a.id ? { ...x, balance: newBal } : x,
           ),
@@ -274,6 +310,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             pushTx(s, a.id, type, amount, newBal, note),
             ...s.transactions,
           ],
+=======
+          accounts: s.accounts.map((x) => (x.id === a.id ? { ...x, balance: newBal } : x)),
+          transactions: [pushTx(s, a.id, type, amount, newBal, note), ...s.transactions],
+>>>>>>> 49a1b1e (updated)
         };
       });
       return { ok: true };
@@ -288,6 +328,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const newBal = a.balance + amount;
         return {
           ...s,
+<<<<<<< HEAD
           accounts: s.accounts.map((x) =>
             x.id === a.id ? { ...x, balance: newBal } : x,
           ),
@@ -295,17 +336,28 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             pushTx(s, a.id, type, amount, newBal, note),
             ...s.transactions,
           ],
+=======
+          accounts: s.accounts.map((x) => (x.id === a.id ? { ...x, balance: newBal } : x)),
+          transactions: [pushTx(s, a.id, type, amount, newBal, note), ...s.transactions],
+>>>>>>> 49a1b1e (updated)
         };
       });
       return { ok: true };
     },
 
+<<<<<<< HEAD
     getAccount: (id) =>
       id ? (state.accounts.find((a) => a.id === id) ?? null) : null,
     getAccountByToken: (token) =>
       state.accounts.find((a) => a.token === token.trim().toUpperCase()) ?? null,
     txsFor: (accountId) =>
       state.transactions.filter((t) => t.accountId === accountId),
+=======
+    getAccount: (id) => (id ? (state.accounts.find((a) => a.id === id) ?? null) : null),
+    getAccountByToken: (token) =>
+      state.accounts.find((a) => a.token === token.trim().toUpperCase()) ?? null,
+    txsFor: (accountId) => state.transactions.filter((t) => t.accountId === accountId),
+>>>>>>> 49a1b1e (updated)
 
     regenerateToken: () => {
       if (!currentAccount) return { ok: false, error: "Sign in first." };
@@ -348,10 +400,14 @@ export const TX_LABEL: Record<TxType, string> = {
 };
 
 export function txSign(type: TxType): 1 | -1 {
+<<<<<<< HEAD
   return type === "deposit" ||
     type === "transfer_in" ||
     type === "bid_release" ||
     type === "sale"
+=======
+  return type === "deposit" || type === "transfer_in" || type === "bid_release" || type === "sale"
+>>>>>>> 49a1b1e (updated)
     ? 1
     : -1;
 }

@@ -25,16 +25,29 @@ export interface UserListing {
   createdAt: string;
 }
 
+<<<<<<< HEAD
 interface Store {
   favorites: string[];
   cart: CartItem[];
   bids: Bid[];
   listings: UserListing[];
   connectedWalletId: string | null;
+=======
+interface Store extends PersistedState {
+  // favorites: string[];
+  // cart: CartItem[];
+  // bids: Bid[];
+  // listings: UserListing[];
+  // connectedWalletId: string | null;
+>>>>>>> 49a1b1e (updated)
   toggleFavorite: (slug: string) => void;
   isFavorite: (slug: string) => boolean;
   addToCart: (slug: string, qty?: number) => void;
   removeFromCart: (slug: string) => void;
+<<<<<<< HEAD
+=======
+  removeFromBid: (slug: string) => void;
+>>>>>>> 49a1b1e (updated)
   setQuantity: (slug: string, qty: number) => void;
   clearCart: () => void;
   placeBid: (lotSlug: string, amount: number) => void;
@@ -115,6 +128,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }),
     removeFromCart: (slug) =>
       setState((s) => ({ ...s, cart: s.cart.filter((c) => c.slug !== slug) })),
+<<<<<<< HEAD
+=======
+    removeFromBid: (slug) =>
+      setState((s) => ({ ...s, bids: s.bids.filter((b) => b.lotSlug !== slug) })),
+>>>>>>> 49a1b1e (updated)
     setQuantity: (slug, qty) =>
       setState((s) => ({
         ...s,
@@ -142,8 +160,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       })),
     removeListing: (id) =>
       setState((s) => ({ ...s, listings: s.listings.filter((l) => l.id !== id) })),
+<<<<<<< HEAD
     connectWallet: (accountId) =>
       setState((s) => ({ ...s, connectedWalletId: accountId })),
+=======
+    connectWallet: (accountId) => setState((s) => ({ ...s, connectedWalletId: accountId })),
+>>>>>>> 49a1b1e (updated)
     disconnectWallet: () => setState((s) => ({ ...s, connectedWalletId: null })),
   };
 

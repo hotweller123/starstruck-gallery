@@ -43,6 +43,7 @@ function ArtistsIndex() {
                   className="block aspect-[4/5] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                 />
               </div>
+<<<<<<< HEAD
               <h3 className="mt-5 font-display text-3xl italic">
                 {artist.name}
               </h3>
@@ -52,6 +53,13 @@ function ArtistsIndex() {
               <p className="mt-4 text-sm leading-relaxed text-ink/75">
                 {artist.short}
               </p>
+=======
+              <h3 className="mt-5 font-display text-3xl italic">{artist.name}</h3>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-detail">
+                {artist.discipline} &mdash; {artist.location}
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-ink/75">{artist.short}</p>
+>>>>>>> 49a1b1e (updated)
             </Link>
           ))}
         </div>

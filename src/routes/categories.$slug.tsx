@@ -4,6 +4,11 @@ import { getArtworksByCategory, type CategorySlug } from "@/data/artworks";
 import { MasonryGallery } from "@/components/site/MasonryGallery";
 import { CategoryChips } from "@/components/site/CategoryChips";
 import { PageHeader } from "@/components/site/PageHeader";
+<<<<<<< HEAD
+=======
+import { useArtworkContext } from "@/lib/useMetArtworksStore";
+import { useMemo } from "react";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/categories/$slug")({
   component: CategoryPage,
@@ -27,7 +32,16 @@ export const Route = createFileRoute("/categories/$slug")({
 
 function CategoryPage() {
   const { category } = Route.useLoaderData();
+<<<<<<< HEAD
   const works = getArtworksByCategory(category.slug as CategorySlug);
+=======
+  const { artworks } = useArtworkContext();
+
+  const works = useMemo(
+    () => getArtworksByCategory(category.slug as CategorySlug, artworks),
+    [artworks, category],
+  );
+>>>>>>> 49a1b1e (updated)
 
   return (
     <>

@@ -10,6 +10,12 @@ import art09 from "@/assets/art-09.jpg";
 import art10 from "@/assets/art-10.jpg";
 import art11 from "@/assets/art-11.jpg";
 import art12 from "@/assets/art-12.jpg";
+<<<<<<< HEAD
+=======
+import { ChicagoArtwork } from "@/hooks/useChicagoArt";
+import { ModChicagoArtwork } from "@/routes";
+import { MetArtwork } from "@/types/metTypes";
+>>>>>>> 49a1b1e (updated)
 
 export type CategorySlug =
   | "abstract"
@@ -19,6 +25,7 @@ export type CategorySlug =
   | "photography"
   | "digital"
   | "mixed-media"
+<<<<<<< HEAD
   | "ceramics";
 
 export type SizeCategory = "small" | "medium" | "large";
@@ -29,6 +36,20 @@ export type DominantColor =
   | "Neutral"
   | "Monochrome"
   | "Earth";
+=======
+  | "calligraphy"
+  | "drawings"
+  | "horology"
+  | "codices"
+  | "ceramics"
+  | "wallpaper"
+  | "paintings"
+  | "ceramics-porcelain";
+
+export type SizeCategory = "small" | "medium" | "large";
+export type Orientation = "portrait" | "landscape" | "square";
+export type DominantColor = "Warm" | "Cool" | "Neutral" | "Monochrome" | "Earth";
+>>>>>>> 49a1b1e (updated)
 
 export interface Artwork {
   slug: string;
@@ -44,6 +65,10 @@ export interface Artwork {
   width: number;
   height: number;
   description: string;
+<<<<<<< HEAD
+=======
+  measurement: any;
+>>>>>>> 49a1b1e (updated)
   // Extended filterable metadata
   price: number; // USD
   sizeCategory: SizeCategory;
@@ -56,9 +81,62 @@ export interface Artwork {
   highlight: boolean;
 }
 
+<<<<<<< HEAD
 const orientationFrom = (w: number, h: number): Orientation =>
   w === h ? "square" : h > w ? "portrait" : "landscape";
 
+=======
+const getImageUrl = (imageId?: string) => {
+  if (!imageId) return "";
+  return `https://www.artic.edu/iiif/2/${imageId}/full/843,/0/default.jpg`;
+};
+
+export const orientationFrom = (w: number, h: number): Orientation =>
+  w === h ? "square" : h > w ? "portrait" : "landscape";
+
+export const changeChicagoToMod = <T extends ChicagoArtwork[]>(arr: T): ModChicagoArtwork[] =>
+  arr.map((ca) => ({
+    image: getImageUrl(ca.image_id),
+    title: ca.title,
+    id: ca.id,
+    name: ca.artist_display,
+    width: ca.thumbnail?.width || 100,
+    height: ca.thumbnail?.height || 100,
+    medium: ca.medium_display,
+    price: ca.id / 100,
+  }));
+
+export const changeMetArtWorkProps = <T extends MetArtwork>(arr: T[] = []) =>
+  arr.map((a) => ({
+    artist: a.artistDisplayName,
+    category: a.classification?.toLowerCase() as CategorySlug,
+    title: a.title,
+    country: a.country,
+    medium: a.medium,
+    slug: String(a.objectID),
+    height: a?.measurements[0]?.elementMeasurements?.Height || 100,
+    width: a?.measurements[0]?.elementMeasurements?.Width || 100,
+    measurement: a.measurements,
+    description: a.artistDisplayBio,
+    sizeCategory: "large" as SizeCategory,
+    theme: a.department,
+    orientation: orientationFrom(
+      a?.measurements[0]?.elementMeasurements?.Width || 100,
+      a?.measurements[0]?.elementMeasurements?.Height || 100,
+    ),
+    style: a.artistNationality,
+    dominantColor: "Cool" as DominantColor,
+    highlight: a.isHighlight,
+    artistSlug: a.artistDisplayName,
+    categoryLabel: "",
+    year: Number(a.accessionYear),
+    image: a.primaryImage,
+    price: (9 * a.objectID) / 1000,
+    dimensions: a.dimensions || "Unknown", // Added dimensions
+    technique: "Unknown", // Added technique
+  }));
+
+>>>>>>> 49a1b1e (updated)
 export const formatPrice = (n: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -66,7 +144,11 @@ export const formatPrice = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 
+<<<<<<< HEAD
 const seed: Omit<Artwork, "orientation">[] = [
+=======
+const seed: Omit<Artwork, "orientation" | "measurement">[] = [
+>>>>>>> 49a1b1e (updated)
   {
     slug: "linen-study-no-4",
     title: "Linen Study No. 4",
@@ -646,11 +728,16 @@ const seed: Omit<Artwork, "orientation">[] = [
   },
 ];
 
+<<<<<<< HEAD
 export const artworks: Artwork[] = seed.map((a) => ({
+=======
+export const artworks: Omit<Artwork, "measurement">[] = seed.map((a) => ({
+>>>>>>> 49a1b1e (updated)
   ...a,
   orientation: orientationFrom(a.width, a.height),
 }));
 
+<<<<<<< HEAD
 export const getArtworkBySlug = (slug: string) =>
   artworks.find((a) => a.slug === slug);
 
@@ -662,6 +749,54 @@ export const getArtworksByArtist = (artistSlug: string) =>
 
 // Filter option enumerations (derived for the FilterDrawer)
 const uniq = <T,>(arr: T[]) => Array.from(new Set(arr)).sort();
+=======
+export const getArtworkBySlug = (slug: string, list: Artwork[] = []) => {
+  if (!slug || !Array.isArray(list) || list.length === 0) {
+    return undefined;
+  }
+
+  // Normalize the value we're searching for (handles both string slugs and numeric objectIDs)
+  const target = String(slug).trim().toLowerCase();
+
+  return list.find((a) => a.slug.toLowerCase() === target);
+
+  // return list.find((item) => {
+  //   if (!item || typeof item !== "object") return false;
+
+  //   // Collect every possible identifier the item might use.
+  //   // Local data usually has "slug".
+  //   // Met Museum API data usually has "objectID" (number).
+  //   const possibleIds = [
+  //     item.slug,
+  //     item.objectID,
+  //     item.id,
+  //     item._id,
+  //     item.artworkId,
+  //     item.artworkSlug,
+  //   ];
+
+  //   console.log(possibleIds, target);
+
+  //   return possibleIds.some((value) => {
+  //     if (value == null) return false;
+
+  //     const normalized = String(value).trim().toLowerCase();
+
+  //     // Also support direct match if someone stored the ID as a stringified number
+  //     return normalized === target;
+  //   });
+  // });
+};
+
+export const getArtworksByCategory = (slug: CategorySlug, artworks: Artwork[] = []) =>
+  artworks.filter((a) => a.category === slug);
+
+export const getArtworksByArtist = (artistSlug: string) =>
+  artworks.filter((a, i, arr) => a.category.includes(artistSlug));
+
+// Filter option enumerations (derived for the FilterDrawer)
+const uniq = <T>(arr: T[]) => Array.from(new Set(arr)).sort();
+>>>>>>> 49a1b1e (updated)
 export const filterOptions = {
   size: ["small", "medium", "large"] as SizeCategory[],
   orientation: ["portrait", "landscape", "square"] as Orientation[],

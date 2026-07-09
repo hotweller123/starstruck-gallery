@@ -2,7 +2,10 @@ import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Sparkles } from "lucide-react";
 import { useWallet } from "@/lib/wallet";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 49a1b1e (updated)
 type Mode = "signin" | "register";
 
 export function AuthForms() {
@@ -18,9 +21,13 @@ export function AuthForms() {
     e.preventDefault();
     setError(null);
     const res =
+<<<<<<< HEAD
       mode === "register"
         ? register({ name, email, password })
         : signIn({ email, password });
+=======
+      mode === "register" ? register({ name, email, password }) : signIn({ email, password });
+>>>>>>> 49a1b1e (updated)
     if (!res.ok) setError(res.error ?? "Something went wrong.");
   };
 
@@ -44,6 +51,7 @@ export function AuthForms() {
             </p>
           </div>
 
+<<<<<<< HEAD
           <div className="mt-5 flex gap-1 rounded-full border border-[var(--w-border)] bg-[var(--w-input)] p-1">
             {(["register", "signin"] as const).map((m) => (
               <button
@@ -61,6 +69,27 @@ export function AuthForms() {
               >
                 {m === "register" ? "Create wallet" : "Sign in"}
               </button>
+=======
+          <div className="mt-5 flex gap-1 rounded-full border border-[var(--w-border)] bg-[var(--w-input)] p-1 pt-2 px-3 md:px-4">
+            {(["register", "signin"] as const).map((m) => (
+              <span key={m} className="relative  w-full">
+                <button
+                  type="button"
+                  onClick={() => setMode(m)}
+                  className={`relative w-full flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition overflow-clip z-20 ${
+                    mode === m ? "" : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
+                  }`}
+                >
+                  {m === "register" ? "Create wallet" : "Sign in"}
+                </button>
+
+                <motion.div
+                  animate={mode == m ? { y: -2, scale: 1.1 } : { y: 0, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 12 }}
+                  className={`absolute inset-0 rounded-full ${mode == m && "bg-[var(--w-brand)] text-[var(--w-brand-contrast)]"} `}
+                ></motion.div>
+              </span>
+>>>>>>> 49a1b1e (updated)
             ))}
           </div>
 
@@ -92,6 +121,10 @@ export function AuthForms() {
                 onChange={setPassword}
                 placeholder="At least 6 characters"
                 icon={<Lock className="size-4" />}
+<<<<<<< HEAD
+=======
+                required
+>>>>>>> 49a1b1e (updated)
                 suffix={
                   <button
                     type="button"
@@ -102,7 +135,10 @@ export function AuthForms() {
                     {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 }
+<<<<<<< HEAD
                 required
+=======
+>>>>>>> 49a1b1e (updated)
               />
             </div>
 
@@ -117,7 +153,11 @@ export function AuthForms() {
             )}
 
             <motion.button
+<<<<<<< HEAD
               whileTap={{ scale: 0.98 }}
+=======
+              whileTap={{ scale: 0.98, opacity: 0.8 }}
+>>>>>>> 49a1b1e (updated)
               whileHover={{ y: -1 }}
               type="submit"
               className="mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg"
@@ -173,11 +213,17 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           required={required}
+<<<<<<< HEAD
           className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-3 ${icon ? "pl-11" : "pl-4"} ${suffix ? "pr-11" : "pr-4"} text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
         />
         {suffix && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</span>
         )}
+=======
+          className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-3 ${icon ? "pl-11" : "pl-4"} ${suffix ? "pr-11" : "pr-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
+        />
+        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</span>}
+>>>>>>> 49a1b1e (updated)
       </div>
     </label>
   );

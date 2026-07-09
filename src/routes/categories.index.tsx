@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { categories } from "@/data/categories";
+<<<<<<< HEAD
 import { artworks } from "@/data/artworks";
 import { PageHeader } from "@/components/site/PageHeader";
+=======
+// import { artworks } from "@/data/artworks";
+import { PageHeader } from "@/components/site/PageHeader";
+import { useArtworkContext } from "@/lib/useMetArtworksStore";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/categories/")({
   component: CategoriesIndex,
@@ -18,6 +24,10 @@ export const Route = createFileRoute("/categories/")({
 });
 
 function CategoriesIndex() {
+<<<<<<< HEAD
+=======
+  const { artworks } = useArtworkContext();
+>>>>>>> 49a1b1e (updated)
   return (
     <>
       <PageHeader
@@ -45,9 +55,13 @@ function CategoriesIndex() {
                   </span>
                 </div>
                 <h2 className="font-display text-5xl italic">{c.label}</h2>
+<<<<<<< HEAD
                 <p className="max-w-md text-sm leading-relaxed text-detail">
                   {c.description}
                 </p>
+=======
+                <p className="max-w-md text-sm leading-relaxed text-detail">{c.description}</p>
+>>>>>>> 49a1b1e (updated)
                 <span className="mt-4 text-[11px] uppercase tracking-[0.22em] text-ink group-hover:text-clay">
                   View works &rarr;
                 </span>

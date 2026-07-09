@@ -28,10 +28,14 @@ export function Countdown({ endsAt, size = "md", className }: Props) {
 
   if (!t) {
     return (
+<<<<<<< HEAD
       <div
         className={cn("inline-flex items-end gap-3 opacity-0", className)}
         aria-hidden
       >
+=======
+      <div className={cn("inline-flex items-end gap-3 opacity-0", className)} aria-hidden>
+>>>>>>> 49a1b1e (updated)
         <span className="font-display italic text-2xl">00:00:00:00</span>
       </div>
     );
@@ -40,12 +44,16 @@ export function Countdown({ endsAt, size = "md", className }: Props) {
   const ended = t.ms === 0;
   const closing = t.ms > 0 && t.ms < 3_600_000; // < 1h
 
+<<<<<<< HEAD
   const numCls =
     size === "lg"
       ? "text-3xl md:text-4xl"
       : size === "sm"
         ? "text-base"
         : "text-2xl";
+=======
+  const numCls = size === "lg" ? "text-3xl md:text-4xl" : size === "sm" ? "text-base" : "text-2xl";
+>>>>>>> 49a1b1e (updated)
   const labelCls = "text-[9px] uppercase tracking-[0.22em] text-detail";
 
   if (ended) {
@@ -79,6 +87,7 @@ export function Countdown({ endsAt, size = "md", className }: Props) {
   );
 
   return (
+<<<<<<< HEAD
     <div
       className={cn(
         "inline-flex items-end gap-3",
@@ -89,6 +98,10 @@ export function Countdown({ endsAt, size = "md", className }: Props) {
       {closing && (
         <span className="dot mb-2 size-2 animate-pulse rounded-full bg-clay" />
       )}
+=======
+    <div className={cn("inline-flex items-end gap-3", closing && "[&_.dot]:bg-clay", className)}>
+      {closing && <span className="dot mb-2 size-2 animate-pulse rounded-full bg-clay" />}
+>>>>>>> 49a1b1e (updated)
       <Cell value={t.days} label="Days" />
       <span className={cn("font-display italic text-ink/30", numCls)}>:</span>
       <Cell value={t.hours} label="Hrs" />

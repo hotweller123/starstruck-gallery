@@ -10,12 +10,22 @@ export function PartnerReasons() {
             Why partner with Aethelred
           </p>
           <h2 className="font-display text-4xl italic leading-[1.02] md:text-6xl">
+<<<<<<< HEAD
             A small audience,<br />carefully kept.
           </h2>
           <p className="mt-8 max-w-md text-canvas/75 leading-relaxed">
             We work with a deliberately small circle of partners — makers,
             houses, journals and institutions whose craft is continuous with
             the work we hang.
+=======
+            A small audience,
+            <br />
+            carefully kept.
+          </h2>
+          <p className="mt-8 max-w-md text-canvas/75 leading-relaxed">
+            We work with a deliberately small circle of partners — makers, houses, journals and
+            institutions whose craft is continuous with the work we hang.
+>>>>>>> 49a1b1e (updated)
           </p>
           <Link
             to="/contact"
@@ -28,6 +38,7 @@ export function PartnerReasons() {
         <ol className="grid grid-cols-1 gap-px bg-canvas/15 sm:grid-cols-2">
           {partnerBenefits.map((p) => (
             <li key={p.no} className="flex flex-col gap-4 bg-ink p-8">
+<<<<<<< HEAD
               <span className="font-display text-3xl italic text-clay">
                 {p.no}
               </span>
@@ -35,6 +46,11 @@ export function PartnerReasons() {
               <p className="text-sm leading-relaxed text-canvas/70">
                 {p.body}
               </p>
+=======
+              <span className="font-display text-3xl italic text-clay">{p.no}</span>
+              <h3 className="font-display text-2xl italic">{p.title}</h3>
+              <p className="text-sm leading-relaxed text-canvas/70">{p.body}</p>
+>>>>>>> 49a1b1e (updated)
             </li>
           ))}
         </ol>

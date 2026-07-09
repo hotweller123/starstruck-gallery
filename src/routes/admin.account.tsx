@@ -18,6 +18,17 @@ import {
 } from "lucide-react";
 import { BentoCard } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
+<<<<<<< HEAD
+=======
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/admin/account")({
   component: AdminAccountPage,
@@ -128,8 +139,11 @@ function AdminAccountPage() {
   return (
     <>
       <div className="mx-auto w-full max-w-6xl space-y-6">
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 49a1b1e (updated)
         {/* Header */}
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -210,9 +224,13 @@ function AdminAccountPage() {
                         <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--a-surface)] text-[var(--a-fg-2)]">
                           <WalletIcon className="size-3.5" />
                         </span>
+<<<<<<< HEAD
                         <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">
                           {w.label}
                         </h4>
+=======
+                        <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">{w.label}</h4>
+>>>>>>> 49a1b1e (updated)
                         {w.isDefault && (
                           <span className="rounded-full border border-[var(--a-pos)]/30 bg-[var(--a-pos)]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)]">
                             Default
@@ -305,7 +323,15 @@ function AdminAccountPage() {
           if (activeWallet) {
             setWallets((prev) =>
               prev.map((w) =>
+<<<<<<< HEAD
                 w.id === activeWallet.id ? { ...w, ...data } : data.isDefault ? { ...w, isDefault: false } : w,
+=======
+                w.id === activeWallet.id
+                  ? { ...w, ...data }
+                  : data.isDefault
+                    ? { ...w, isDefault: false }
+                    : w,
+>>>>>>> 49a1b1e (updated)
               ),
             );
           } else {
@@ -354,12 +380,19 @@ function InfoRow({
 
 function EmptyWallets({ onAdd }: { onAdd: () => void }) {
   return (
+<<<<<<< HEAD
     <div className="grid place-items-center rounded-lg border border-dashed border-[var(--a-border)] px-6 py-12 text-center">
       <WalletIcon className="size-8 text-[var(--a-muted)]" />
       <p className="mt-3 text-sm font-semibold text-[var(--a-fg)]">No wallets yet</p>
       <p className="mt-1 max-w-sm text-xs text-[var(--a-muted)]">
         Upload your first crypto wallet to receive treasury settlements and payouts.
       </p>
+=======
+    <div className="grid place-items-center rounded-xl border border-dashed border-[var(--a-border)] px-6 py-12 text-center">
+      <WalletIcon className="size-8 text-[var(--a-muted)]" />
+      <p className="mt-3 text-sm font-semibold text-[var(--a-fg)]">No wallets yet</p>
+      <p className="mt-1 max-w-sm text-xs text-[var(--a-muted)]">Upload your first crypto wallet</p>
+>>>>>>> 49a1b1e (updated)
       <button
         onClick={onAdd}
         className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
@@ -430,7 +463,11 @@ function WalletFormModal({
                 className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
               />
             </DialogPrimitive.Overlay>
+<<<<<<< HEAD
             <DialogPrimitive.Content asChild forceMount aria-describedby={undefined}>
+=======
+            <DialogPrimitive.Content asChild forceMount>
+>>>>>>> 49a1b1e (updated)
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -438,6 +475,12 @@ function WalletFormModal({
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="admin-theme fixed inset-0 z-50 flex flex-col bg-[#0f0f10] text-[var(--a-fg)] md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[88vh] md:w-[min(560px,94vw)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:border md:border-[var(--a-border-hi)] md:shadow-2xl"
               >
+<<<<<<< HEAD
+=======
+                <DialogPrimitive.Description className="sr-only">
+                  Wallet upload or edit form
+                </DialogPrimitive.Description>
+>>>>>>> 49a1b1e (updated)
                 <div className="flex items-start justify-between gap-3 border-b border-[var(--a-border)] px-5 py-4 md:px-6">
                   <div>
                     <p className="a-eyebrow">Treasury</p>
@@ -453,10 +496,14 @@ function WalletFormModal({
                   </DialogPrimitive.Close>
                 </div>
 
+<<<<<<< HEAD
                 <form
                   onSubmit={submit}
                   className="flex flex-1 flex-col overflow-hidden"
                 >
+=======
+                <form onSubmit={submit} className="flex flex-1 flex-col overflow-hidden">
+>>>>>>> 49a1b1e (updated)
                   <div className="flex-1 space-y-4 overflow-y-auto a-scrollbar px-5 py-5 md:px-6">
                     <Field label="Label">
                       <input
@@ -468,6 +515,7 @@ function WalletFormModal({
                       />
                     </Field>
                     <Field label="Network">
+<<<<<<< HEAD
                       <select
                         value={network}
                         onChange={(e) => setNetwork(e.target.value as CryptoWallet["network"])}
@@ -479,6 +527,25 @@ function WalletFormModal({
                           </option>
                         ))}
                       </select>
+=======
+                      <Select
+                        onValueChange={(e) => setNetwork(e as CryptoWallet["network"])}
+                        value={network}
+                      >
+                        <SelectTrigger className={inputCls}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {NETWORKS.map((n) => (
+                              <SelectItem key={n} value={n}>
+                                {n}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+>>>>>>> 49a1b1e (updated)
                     </Field>
                     <Field label="Wallet address">
                       <input

@@ -3,6 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Upload, Trash2 } from "lucide-react";
 import { useStore, type UserListing } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
+<<<<<<< HEAD
+=======
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -75,11 +86,15 @@ function SellPage() {
           {/* Image */}
           <label className="group flex aspect-[4/3] cursor-pointer flex-col items-center justify-center border-2 border-dashed border-ink/20 bg-surface/30 transition-colors hover:border-ink/40">
             {form.image ? (
+<<<<<<< HEAD
               <img
                 src={form.image}
                 alt="Preview"
                 className="h-full w-full object-cover"
               />
+=======
+              <img src={form.image} alt="Preview" className="h-full w-full object-cover" />
+>>>>>>> 49a1b1e (updated)
             ) : (
               <div className="flex flex-col items-center gap-3 text-center">
                 <Upload className="size-8 text-detail" strokeWidth={1.25} />
@@ -152,6 +167,7 @@ function SellPage() {
               />
             </Field>
             <Field label="Category" className="md:col-span-2">
+<<<<<<< HEAD
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -161,6 +177,27 @@ function SellPage() {
                   <option key={c}>{c}</option>
                 ))}
               </select>
+=======
+              <Select
+                value={form.category}
+                onValueChange={(e) => setForm((f) => ({ ...f, category: e }))}
+              >
+                <SelectTrigger
+                  className={`focus:border-0 focus:border-ink transition-all shadow-none ${inputCls}`}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories.map((c) => (
+                      <SelectItem value={c} key={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+>>>>>>> 49a1b1e (updated)
             </Field>
             <Field label="Description" className="md:col-span-2">
               <textarea
@@ -194,6 +231,7 @@ function SellPage() {
           ) : (
             <ul className="mt-6 flex flex-col gap-4">
               {listings.map((l) => (
+<<<<<<< HEAD
                 <li
                   key={l.id}
                   className="flex gap-4 border border-ink/10 p-3"
@@ -203,6 +241,10 @@ function SellPage() {
                     alt={l.title}
                     className="size-20 shrink-0 object-cover"
                   />
+=======
+                <li key={l.id} className="flex gap-4 border border-ink/10 p-3">
+                  <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" />
+>>>>>>> 49a1b1e (updated)
                   <div className="flex flex-1 flex-col">
                     <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
                       {l.category}

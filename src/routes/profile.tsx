@@ -69,9 +69,13 @@ function ProfilePage() {
               >
                 <Icon className="size-5 text-detail group-hover:text-clay" strokeWidth={1.25} />
                 <p className="mt-4 font-display text-4xl italic">{value}</p>
+<<<<<<< HEAD
                 <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-detail">
                   {label}
                 </p>
+=======
+                <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-detail">{label}</p>
+>>>>>>> 49a1b1e (updated)
               </Link>
             ))}
           </div>

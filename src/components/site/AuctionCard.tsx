@@ -49,11 +49,15 @@ export function AuctionCard({ lot, priority }: Props) {
           {lot.categoryLabel} · {lot.year}
         </p>
         <h3 className="mt-2 font-display text-3xl italic leading-tight text-ink">
+<<<<<<< HEAD
           <Link
             to="/auctions/$slug"
             params={{ slug: lot.slug }}
             className="hover:text-clay"
           >
+=======
+          <Link to="/auctions/$slug" params={{ slug: lot.slug }} className="hover:text-clay">
+>>>>>>> 49a1b1e (updated)
             {lot.title}
           </Link>
         </h3>
@@ -67,6 +71,7 @@ export function AuctionCard({ lot, priority }: Props) {
           </Link>
         )}
 
+<<<<<<< HEAD
         <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-ink/70">
           {lot.description}
         </p>
@@ -76,6 +81,13 @@ export function AuctionCard({ lot, priority }: Props) {
             <p className="text-[9px] uppercase tracking-[0.22em] text-detail">
               Current bid
             </p>
+=======
+        <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-ink/70">{lot.description}</p>
+
+        <div className="mt-6 grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10">
+          <div className="bg-canvas p-4">
+            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Current bid</p>
+>>>>>>> 49a1b1e (updated)
             <p className="mt-1 font-display text-2xl italic text-ink">
               {formatBid(lot.currentBid)}
             </p>
@@ -84,9 +96,13 @@ export function AuctionCard({ lot, priority }: Props) {
             </p>
           </div>
           <div className="bg-canvas p-4">
+<<<<<<< HEAD
             <p className="text-[9px] uppercase tracking-[0.22em] text-detail">
               Estimate
             </p>
+=======
+            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Estimate</p>
+>>>>>>> 49a1b1e (updated)
             <p className="mt-1 font-display text-lg italic text-ink/80">
               {formatBid(lot.estimateLow)} – {formatBid(lot.estimateHigh)}
             </p>

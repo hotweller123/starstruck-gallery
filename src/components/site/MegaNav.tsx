@@ -1,7 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
+<<<<<<< HEAD
 import { Menu, X, Mail, MapPin, Instagram, BookOpen, ChevronDown, Heart, ShoppingBag, User, Wallet } from "lucide-react";
+=======
+import {
+  Menu,
+  X,
+  Mail,
+  MapPin,
+  Instagram,
+  BookOpen,
+  ChevronDown,
+  Heart,
+  ShoppingBag,
+  User,
+  Wallet,
+} from "lucide-react";
+>>>>>>> 49a1b1e (updated)
 import { useStore } from "@/lib/store";
 import { useWallet } from "@/lib/wallet";
 import { categories } from "@/data/categories";
@@ -132,9 +148,15 @@ export function MegaNav() {
 
         <div className="flex items-center gap-1 md:gap-2">
           <WalletNavIcon />
+<<<<<<< HEAD
           <IconLink to="/favourites" label="Favourites" count={favCount} icon={Heart} />
           <IconLink to="/cart" label="Cart" count={cartCount} icon={ShoppingBag} />
           <IconLink to="/profile" label="Profile" icon={User} />
+=======
+          <IconLink to="/favourites" label="Favourites" count={favCount} Icon={Heart} />
+          <IconLink to="/cart" label="Cart" count={cartCount} Icon={ShoppingBag} />
+          <IconLink to="/profile" label="Profile" Icon={User} />
+>>>>>>> 49a1b1e (updated)
           <Link
             to="/contact"
             className="ml-2 hidden border border-ink px-5 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-ink transition-colors hover:bg-ink hover:text-canvas md:inline-block"
@@ -167,7 +189,13 @@ export function MegaNav() {
             <div>
               {openPanel === "categories" && (
                 <>
+<<<<<<< HEAD
                   <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">Browse by mode of design</p>
+=======
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
+                    Browse by mode of design
+                  </p>
+>>>>>>> 49a1b1e (updated)
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {categories.map((c) => (
                       <li key={c.slug}>
@@ -177,8 +205,17 @@ export function MegaNav() {
                           onClick={closeNow}
                           className="group block"
                         >
+<<<<<<< HEAD
                           <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">{c.label}</h4>
                           <p className="mt-1 text-xs leading-relaxed text-detail">{c.description}</p>
+=======
+                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
+                            {c.label}
+                          </h4>
+                          <p className="mt-1 text-xs leading-relaxed text-detail">
+                            {c.description}
+                          </p>
+>>>>>>> 49a1b1e (updated)
                         </Link>
                       </li>
                     ))}
@@ -188,6 +225,7 @@ export function MegaNav() {
 
               {openPanel === "artists" && (
                 <>
+<<<<<<< HEAD
                   <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">In our rotation</p>
                   <ul className="mb-10 grid grid-cols-2 gap-x-10 gap-y-4">
                     {artists.map((a) => (
@@ -195,11 +233,37 @@ export function MegaNav() {
                         <Link to="/artists/$slug" params={{ slug: a.slug }} onClick={closeNow} className="group block">
                           <h4 className="font-display text-xl italic text-ink group-hover:text-clay">{a.name}</h4>
                           <p className="text-[11px] uppercase tracking-[0.18em] text-detail">{a.discipline}</p>
+=======
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
+                    Renowned, the world over
+                  </p>
+                  <ul className="mb-10 grid grid-cols-2 gap-x-10 gap-y-4">
+                    {artists.map((a) => (
+                      <li key={a.slug}>
+                        <Link
+                          to="/artists/$slug"
+                          params={{ slug: a.slug }}
+                          onClick={closeNow}
+                          className="group block"
+                        >
+                          <h4 className="font-display text-xl italic text-ink group-hover:text-clay">
+                            {a.name}
+                          </h4>
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-detail">
+                            {a.discipline}
+                          </p>
+>>>>>>> 49a1b1e (updated)
                         </Link>
                       </li>
                     ))}
                   </ul>
+<<<<<<< HEAD
                   <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-detail">Renowned, the world over</p>
+=======
+                  {/* <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-detail">
+                    Renowned, the world over
+                  </p>
+>>>>>>> 49a1b1e (updated)
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-3">
                     {renownedArtists.map((r) => (
                       <li key={r.name}>
@@ -207,18 +271,34 @@ export function MegaNav() {
                         <p className="text-xs text-detail">{r.note}</p>
                       </li>
                     ))}
+<<<<<<< HEAD
                   </ul>
+=======
+                  </ul> */}
+>>>>>>> 49a1b1e (updated)
                 </>
               )}
 
               {openPanel === "about" && (
                 <>
+<<<<<<< HEAD
                   <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">The gallery</p>
+=======
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
+                    The gallery
+                  </p>
+>>>>>>> 49a1b1e (updated)
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {aboutLinks.map((l) => (
                       <li key={l.label}>
                         <Link to={l.to} onClick={closeNow} className="group block">
+<<<<<<< HEAD
                           <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">{l.label}</h4>
+=======
+                          <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
+                            {l.label}
+                          </h4>
+>>>>>>> 49a1b1e (updated)
                           <p className="mt-1 text-xs leading-relaxed text-detail">{l.note}</p>
                         </Link>
                       </li>
@@ -230,7 +310,13 @@ export function MegaNav() {
 
             <div className="relative">
               <img
+<<<<<<< HEAD
                 src={openPanel === "categories" ? art09 : openPanel === "artists" ? artist02 : art10}
+=======
+                src={
+                  openPanel === "categories" ? art09 : openPanel === "artists" ? artist02 : art10
+                }
+>>>>>>> 49a1b1e (updated)
                 alt=""
                 className="aspect-[4/5] w-full object-cover"
               />
@@ -248,9 +334,15 @@ export function MegaNav() {
       {mounted &&
         mobileOpen &&
         createPortal(
+<<<<<<< HEAD
           <div className="fixed inset-0 z-[100] flex flex-col bg-canvas md:hidden">
             {/* In-sheet header with close button */}
             <div className="flex h-[73px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
+=======
+          <div className="fixed inset-0 z-100 flex flex-col bg-canvas md:hidden">
+            {/* In-sheet header with close button */}
+            <div className="flex h-[81px] shrink-0 items-center justify-between border-b border-ink/10 px-6">
+>>>>>>> 49a1b1e (updated)
               <Link
                 to="/"
                 onClick={() => setMobileOpen(false)}
@@ -258,7 +350,16 @@ export function MegaNav() {
               >
                 Aethelred
               </Link>
+<<<<<<< HEAD
               <button type="button" aria-label="Close menu" onClick={() => setMobileOpen(false)} className="text-ink">
+=======
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setMobileOpen(false)}
+                className="text-ink"
+              >
+>>>>>>> 49a1b1e (updated)
                 <X className="size-6" strokeWidth={ICON_STROKE} />
               </button>
             </div>
@@ -266,8 +367,21 @@ export function MegaNav() {
             <div className="flex flex-1 flex-col overflow-y-auto">
               {/* Primary nav with expandable sub-routes */}
               <nav className="flex flex-col px-6 pt-8">
+<<<<<<< HEAD
                 <MobileNavLink to="/gallery" label="Gallery" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/auctions" label="Auction" onNavigate={() => setMobileOpen(false)} />
+=======
+                <MobileNavLink
+                  to="/gallery"
+                  label="Gallery"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink
+                  to="/auctions"
+                  label="Auction"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+>>>>>>> 49a1b1e (updated)
 
                 <MobileNavGroup
                   label="Categories"
@@ -311,16 +425,46 @@ export function MegaNav() {
                   label={`Cart${cartCount ? ` (${cartCount})` : ""}`}
                   onNavigate={() => setMobileOpen(false)}
                 />
+<<<<<<< HEAD
                 <MobileNavLink to="/wallet" label="Wallet" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/connect" label="Connect wallet" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/sell" label="Sell your work" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/profile" label="Profile" onNavigate={() => setMobileOpen(false)} />
                 <MobileNavLink to="/contact" label="Contact" onNavigate={() => setMobileOpen(false)} />
+=======
+                <MobileNavLink
+                  to="/wallet"
+                  label="Wallet"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink
+                  to="/connect"
+                  label="Connect wallet"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink
+                  to="/sell"
+                  label="Sell your work"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink
+                  to="/profile"
+                  label="Profile"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+                <MobileNavLink
+                  to="/contact"
+                  label="Contact"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+>>>>>>> 49a1b1e (updated)
               </nav>
 
               {/* Footer-style details below nav */}
               <div className="mt-auto border-t border-ink/10 bg-sand/30 px-6 py-10">
+<<<<<<< HEAD
                 <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">The gallery</p>
                 <ul className="flex flex-col gap-4 text-sm text-ink">
                   <li className="flex items-start gap-3">
@@ -337,6 +481,38 @@ export function MegaNav() {
                   </li>
                   <li className="flex items-start gap-3">
                     <BookOpen className="mt-0.5 size-4 shrink-0 text-detail" strokeWidth={ICON_STROKE} />
+=======
+                <p className="mb-6 text-[10px] uppercase tracking-[0.3em] text-detail">
+                  The gallery
+                </p>
+                <ul className="flex flex-col gap-4 text-sm text-ink">
+                  <li className="flex items-start gap-3">
+                    <Mail
+                      className="mt-0.5 size-4 shrink-0 text-detail"
+                      strokeWidth={ICON_STROKE}
+                    />
+                    <a href="mailto:hello@aethelred.gallery">hello@aethelred.gallery</a>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <MapPin
+                      className="mt-0.5 size-4 shrink-0 text-detail"
+                      strokeWidth={ICON_STROKE}
+                    />
+                    <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Instagram
+                      className="mt-0.5 size-4 shrink-0 text-detail"
+                      strokeWidth={ICON_STROKE}
+                    />
+                    <a href="#">@aethelred.gallery</a>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <BookOpen
+                      className="mt-0.5 size-4 shrink-0 text-detail"
+                      strokeWidth={ICON_STROKE}
+                    />
+>>>>>>> 49a1b1e (updated)
                     <a href="#">Journal &amp; broadsheets</a>
                   </li>
                 </ul>
@@ -357,9 +533,27 @@ export function MegaNav() {
   );
 }
 
+<<<<<<< HEAD
 function MobileNavLink({ to, label, onNavigate }: { to: string; label: string; onNavigate: () => void }) {
   return (
     <Link to={to} onClick={onNavigate} className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink">
+=======
+function MobileNavLink({
+  to,
+  label,
+  onNavigate,
+}: {
+  to: string;
+  label: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className="border-b border-ink/10 py-5 font-display text-3xl italic text-ink"
+    >
+>>>>>>> 49a1b1e (updated)
       {label}
     </Link>
   );
@@ -400,9 +594,24 @@ function MobileNavGroup({
         <ul className="flex flex-col gap-4 pb-6 pl-1 pr-2">
           {items.map((item) => (
             <li key={`${item.to}-${item.label}`}>
+<<<<<<< HEAD
               <Link to={item.to} params={item.params as never} onClick={onNavigate} className="group block">
                 <p className="font-display text-lg italic text-ink group-hover:text-clay">{item.label}</p>
                 {item.note && <p className="mt-0.5 text-xs leading-relaxed text-detail">{item.note}</p>}
+=======
+              <Link
+                to={item.to}
+                params={item.params as never}
+                onClick={onNavigate}
+                className="group block"
+              >
+                <p className="font-display text-lg italic text-ink group-hover:text-clay">
+                  {item.label}
+                </p>
+                {item.note && (
+                  <p className="mt-0.5 text-xs leading-relaxed text-detail">{item.note}</p>
+                )}
+>>>>>>> 49a1b1e (updated)
               </Link>
             </li>
           ))}
@@ -412,7 +621,21 @@ function MobileNavGroup({
   );
 }
 
+<<<<<<< HEAD
 function IconLink({ to, label, count, icon: Icon }: { to: string; label: string; count?: number; icon: typeof Heart }) {
+=======
+function IconLink({
+  to,
+  label,
+  count,
+  Icon,
+}: {
+  to: string;
+  label: string;
+  count?: number;
+  Icon: typeof Heart;
+}) {
+>>>>>>> 49a1b1e (updated)
   return (
     <Link
       to={to}
@@ -420,9 +643,15 @@ function IconLink({ to, label, count, icon: Icon }: { to: string; label: string;
       className="relative inline-flex size-10 items-center justify-center text-ink/80 transition-colors hover:text-clay"
       activeProps={{ className: "text-clay" }}
     >
+<<<<<<< HEAD
       <Icon className="size-[18px]" strokeWidth={ICON_STROKE} />
       {typeof count === "number" && count > 0 && (
         <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-clay px-1 text-[10px] font-medium leading-[18px] text-canvas">
+=======
+      <Icon className="size-4.5" strokeWidth={ICON_STROKE} />
+      {typeof count === "number" && count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-clay px-1 text-[10px] font-medium leading-4.5 text-canvas">
+>>>>>>> 49a1b1e (updated)
           {count > 99 ? "99+" : count}
         </span>
       )}
@@ -442,8 +671,13 @@ function WalletNavIcon() {
         className="ml-1 hidden items-center gap-2 border border-ink/20 px-3 py-1.5 text-[11px] font-medium tracking-[0.18em] text-ink hover:border-ink md:inline-flex"
         activeProps={{ className: "border-clay text-clay" }}
       >
+<<<<<<< HEAD
         <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />
         ${account.balance.toLocaleString()}
+=======
+        <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />$
+        {account.balance.toLocaleString()}
+>>>>>>> 49a1b1e (updated)
       </Link>
     );
   }

@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+<<<<<<< HEAD
 import { useMemo, useState } from "react";
+=======
+import { MouseEvent, useMemo, useState } from "react";
+>>>>>>> 49a1b1e (updated)
 import {
   Plus,
   Search,
@@ -23,16 +27,25 @@ import {
   Tag,
 } from "lucide-react";
 import { DataTable, SectionHeader, StatusChip, TabBar } from "@/components/admin/primitives";
+<<<<<<< HEAD
 import {
   RecordSheet,
   type FieldDef,
   type OperationDef,
 } from "@/components/admin/RecordSheet";
+=======
+import { RecordSheet, type FieldDef, type OperationDef } from "@/components/admin/RecordSheet";
+>>>>>>> 49a1b1e (updated)
 import { artworks as seedArtworks, type Artwork } from "@/data/artworks";
 import { artists as seedArtists, type Artist } from "@/data/artists";
 import { auctionLots as seedLots, type AuctionLot } from "@/data/auctions";
 import { categories as seedCategories, type Category } from "@/data/categories";
 import { fmtMoney } from "@/data/admin-mock";
+<<<<<<< HEAD
+=======
+import { AnimatePresence, motion } from "motion/react";
+import { se } from "date-fns/locale";
+>>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/admin/exhibition")({
   component: ExhibitionAdmin,
@@ -79,7 +92,11 @@ function ExhibitionAdmin() {
           onChange={(id) => setTab(id as Tab)}
         />
         <div className="relative">
+<<<<<<< HEAD
           <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--a-faint)]" />
+=======
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--a-faint)] " />
+>>>>>>> 49a1b1e (updated)
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -89,9 +106,13 @@ function ExhibitionAdmin() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {tab === "artworks" && (
         <ArtworksPanel q={q} rows={artworks} setRows={setArtworks} />
       )}
+=======
+      {tab === "artworks" && <ArtworksPanel q={q} rows={artworks} setRows={setArtworks} />}
+>>>>>>> 49a1b1e (updated)
       {tab === "artists" && (
         <ArtistsPanel q={q} rows={artists} setRows={setArtists} artworks={artworks} />
       )}
@@ -141,7 +162,14 @@ function ArtworksPanel({
   function duplicate(slug: string) {
     const src = rows.find((a) => a.slug === slug);
     if (!src) return;
+<<<<<<< HEAD
     setRows([{ ...src, slug: `${src.slug}-copy-${Date.now()}`, title: `${src.title} (copy)` }, ...rows]);
+=======
+    setRows([
+      { ...src, slug: `${src.slug}-copy-${Date.now()}`, title: `${src.title} (copy)` },
+      ...rows,
+    ]);
+>>>>>>> 49a1b1e (updated)
   }
 
   const fields: FieldDef<ArtRow>[] = [
@@ -193,11 +221,27 @@ function ArtworksPanel({
               </span>
             ),
           },
+<<<<<<< HEAD
           { key: "year", header: "Year", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.year}</span> },
           {
             key: "price",
             header: "Price",
             render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(r.price)}</span>,
+=======
+          {
+            key: "year",
+            header: "Year",
+            render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.year}</span>,
+          },
+          {
+            key: "price",
+            header: "Price",
+            render: (r) => (
+              <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                {fmtMoney(r.price)}
+              </span>
+            ),
+>>>>>>> 49a1b1e (updated)
           },
           {
             key: "status",
@@ -241,14 +285,29 @@ function ArtworksPanel({
         extra={
           selected && (
             <div>
+<<<<<<< HEAD
               <img src={selected.image} alt={selected.title} className="aspect-square w-full rounded object-cover" />
               <p className="mt-3 text-xs text-[var(--a-muted)]">{selected.description ?? "No description."}</p>
+=======
+              <img
+                src={selected.image}
+                alt={selected.title}
+                className="aspect-square w-full rounded object-cover"
+              />
+              <p className="mt-3 text-xs text-[var(--a-muted)]">
+                {selected.description ?? "No description."}
+              </p>
+>>>>>>> 49a1b1e (updated)
             </div>
           )
         }
         operations={
           selected
+<<<<<<< HEAD
             ? [
+=======
+            ? ([
+>>>>>>> 49a1b1e (updated)
                 {
                   id: "highlight",
                   label: selected.highlight ? "Remove highlight" : "Mark as highlight",
@@ -292,7 +351,11 @@ function ArtworksPanel({
                     setSelected(null);
                   },
                 },
+<<<<<<< HEAD
               ] as OperationDef[]
+=======
+              ] as OperationDef[])
+>>>>>>> 49a1b1e (updated)
             : undefined
         }
       />
@@ -330,7 +393,11 @@ function ArtistsPanel({
     { key: "location", label: "Location" },
     { key: "short", label: "Tagline", kind: "textarea", span: 2 },
     { key: "bio", label: "Bio", kind: "textarea", span: 2 },
+<<<<<<< HEAD
     { key: "slug", label: "Slug", editable: false },
+=======
+    { key: "slug", label: "Slug", editable: false, span: 2 },
+>>>>>>> 49a1b1e (updated)
   ];
 
   return (
@@ -352,7 +419,15 @@ function ArtistsPanel({
               </div>
             ),
           },
+<<<<<<< HEAD
           { key: "loc", header: "Based in", render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.location}</span> },
+=======
+          {
+            key: "loc",
+            header: "Based in",
+            render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.location}</span>,
+          },
+>>>>>>> 49a1b1e (updated)
           {
             key: "works",
             header: "Works",
@@ -381,7 +456,15 @@ function ArtistsPanel({
         extra={
           selected && (
             <div className="text-center">
+<<<<<<< HEAD
               <img src={selected.portrait} alt={selected.name} className="mx-auto aspect-square w-full rounded-full object-cover" />
+=======
+              <img
+                src={selected.portrait}
+                alt={selected.name}
+                className="mx-auto aspect-square w-full rounded-full object-cover"
+              />
+>>>>>>> 49a1b1e (updated)
               <p className="mt-3 text-xs text-[var(--a-muted)]">
                 {artworks.filter((a) => a.artistSlug === selected.slug).length} works in catalog
               </p>
@@ -391,9 +474,36 @@ function ArtistsPanel({
         operations={
           selected
             ? [
+<<<<<<< HEAD
                 { id: "feature", label: "Feature artist", icon: Award, tone: "primary", onRun: () => alert(`Featured ${selected.name}.`) },
                 { id: "spotlight", label: "Add to spotlight", icon: Star, onRun: () => alert("Added to spotlight (mock).") },
                 { id: "archive", label: "Archive artist", icon: Archive, tone: "danger", confirm: `Archive ${selected.name}?`, onRun: () => { setRows(rows.filter((a) => a.slug !== selected.slug)); setSelected(null); } },
+=======
+                {
+                  id: "feature",
+                  label: "Feature artist",
+                  icon: Award,
+                  tone: "primary",
+                  onRun: () => alert(`Featured ${selected.name}.`),
+                },
+                {
+                  id: "spotlight",
+                  label: "Add to spotlight",
+                  icon: Star,
+                  onRun: () => alert("Added to spotlight (mock)."),
+                },
+                {
+                  id: "archive",
+                  label: "Archive artist",
+                  icon: Archive,
+                  tone: "danger",
+                  confirm: `Archive ${selected.name}?`,
+                  onRun: () => {
+                    setRows(rows.filter((a) => a.slug !== selected.slug));
+                    setSelected(null);
+                  },
+                },
+>>>>>>> 49a1b1e (updated)
               ]
             : undefined
         }
@@ -404,7 +514,11 @@ function ArtistsPanel({
 
 /* ------------------------------ AUCTIONS ------------------------------ */
 
+<<<<<<< HEAD
 type LotRow = AuctionLot & { id: string; status?: string };
+=======
+type LotRow = AuctionLot & { id: string };
+>>>>>>> 49a1b1e (updated)
 
 function AuctionsPanel({
   q,
@@ -418,7 +532,14 @@ function AuctionsPanel({
   const [selected, setSelected] = useState<LotRow | null>(null);
   const data: LotRow[] = rows
     .filter((l) => !q || l.title.toLowerCase().includes(q.toLowerCase()) || l.lotNumber.includes(q))
+<<<<<<< HEAD
     .map((l) => ({ ...l, id: l.slug, status: (l as unknown as { status?: string }).status ?? "active" }));
+=======
+    .map((l) => ({
+      ...l,
+      id: l.slug,
+    }));
+>>>>>>> 49a1b1e (updated)
 
   function patch(slug: string, p: Partial<AuctionLot>) {
     setRows(rows.map((l) => (l.slug === slug ? { ...l, ...p } : l)));
@@ -438,8 +559,55 @@ function AuctionsPanel({
     { key: "condition", label: "Condition" },
     { key: "provenance", label: "Provenance", kind: "textarea", span: 2 },
     { key: "description", label: "Description", kind: "textarea", span: 2 },
+<<<<<<< HEAD
   ];
 
+=======
+    {
+      key: "status",
+      label: "Status",
+      kind: "select",
+      render(value, row) {
+        return (
+          <>
+            <span className="capitalize">{value as string}</span>
+          </>
+        );
+      },
+      options: [
+        {
+          label: "Active",
+          value: "active",
+        },
+        {
+          label: "Pending",
+          value: "pending",
+        },
+        {
+          label: "Suspended",
+          value: "suspended",
+        },
+      ],
+    },
+  ];
+
+  const [imagesHover, setImagesHover] = useState<string[]>([]);
+  const [uniqueImageID, setUniqueImageID] = useState<string | null>(null);
+
+  const open = (
+    e: MouseEvent<HTMLDivElement>,
+    { id, images }: { id: string; images: string[] },
+  ) => {
+    if (images.length) setImagesHover(images);
+    if (id) {
+      setUniqueImageID(id);
+    }
+  };
+
+  const scheduleClose = () => {
+    setUniqueImageID(null);
+  };
+>>>>>>> 49a1b1e (updated)
   return (
     <>
       <DataTable
@@ -450,8 +618,59 @@ function AuctionsPanel({
             key: "title",
             header: "Lot",
             render: (r) => (
+<<<<<<< HEAD
               <div className="flex items-center gap-3">
                 {r.images?.[0] && <img src={r.images[0]} alt={r.title} className="size-10 rounded object-cover" />}
+=======
+              <div className="flex items-center gap-3 relative">
+                <div
+                  className="absolute -top-[105%] w-auto h-auto ml-1 p-2 flex gap-2 "
+                  onMouseEnter={(e) => {
+                    e.stopPropagation();
+                    open(e, { id: r.id, images: r.images });
+                  }}
+                  onMouseLeave={() => {
+                    scheduleClose();
+                  }}
+                >
+                  <AnimatePresence mode="wait">
+                    {r.id === uniqueImageID &&
+                      imagesHover.length > 0 &&
+                      imagesHover.map((i, num) => (
+                        <motion.div
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          // transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <img
+                            key={i}
+                            src={i}
+                            className="size-16 transition object-cover aspect-auto rounded transition"
+                          />
+                        </motion.div>
+                      ))}
+                  </AnimatePresence>
+                </div>
+                {r.images?.[0] && (
+                  <img
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      open(e, { id: r.id, images: r.images });
+                    }}
+                    onMouseLeave={() => {
+                      scheduleClose();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      open(e, { id: r.id, images: r.images });
+                    }}
+                    src={r.images[0]}
+                    alt={r.title}
+                    className="size-12 border rounded object-cover"
+                  />
+                )}
+>>>>>>> 49a1b1e (updated)
                 <div>
                   <p className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
                   <p className="a-mono text-[10px] text-[var(--a-muted)]">Lot {r.lotNumber}</p>
@@ -471,9 +690,23 @@ function AuctionsPanel({
           {
             key: "bid",
             header: "Current bid",
+<<<<<<< HEAD
             render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-accent)]">{fmtMoney(r.currentBid ?? 0)}</span>,
           },
           { key: "status", header: "Status", render: (r) => <StatusChip value={r.status ?? "active"} /> },
+=======
+            render: (r) => (
+              <span className="a-mono text-xs font-bold text-[var(--a-accent)]">
+                {fmtMoney(r.currentBid ?? 0)}
+              </span>
+            ),
+          },
+          {
+            key: "status",
+            header: "Status",
+            render: (r) => <StatusChip value={r.status ?? "active"} />,
+          },
+>>>>>>> 49a1b1e (updated)
         ]}
       />
       <RecordSheet<LotRow>
@@ -481,7 +714,13 @@ function AuctionsPanel({
         onOpenChange={(o) => !o && setSelected(null)}
         eyebrow={`Lot ${selected?.lotNumber ?? ""}`}
         title={selected?.title ?? ""}
+<<<<<<< HEAD
         subtitle={selected ? `${selected.categoryLabel} · ${fmtMoney(selected.currentBid ?? 0)}` : undefined}
+=======
+        subtitle={
+          selected ? `${selected.categoryLabel} · ${fmtMoney(selected.currentBid ?? 0)}` : undefined
+        }
+>>>>>>> 49a1b1e (updated)
         record={selected}
         fields={fields}
         onSave={(p) => {
@@ -491,17 +730,72 @@ function AuctionsPanel({
         }}
         extra={
           selected?.images?.[0] && (
+<<<<<<< HEAD
             <img src={selected.images[0]} alt={selected.title} className="aspect-square w-full rounded object-cover" />
+=======
+            <img
+              src={selected.images[0]}
+              alt={selected.title}
+              className="aspect-square w-full rounded object-cover"
+            />
+>>>>>>> 49a1b1e (updated)
           )
         }
         operations={
           selected
             ? [
+<<<<<<< HEAD
                 { id: "open", label: "Open bidding", icon: PlayCircle, tone: "success", onRun: () => { patch(selected.slug, { status: "active" } as Partial<AuctionLot>); setSelected({ ...selected, status: "active" }); } },
                 { id: "pause", label: "Pause lot", icon: Pause, onRun: () => { patch(selected.slug, { status: "pending" } as Partial<AuctionLot>); setSelected({ ...selected, status: "pending" }); } },
                 { id: "close", label: "Close & award winner", icon: Hammer, tone: "primary", confirm: "Close this lot and award current high bidder?", onRun: () => alert("Lot closed (mock).") },
                 { id: "withdraw", label: "Withdraw lot", icon: Archive, tone: "danger", confirm: "Withdraw this lot from auction?", onRun: () => { setRows(rows.filter((l) => l.slug !== selected.slug)); setSelected(null); } },
                 { id: "flag", label: "Flag for review", icon: Flag, onRun: () => alert("Flagged (mock).") },
+=======
+                // {
+                //   id: "open",
+                //   label: "Open bidding",
+                //   icon: PlayCircle,
+                //   tone: "success",
+                //   onRun: () => {
+                //     patch(selected.slug, { status: "active" } as Partial<AuctionLot>);
+                //     setSelected({ ...selected, status: "active" });
+                //   },
+                // },
+                // {
+                //   id: "pause",
+                //   label: "Pause lot",
+                //   icon: Pause,
+                //   onRun: () => {
+                //     patch(selected.slug, { status: "pending" } as Partial<AuctionLot>);
+                //     setSelected({ ...selected, status: "pending" });
+                //   },
+                // },
+                {
+                  id: "close",
+                  label: "Close & award winner",
+                  icon: Hammer,
+                  tone: "primary",
+                  confirm: "Close this lot and award current high bidder?",
+                  onRun: () => alert("Lot closed (mock)."),
+                },
+                {
+                  id: "withdraw",
+                  label: "Withdraw lot",
+                  icon: Archive,
+                  tone: "danger",
+                  confirm: "Withdraw this lot from auction?",
+                  onRun: () => {
+                    setRows(rows.filter((l) => l.slug !== selected.slug));
+                    setSelected(null);
+                  },
+                },
+                {
+                  id: "flag",
+                  label: "Flag for review",
+                  icon: Flag,
+                  onRun: () => alert("Flagged (mock)."),
+                },
+>>>>>>> 49a1b1e (updated)
               ]
             : undefined
         }
@@ -554,7 +848,15 @@ function CategoriesPanel({
               </span>
             ),
           },
+<<<<<<< HEAD
           { key: "slug", header: "Slug", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.slug}</span> },
+=======
+          {
+            key: "slug",
+            header: "Slug",
+            render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.slug}</span>,
+          },
+>>>>>>> 49a1b1e (updated)
           {
             key: "count",
             header: "Works",
@@ -581,8 +883,28 @@ function CategoriesPanel({
         operations={
           selected
             ? [
+<<<<<<< HEAD
                 { id: "rename", label: "Bulk re-tag works", icon: Pencil, onRun: () => alert("Bulk retag started (mock).") },
                 { id: "delete", label: "Delete category", icon: Trash2, tone: "danger", confirm: `Delete category "${selected.label}"? Works will be uncategorised.`, onRun: () => { setRows(rows.filter((c) => c.slug !== selected.slug)); setSelected(null); } },
+=======
+                {
+                  id: "rename",
+                  label: "Bulk re-tag works",
+                  icon: Pencil,
+                  onRun: () => alert("Bulk retag started (mock)."),
+                },
+                {
+                  id: "delete",
+                  label: "Delete category",
+                  icon: Trash2,
+                  tone: "danger",
+                  confirm: `Delete category "${selected.label}"? Works will be uncategorised.`,
+                  onRun: () => {
+                    setRows(rows.filter((c) => c.slug !== selected.slug));
+                    setSelected(null);
+                  },
+                },
+>>>>>>> 49a1b1e (updated)
               ]
             : undefined
         }
@@ -610,7 +932,13 @@ function Kpi({
         <p className="a-eyebrow">{label}</p>
         <Icon className={`size-4 ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-muted)]"}`} />
       </div>
+<<<<<<< HEAD
       <p className={`font-display mt-1.5 text-xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}>
+=======
+      <p
+        className={`font-display mt-1.5 text-xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}
+      >
+>>>>>>> 49a1b1e (updated)
         {value}
       </p>
     </div>

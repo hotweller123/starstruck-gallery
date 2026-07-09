@@ -14,11 +14,17 @@ import { MegaNav } from "@/components/site/MegaNav";
 import { Footer } from "@/components/site/Footer";
 import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
+<<<<<<< HEAD
 
+=======
+import ArtWorkProvider from "@/lib/useMetArtworksStore";
+import { ToastProvider } from "@/components/ui/toast";
+>>>>>>> 49a1b1e (updated)
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen flex-col">
+<<<<<<< HEAD
       <MegaNav />
       <div className="flex flex-1 items-center justify-center px-6 py-32">
         <div className="max-w-md text-center">
@@ -31,6 +37,15 @@ function NotFoundComponent() {
           <p className="mt-6 text-detail">
             The page you're looking for doesn't exist, or has been moved to
             another wall.
+=======
+      {/* <MegaNav /> */}
+      <div className="flex flex-1 items-center justify-center px-6 py-32">
+        <div className="max-w-md text-center">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-detail">404</p>
+          <h1 className="mt-6 font-display text-6xl italic text-ink">Lost in the gallery</h1>
+          <p className="mt-6 text-detail">
+            The page you're looking for doesn't exist, or has been moved to another wall.
+>>>>>>> 49a1b1e (updated)
           </p>
           <Link
             to="/"
@@ -40,7 +55,11 @@ function NotFoundComponent() {
           </Link>
         </div>
       </div>
+<<<<<<< HEAD
       <Footer />
+=======
+      {/* <Footer /> */}
+>>>>>>> 49a1b1e (updated)
     </div>
   );
 }
@@ -52,12 +71,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
       <div className="max-w-md text-center">
+<<<<<<< HEAD
         <h1 className="font-display text-4xl italic text-ink">
           This page didn't load
         </h1>
         <p className="mt-4 text-sm text-detail">
           Something went wrong on our end.
         </p>
+=======
+        <h1 className="font-display text-4xl italic text-ink">This page didn't load</h1>
+        <p className="mt-4 text-sm text-detail">Something went wrong on our end.</p>
+>>>>>>> 49a1b1e (updated)
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
@@ -98,8 +122,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:description",
+<<<<<<< HEAD
         content:
           "Quiet, considered works from a small circle of contemporary artists.",
+=======
+        content: "Quiet, considered works from a small circle of contemporary artists.",
+>>>>>>> 49a1b1e (updated)
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -148,6 +176,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <WalletProvider>
+<<<<<<< HEAD
           {isAdmin ? (
             <div className="admin-theme min-h-screen">
               <Outlet />
@@ -165,10 +194,36 @@ function RootComponent() {
               <Footer />
             </div>
           )}
+=======
+          <ToastProvider>
+            {isAdmin ? (
+              <div className="admin-theme min-h-screen">
+                <Outlet />
+              </div>
+            ) : isWallet ? (
+              <div className="wallet-theme flex min-h-screen flex-col">
+                <Outlet />
+              </div>
+            ) : (
+              <ArtWorkProvider>
+                <div className="flex min-h-screen flex-col bg-canvas">
+                  <MegaNav />
+                  <main className="flex-1">
+                    <Outlet />
+                  </main>
+                  <Footer />
+                </div>
+              </ArtWorkProvider>
+            )}
+          </ToastProvider>
+>>>>>>> 49a1b1e (updated)
         </WalletProvider>
       </StoreProvider>
     </QueryClientProvider>
   );
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 49a1b1e (updated)

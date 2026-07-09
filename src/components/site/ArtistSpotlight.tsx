@@ -16,9 +16,20 @@ export function ArtistSpotlight({ artist }: { artist: Artist }) {
           />
         </div>
         <div className="w-full md:w-1/2">
+<<<<<<< HEAD
           <span className="mb-6 block text-[11px] uppercase tracking-[0.3em] text-clay">Featured Artist</span>
           <h2 className="font-display text-5xl italic leading-[1.05] md:text-6xl">{artist.short}</h2>
           <p className="mt-8 text-lg leading-relaxed text-canvas/70">{artist.bio}</p>
+=======
+          <span className="mb-6 block text-[11px] uppercase tracking-[0.3em] text-clay">
+            Featured Artist
+          </span>
+          <h2 className="font-display text-5xl italic leading-[1.05] md:text-6xl">
+            {artist.short}
+          </h2>
+          <p className="mt-8 text-lg leading-relaxed text-canvas/70">{artist.bio}</p>
+          {/* note: the params props to the link with the slug*/}
+>>>>>>> 49a1b1e (updated)
           <Link
             to="/artists/$slug"
             params={{ slug: artist.slug }}

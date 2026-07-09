@@ -2,6 +2,17 @@ import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Lock } from "lucide-react";
 import { motion } from "motion/react";
+<<<<<<< HEAD
+=======
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+>>>>>>> 49a1b1e (updated)
 
 export function FormPage({
   title,
@@ -37,7 +48,11 @@ export function FormPage({
           initial={{ scale: 0.985 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
+<<<<<<< HEAD
           className="overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl"
+=======
+          className="overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-xl"
+>>>>>>> 49a1b1e (updated)
         >
           <div className="relative border-b border-[var(--w-border)] bg-[var(--w-surface-2)] px-7 py-7 md:px-9 md:py-9">
             <div className="absolute inset-0 wallet-dotgrid opacity-40" aria-hidden />
@@ -59,9 +74,13 @@ export function FormPage({
                 <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-[2rem]">
                   {title}
                 </h1>
+<<<<<<< HEAD
                 {subtitle && (
                   <p className="mt-1 text-sm text-[var(--w-muted)]">{subtitle}</p>
                 )}
+=======
+                {subtitle && <p className="mt-1 text-sm text-[var(--w-muted)]">{subtitle}</p>}
+>>>>>>> 49a1b1e (updated)
               </div>
             </div>
           </div>
@@ -150,6 +169,7 @@ export function WSelect({
       <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)]">
         {label}
       </span>
+<<<<<<< HEAD
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -161,6 +181,30 @@ export function WSelect({
           </option>
         ))}
       </select>
+=======
+      <Select value={value} onValueChange={(e) => onChange(e)}>
+        <SelectTrigger className="appearance-none rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3.5 text-sm font-medium text-[var(--w-fg)] focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {options.map((o) => (
+              <SelectItem
+                key={o.value}
+                value={o.value}
+                className={
+                  value === o.value
+                    ? "!bg-slate-600 z-10 text-white"
+                    : "hover:bg-slate-600/30! z-10"
+                }
+              >
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+>>>>>>> 49a1b1e (updated)
     </label>
   );
 }
