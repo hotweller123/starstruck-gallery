@@ -33,10 +33,7 @@ export interface AuctionLot {
   currentBid: number;
   bidCount: number;
   reserveMet: boolean;
-<<<<<<< HEAD
-=======
   status?: "active" | "pending" | "suspended";
->>>>>>> 49a1b1e (updated)
   endsAt: string; // ISO
 }
 
@@ -61,10 +58,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "001",
     title: "Linen Meridian",
     sellerSlug: "soren-kjeldsen",
-<<<<<<< HEAD
-=======
     status: "suspended",
->>>>>>> 49a1b1e (updated)
     category: "abstract",
     categoryLabel: "Abstract",
     year: 2024,
@@ -88,10 +82,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "002",
     title: "Vessel III",
     sellerSlug: "elena-vos",
-<<<<<<< HEAD
-=======
     status: "suspended",
->>>>>>> 49a1b1e (updated)
     category: "ceramics",
     categoryLabel: "Ceramics",
     year: 2024,
@@ -115,10 +106,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "003",
     title: "Descent (Stair Study)",
     sellerSlug: "marcus-thorne",
-<<<<<<< HEAD
-=======
     status: "suspended",
->>>>>>> 49a1b1e (updated)
     category: "photography",
     categoryLabel: "Photography",
     year: 2023,
@@ -142,10 +130,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "004",
     title: "Tracing Breath",
     sellerSlug: "amara-osei",
-<<<<<<< HEAD
-=======
     status: "suspended",
->>>>>>> 49a1b1e (updated)
     category: "minimalism",
     categoryLabel: "Minimalism",
     year: 2024,
@@ -169,10 +154,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "005",
     title: "Study of Drape",
     sellerSlug: "soren-kjeldsen",
-<<<<<<< HEAD
-=======
     status: "active",
->>>>>>> 49a1b1e (updated)
     category: "figurative",
     categoryLabel: "Figurative",
     year: 2023,
@@ -196,21 +178,13 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "006",
     title: "Oxidised Grace",
     sellerSlug: "elena-vos",
-<<<<<<< HEAD
-=======
     status: "active",
->>>>>>> 49a1b1e (updated)
     category: "ceramics",
     categoryLabel: "Ceramics",
     year: 2024,
     medium: "Black stoneware, raw sand base",
     dimensions: "38 × 30 × 30 cm",
-<<<<<<< HEAD
-    description:
-      "A matte black vessel that refuses the pedestal and chooses the ground instead.",
-=======
     description: "A matte black vessel that refuses the pedestal and chooses the ground instead.",
->>>>>>> 49a1b1e (updated)
     provenance: "Vos Studio, Antwerp.",
     condition: "Excellent.",
     images: [art07, art02],
@@ -227,10 +201,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "007",
     title: "Fragile Archive",
     sellerSlug: "sachi-tanaka",
-<<<<<<< HEAD
-=======
     status: "pending",
->>>>>>> 49a1b1e (updated)
     category: "mixed-media",
     categoryLabel: "Mixed Media",
     year: 2023,
@@ -254,10 +225,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "008",
     title: "Horizon Field",
     sellerSlug: "soren-kjeldsen",
-<<<<<<< HEAD
-=======
     status: "pending",
->>>>>>> 49a1b1e (updated)
     category: "abstract",
     categoryLabel: "Abstract",
     year: 2024,
@@ -281,10 +249,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "009",
     title: "Breathable Space",
     sellerSlug: "sachi-tanaka",
-<<<<<<< HEAD
-=======
     status: "pending",
->>>>>>> 49a1b1e (updated)
     category: "photography",
     categoryLabel: "Photography",
     year: 2024,
@@ -308,10 +273,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "010",
     title: "Monolith I",
     sellerSlug: "marcus-thorne",
-<<<<<<< HEAD
-=======
     status: "active",
->>>>>>> 49a1b1e (updated)
     category: "sculpture",
     categoryLabel: "Sculpture",
     year: 2023,
@@ -335,10 +297,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "011",
     title: "Concentric",
     sellerSlug: "amara-osei",
-<<<<<<< HEAD
-=======
     status: "active",
->>>>>>> 49a1b1e (updated)
     category: "digital",
     categoryLabel: "Digital",
     year: 2024,
@@ -362,10 +321,7 @@ export const auctionLots: AuctionLot[] = [
     lotNumber: "012",
     title: "Evening Pigment",
     sellerSlug: "soren-kjeldsen",
-<<<<<<< HEAD
-=======
     status: "active",
->>>>>>> 49a1b1e (updated)
     category: "abstract",
     categoryLabel: "Abstract",
     year: 2025,
@@ -393,22 +349,12 @@ export const formatBid = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 
-<<<<<<< HEAD
-export const getAuctionBySlug = (slug: string) =>
-  auctionLots.find((l) => l.slug === slug);
-=======
 export const getAuctionBySlug = (slug: string) => auctionLots.find((l) => l.slug === slug);
->>>>>>> 49a1b1e (updated)
 
 export const getLotsBySeller = (sellerSlug: string) =>
   auctionLots.filter((l) => l.sellerSlug === sellerSlug);
 
-<<<<<<< HEAD
-export const getSeller = (slug: string): Artist | undefined =>
-  artists.find((a) => a.slug === slug);
-=======
 export const getSeller = (slug: string): Artist | undefined => artists.find((a) => a.slug === slug);
->>>>>>> 49a1b1e (updated)
 
 export const auctionPriceMin =
   Math.floor(Math.min(...auctionLots.map((l) => l.currentBid)) / 100) * 100;

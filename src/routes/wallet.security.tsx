@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "motion/react";
-<<<<<<< HEAD
-import { AlertTriangle, Copy, Check, RefreshCw, ShieldCheck, Smartphone, Fingerprint, Bell } from "lucide-react";
-=======
 import {
   AlertTriangle,
   Copy,
@@ -14,7 +11,6 @@ import {
   Fingerprint,
   Bell,
 } from "lucide-react";
->>>>>>> 49a1b1e (updated)
 import { useWallet } from "@/lib/wallet";
 import { useStore } from "@/lib/store";
 
@@ -40,13 +36,7 @@ function SecurityPage() {
   };
 
   const regen = () => {
-<<<<<<< HEAD
-    if (
-      !confirm("Generating a new token will disconnect the wallet from the site. Continue?")
-    )
-=======
     if (!confirm("Generating a new token will disconnect the wallet from the site. Continue?"))
->>>>>>> 49a1b1e (updated)
       return;
     if (connectedWalletId === currentAccount.id) disconnectWallet();
     regenerateToken();
@@ -63,25 +53,14 @@ function SecurityPage() {
         <div>
           <p className="font-extrabold text-[var(--w-fg)]">Demo wallet</p>
           <p className="mt-1 text-[var(--w-muted)]">
-<<<<<<< HEAD
-            Simulated for exhibition purposes. All data lives in your browser
-            and password storage is not production-grade.
-=======
             Simulated for exhibition purposes. All data lives in your browser and password storage
             is not production-grade.
->>>>>>> 49a1b1e (updated)
           </p>
         </div>
       </motion.div>
 
       <div className="rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl md:p-8">
-<<<<<<< HEAD
-        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--w-fg)]">
-          Wallet token
-        </h1>
-=======
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--w-fg)]">Wallet token</h1>
->>>>>>> 49a1b1e (updated)
         <p className="mt-1 text-sm text-[var(--w-muted)]">
           Paste this token on the site's Connect page to log in to Aethelred.
         </p>
@@ -154,20 +133,10 @@ function SecurityPage() {
       <div className="rounded-[2rem] border border-[var(--w-danger)]/30 bg-[var(--w-danger)]/5 p-6 md:p-8">
         <div className="flex items-center gap-3">
           <AlertTriangle className="size-5 text-[var(--w-danger)]" strokeWidth={2} />
-<<<<<<< HEAD
-          <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">
-            Danger zone
-          </h2>
-        </div>
-        <p className="mt-2 text-sm text-[var(--w-muted)]">
-          Disconnect this wallet from the exhibition site. Your balance and
-          activity stay intact.
-=======
           <h2 className="text-xl font-bold tracking-tight text-[var(--w-fg)]">Danger zone</h2>
         </div>
         <p className="mt-2 text-sm text-[var(--w-muted)]">
           Disconnect this wallet from the exhibition site. Your balance and activity stay intact.
->>>>>>> 49a1b1e (updated)
         </p>
         <button
           onClick={() => disconnectWallet()}

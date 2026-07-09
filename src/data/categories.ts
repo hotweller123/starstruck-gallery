@@ -55,12 +55,6 @@ export const categories: Category[] = [
     description:
       "Vessels and ceramic objects that sit between the functional and the contemplative.",
   },
-<<<<<<< HEAD
-];
-
-export const getCategory = (slug: string) =>
-  categories.find((c) => c.slug === slug);
-=======
   {
     slug: "calligraphy",
     label: "Calligraphy",
@@ -106,4 +100,3 @@ export const getCategory = (slug: string) =>
 ];
 
 export const getCategory = (slug: string) => categories.find((c) => c.slug === slug);
->>>>>>> 49a1b1e (updated)

@@ -12,16 +12,7 @@ interface Props {
 }
 
 /** Swipable image carousel for an auction lot card. */
-<<<<<<< HEAD
-export function AuctionImageSwiper({
-  images,
-  alt,
-  priority,
-  aspect = "aspect-[4/5]",
-}: Props) {
-=======
 export function AuctionImageSwiper({ images, alt, priority, aspect = "aspect-[4/5]" }: Props) {
->>>>>>> 49a1b1e (updated)
   const [emblaRef, embla] = useEmblaCarousel({ loop: true, align: "start" });
   const [selected, setSelected] = useState(0);
 
@@ -44,14 +35,7 @@ export function AuctionImageSwiper({ images, alt, priority, aspect = "aspect-[4/
       <div ref={emblaRef} className="h-full overflow-hidden">
         <div className="flex h-full">
           {images.map((src, i) => (
-<<<<<<< HEAD
-            <div
-              key={`${src}-${i}`}
-              className="relative h-full min-w-0 flex-[0_0_100%]"
-            >
-=======
             <div key={`${src}-${i}`} className="relative h-full min-w-0 flex-[0_0_100%]">
->>>>>>> 49a1b1e (updated)
               <SmartImage
                 src={src}
                 alt={`${alt} — view ${i + 1}`}

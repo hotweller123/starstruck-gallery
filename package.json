@@ -9,15 +9,11 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-<<<<<<< HEAD
-    "format": "prettier --write ."
-=======
     "format": "prettier --write .",
     "clean": "rm -rf dist .vite .tanstack .output node_modules/.vite",
     "fix:server-core": "node scripts/fix-tanstack-server-core.cjs",
     "reset:server-core": "npm run fix:server-core && npm install",
     "postinstall": "node scripts/fix-tanstack-server-core.cjs || true"
->>>>>>> 49a1b1e (updated)
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -53,20 +49,14 @@
     "@tanstack/react-router": "^1.168.25",
     "@tanstack/react-start": "^1.167.50",
     "@tanstack/router-plugin": "^1.167.28",
-<<<<<<< HEAD
-=======
     "@tanstack/start-server-core": "^1.169.16",
->>>>>>> 49a1b1e (updated)
     "animate.css": "^4.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
-<<<<<<< HEAD
-=======
     "html-to-text": "^10.0.0",
->>>>>>> 49a1b1e (updated)
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
     "motion": "^12.40.0",
@@ -86,10 +76,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-<<<<<<< HEAD
-    "@lovable.dev/vite-tanstack-config": "^1.7.0",
-=======
->>>>>>> 49a1b1e (updated)
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

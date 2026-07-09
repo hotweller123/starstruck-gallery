@@ -1,9 +1,5 @@
 import { useMemo, useState } from "react";
-<<<<<<< HEAD
-import { createFileRoute } from "@tanstack/react-router";
-=======
 import { createFileRoute, Link } from "@tanstack/react-router";
->>>>>>> 49a1b1e (updated)
 import { SlidersHorizontal, X } from "lucide-react";
 import {
   auctionCategories,
@@ -18,17 +14,6 @@ import { artists } from "@/data/artists";
 import { PageHeader } from "@/components/site/PageHeader";
 import { AuctionCard } from "@/components/site/AuctionCard";
 import { Countdown } from "@/components/site/Countdown";
-<<<<<<< HEAD
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-=======
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -40,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
->>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/auctions/")({
   component: AuctionsPage,
@@ -92,14 +76,7 @@ function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
   out = [...out];
   switch (sort) {
     case "ending-soon":
-<<<<<<< HEAD
-      out.sort(
-        (a, b) =>
-          new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime(),
-      );
-=======
       out.sort((a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime());
->>>>>>> 49a1b1e (updated)
       break;
     case "newest":
       out.sort((a, b) => b.year - a.year);
@@ -123,26 +100,14 @@ function AuctionsPage() {
   const [activeCat, setActiveCat] = useState<CategorySlug | "all">("all");
 
   const filtered = useMemo(() => {
-<<<<<<< HEAD
-    const f: AuctionFilters =
-      activeCat === "all"
-        ? filters
-        : { ...filters, category: [activeCat] };
-=======
     const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
->>>>>>> 49a1b1e (updated)
     return apply(auctionLots, f, sort);
   }, [filters, sort, activeCat]);
 
   const featured = useMemo(
     () =>
       [...auctionLots].sort(
-<<<<<<< HEAD
-        (a, b) =>
-          new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime(),
-=======
         (a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime(),
->>>>>>> 49a1b1e (updated)
       )[0],
     [],
   );
@@ -195,18 +160,6 @@ function AuctionsPage() {
                       {formatBid(featured.currentBid)}
                     </p>
                     <p className="text-xs text-detail">
-<<<<<<< HEAD
-                      {featured.bidCount} bids · est. {formatBid(featured.estimateLow)}
-                      –{formatBid(featured.estimateHigh)}
-                    </p>
-                  </div>
-                  <a
-                    href={`/auctions/${featured.slug}`}
-                    className="inline-block border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
-                  >
-                    View lot
-                  </a>
-=======
                       {featured.bidCount} bids · est. {formatBid(featured.estimateLow)}–
                       {formatBid(featured.estimateHigh)}
                     </p>
@@ -218,7 +171,6 @@ function AuctionsPage() {
                   >
                     View lot
                   </Link>
->>>>>>> 49a1b1e (updated)
                 </div>
               </div>
             </div>
@@ -257,19 +209,6 @@ function AuctionsPage() {
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-detail">
             Sort
-<<<<<<< HEAD
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="border border-ink/20 bg-canvas px-3 py-2 text-[11px] uppercase tracking-[0.22em] text-ink focus:border-ink focus:outline-none"
-            >
-              <option value="ending-soon">Ending soon</option>
-              <option value="newest">Newest</option>
-              <option value="low-high">Bid: low → high</option>
-              <option value="high-low">Bid: high → low</option>
-              <option value="most-bids">Most bids</option>
-            </select>
-=======
             <Select value={sort} onValueChange={(e) => setSort(e as SortKey)}>
               <SelectTrigger className="border border-ink/20 bg-canvas px-3 py-2 text-[11px] uppercase tracking-[0.22em] text-ink focus:border-none focus:outline-none">
                 <SelectValue />
@@ -284,7 +223,6 @@ function AuctionsPage() {
                 </SelectGroup>
               </SelectContent>
             </Select>
->>>>>>> 49a1b1e (updated)
           </label>
           <AuctionFilterSheet
             value={filters}
@@ -297,13 +235,7 @@ function AuctionsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-32">
         {filtered.length === 0 ? (
-<<<<<<< HEAD
-          <p className="py-24 text-center text-sm text-detail">
-            No lots match these filters.
-          </p>
-=======
           <p className="py-24 text-center text-sm text-detail">No lots match these filters.</p>
->>>>>>> 49a1b1e (updated)
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((l, i) => (
@@ -345,23 +277,9 @@ function AuctionFilterSheet({
     });
   };
 
-<<<<<<< HEAD
-  const Section = ({
-    title,
-    children,
-  }: {
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <section className="border-t border-ink/10 py-6 first:border-t-0 first:pt-0">
-      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">
-        {title}
-      </h3>
-=======
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section className="border-t border-ink/10 py-6 first:border-t-0 first:pt-0">
       <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">{title}</h3>
->>>>>>> 49a1b1e (updated)
       {children}
     </section>
   );
@@ -404,40 +322,22 @@ function AuctionFilterSheet({
         className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden bg-canvas p-0 sm:w-[440px] sm:max-w-[440px]"
       >
         <SheetHeader className="flex flex-row items-center justify-between border-b border-ink/10 px-6 py-5">
-<<<<<<< HEAD
-          <SheetTitle className="font-display text-2xl italic">
-            Refine lots
-          </SheetTitle>
-=======
           <SheetTitle className="font-display text-2xl italic">Refine lots</SheetTitle>
->>>>>>> 49a1b1e (updated)
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close"
             className="text-detail hover:text-ink"
           >
-<<<<<<< HEAD
-            <X className="size-5" />
-=======
             {/* <X className="size-5" /> */}
->>>>>>> 49a1b1e (updated)
           </button>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-<<<<<<< HEAD
-          <Section
-            title={`Bid · ${formatBid(draft.priceMin)} — ${formatBid(draft.priceMax)}`}
-          >
-            <Slider
-              value={[draft.priceMin, draft.priceMax]}
-=======
           <Section title={`Bid · ${formatBid(draft.priceMin)} — ${formatBid(draft.priceMax)}`}>
             <Slider
               value={[draft.priceMin, draft.priceMax]}
               className="mx-auto w-full max-w-xs"
->>>>>>> 49a1b1e (updated)
               min={auctionPriceMin}
               max={auctionPriceMax}
               step={100}
@@ -483,26 +383,14 @@ function AuctionFilterSheet({
                 <span className="text-sm text-ink">Reserve met only</span>
                 <Switch
                   checked={draft.reserveMet}
-<<<<<<< HEAD
-                  onCheckedChange={(v) =>
-                    setDraft((d) => ({ ...d, reserveMet: !!v }))
-                  }
-=======
                   onCheckedChange={(v) => setDraft((d) => ({ ...d, reserveMet: !!v }))}
->>>>>>> 49a1b1e (updated)
                 />
               </label>
               <label className="flex items-center justify-between gap-4">
                 <span className="text-sm text-ink">Ending in 24 hours</span>
                 <Switch
                   checked={draft.endingSoon}
-<<<<<<< HEAD
-                  onCheckedChange={(v) =>
-                    setDraft((d) => ({ ...d, endingSoon: !!v }))
-                  }
-=======
                   onCheckedChange={(v) => setDraft((d) => ({ ...d, endingSoon: !!v }))}
->>>>>>> 49a1b1e (updated)
                 />
               </label>
             </div>

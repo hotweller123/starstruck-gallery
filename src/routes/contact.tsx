@@ -18,14 +18,11 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
-<<<<<<< HEAD
-=======
   const [complaint, setComplaint] = useState({
     name: "",
     email: "",
     subject: "",
   });
->>>>>>> 49a1b1e (updated)
 
   return (
     <>
@@ -51,14 +48,6 @@ function ContactPage() {
             ] as const
           ).map((f) => (
             <label key={f.id} className="flex flex-col gap-2">
-<<<<<<< HEAD
-              <span className="text-[11px] uppercase tracking-[0.22em] text-detail">
-                {f.label}
-              </span>
-              <input
-                id={f.id}
-                name={f.id}
-=======
               <span className="text-[11px] uppercase tracking-[0.22em] text-detail">{f.label}</span>
               <input
                 id={f.id}
@@ -68,7 +57,6 @@ function ContactPage() {
                   const { name, value } = e.target;
                   setComplaint((c) => ({ ...c, [name]: value }));
                 }}
->>>>>>> 49a1b1e (updated)
                 type={f.type}
                 required
                 className="border-b border-ink/20 bg-transparent pb-2 text-base outline-none transition-colors focus:border-ink"
@@ -76,13 +64,7 @@ function ContactPage() {
             </label>
           ))}
           <label className="flex flex-col gap-2">
-<<<<<<< HEAD
-            <span className="text-[11px] uppercase tracking-[0.22em] text-detail">
-              Message
-            </span>
-=======
             <span className="text-[11px] uppercase tracking-[0.22em] text-detail">Message</span>
->>>>>>> 49a1b1e (updated)
             <textarea
               name="message"
               required
@@ -94,11 +76,7 @@ function ContactPage() {
           <button
             type="submit"
             disabled={sent}
-<<<<<<< HEAD
-            className="mt-4 self-start border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas transition-colors hover:bg-clay hover:border-clay disabled:opacity-50"
-=======
             className="mt-4 self-start border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas transition-colors hover:bg-clay hover:border-clay disabled:opacity-50 disabled:pointer-events-none"
->>>>>>> 49a1b1e (updated)
           >
             {sent ? "Thank you — we'll be in touch" : "Send inquiry"}
           </button>
@@ -106,17 +84,8 @@ function ContactPage() {
 
         <aside className="flex flex-col gap-10 text-sm leading-relaxed text-ink/80">
           <div>
-<<<<<<< HEAD
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
-              Gallery
-            </p>
-            <p className="mt-3 font-display text-2xl italic">
-              Aethelred Gallery
-            </p>
-=======
             <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Gallery</p>
             <p className="mt-3 font-display text-2xl italic">Aethelred Gallery</p>
->>>>>>> 49a1b1e (updated)
             <p className="mt-2">
               14 Linen Street
               <br />
@@ -124,13 +93,7 @@ function ContactPage() {
             </p>
           </div>
           <div>
-<<<<<<< HEAD
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
-              Hours
-            </p>
-=======
             <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Hours</p>
->>>>>>> 49a1b1e (updated)
             <p className="mt-3">
               Tuesday &ndash; Saturday
               <br />
@@ -138,13 +101,7 @@ function ContactPage() {
             </p>
           </div>
           <div>
-<<<<<<< HEAD
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
-              Direct
-            </p>
-=======
             <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Direct</p>
->>>>>>> 49a1b1e (updated)
             <p className="mt-3">
               <a
                 href="mailto:hello@aethelred.gallery"

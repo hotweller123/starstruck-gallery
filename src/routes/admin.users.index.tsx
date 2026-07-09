@@ -9,8 +9,6 @@ import {
   type UserRole,
   type AdminUser,
 } from "@/data/admin-mock";
-<<<<<<< HEAD
-=======
 import {
   Select,
   SelectContent,
@@ -19,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
->>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/admin/users/")({
   component: UsersAdmin,
@@ -30,20 +27,11 @@ function UsersAdmin() {
   const [q, setQ] = useState("");
   const [role, setRole] = useState<"all" | UserRole>("all");
 
-<<<<<<< HEAD
-  const rows = users
-    .filter((u) => role === "all" || u.role === role)
-    .filter(
-      (u) =>
-        !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.includes(q.toLowerCase()),
-    );
-=======
   const ql = q.toLowerCase();
 
   const rows = users
     .filter((u) => role === "all" || u.role === role)
     .filter((u) => !q || u.name.toLowerCase().includes(ql) || u.email.includes(ql));
->>>>>>> 49a1b1e (updated)
 
   const counts = {
     admin: users.filter((u) => u.role === "admin").length,
@@ -81,11 +69,7 @@ function UsersAdmin() {
               onClick={() => setRole(r)}
               className={`rounded px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
                 role === r
-<<<<<<< HEAD
-                  ? "bg-[var(--a-bg-2)] text-[var(--a-fg)]"
-=======
                   ? "bg-[var(--a-accent-2)] text-[var(--a-fg)]"
->>>>>>> 49a1b1e (updated)
                   : "text-[var(--a-muted)] hover:text-[var(--a-fg)]"
               }`}
             >
@@ -135,21 +119,6 @@ function UsersAdmin() {
             header: "Role",
             rowLink: false,
             render: (u) => (
-<<<<<<< HEAD
-              <select
-                value={u.role}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  setUserRole(u.id, e.target.value as UserRole);
-                }}
-                className="rounded-md border border-[var(--a-border)] bg-[var(--a-input)] px-2 py-1 text-xs text-[var(--a-fg)] focus:border-[var(--a-border-hi)]"
-              >
-                <option value="user">User</option>
-                <option value="moderator">Moderator</option>
-                <option value="admin">Admin</option>
-              </select>
-=======
               <>
                 <Select
                   onValueChange={(e) => {
@@ -171,7 +140,6 @@ function UsersAdmin() {
                   </SelectContent>
                 </Select>
               </>
->>>>>>> 49a1b1e (updated)
             ),
           },
           { key: "status", header: "Status", render: (u) => <StatusChip value={u.status} /> },

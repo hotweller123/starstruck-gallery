@@ -10,12 +10,9 @@ import art09 from "@/assets/art-09.jpg";
 import art10 from "@/assets/art-10.jpg";
 import art11 from "@/assets/art-11.jpg";
 import art12 from "@/assets/art-12.jpg";
-<<<<<<< HEAD
-=======
 import { ChicagoArtwork } from "@/hooks/useChicagoArt";
 import { ModChicagoArtwork } from "@/routes";
 import { MetArtwork } from "@/types/metTypes";
->>>>>>> 49a1b1e (updated)
 
 export type CategorySlug =
   | "abstract"
@@ -25,18 +22,6 @@ export type CategorySlug =
   | "photography"
   | "digital"
   | "mixed-media"
-<<<<<<< HEAD
-  | "ceramics";
-
-export type SizeCategory = "small" | "medium" | "large";
-export type Orientation = "portrait" | "landscape" | "square";
-export type DominantColor =
-  | "Warm"
-  | "Cool"
-  | "Neutral"
-  | "Monochrome"
-  | "Earth";
-=======
   | "calligraphy"
   | "drawings"
   | "horology"
@@ -49,7 +34,6 @@ export type DominantColor =
 export type SizeCategory = "small" | "medium" | "large";
 export type Orientation = "portrait" | "landscape" | "square";
 export type DominantColor = "Warm" | "Cool" | "Neutral" | "Monochrome" | "Earth";
->>>>>>> 49a1b1e (updated)
 
 export interface Artwork {
   slug: string;
@@ -65,10 +49,7 @@ export interface Artwork {
   width: number;
   height: number;
   description: string;
-<<<<<<< HEAD
-=======
   measurement: any;
->>>>>>> 49a1b1e (updated)
   // Extended filterable metadata
   price: number; // USD
   sizeCategory: SizeCategory;
@@ -81,11 +62,6 @@ export interface Artwork {
   highlight: boolean;
 }
 
-<<<<<<< HEAD
-const orientationFrom = (w: number, h: number): Orientation =>
-  w === h ? "square" : h > w ? "portrait" : "landscape";
-
-=======
 const getImageUrl = (imageId?: string) => {
   if (!imageId) return "";
   return `https://www.artic.edu/iiif/2/${imageId}/full/843,/0/default.jpg`;
@@ -136,7 +112,6 @@ export const changeMetArtWorkProps = <T extends MetArtwork>(arr: T[] = []) =>
     technique: "Unknown", // Added technique
   }));
 
->>>>>>> 49a1b1e (updated)
 export const formatPrice = (n: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -144,11 +119,7 @@ export const formatPrice = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 
-<<<<<<< HEAD
-const seed: Omit<Artwork, "orientation">[] = [
-=======
 const seed: Omit<Artwork, "orientation" | "measurement">[] = [
->>>>>>> 49a1b1e (updated)
   {
     slug: "linen-study-no-4",
     title: "Linen Study No. 4",
@@ -728,28 +699,11 @@ const seed: Omit<Artwork, "orientation" | "measurement">[] = [
   },
 ];
 
-<<<<<<< HEAD
-export const artworks: Artwork[] = seed.map((a) => ({
-=======
 export const artworks: Omit<Artwork, "measurement">[] = seed.map((a) => ({
->>>>>>> 49a1b1e (updated)
   ...a,
   orientation: orientationFrom(a.width, a.height),
 }));
 
-<<<<<<< HEAD
-export const getArtworkBySlug = (slug: string) =>
-  artworks.find((a) => a.slug === slug);
-
-export const getArtworksByCategory = (slug: CategorySlug) =>
-  artworks.filter((a) => a.category === slug);
-
-export const getArtworksByArtist = (artistSlug: string) =>
-  artworks.filter((a) => a.artistSlug === artistSlug);
-
-// Filter option enumerations (derived for the FilterDrawer)
-const uniq = <T,>(arr: T[]) => Array.from(new Set(arr)).sort();
-=======
 export const getArtworkBySlug = (slug: string, list: Artwork[] = []) => {
   if (!slug || !Array.isArray(list) || list.length === 0) {
     return undefined;
@@ -796,7 +750,6 @@ export const getArtworksByArtist = (artistSlug: string) =>
 
 // Filter option enumerations (derived for the FilterDrawer)
 const uniq = <T>(arr: T[]) => Array.from(new Set(arr)).sort();
->>>>>>> 49a1b1e (updated)
 export const filterOptions = {
   size: ["small", "medium", "large"] as SizeCategory[],
   orientation: ["portrait", "landscape", "square"] as Orientation[],

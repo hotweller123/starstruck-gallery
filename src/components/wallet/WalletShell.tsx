@@ -21,10 +21,6 @@ import {
 import { useWallet } from "@/lib/wallet";
 import { AuthForms } from "./AuthForms";
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 49a1b1e (updated)
 const nav: ReadonlyArray<{
   to: string;
   label: string;
@@ -39,19 +35,12 @@ const nav: ReadonlyArray<{
   { to: "/wallet/security", label: "Security", icon: ShieldCheck },
 ];
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 49a1b1e (updated)
 function Brand() {
   return (
     <Link to="/wallet" className="flex items-center gap-2.5">
       <motion.span
         whileHover={{ rotate: -8 }}
-<<<<<<< HEAD
-=======
         transition={{ duration: 0.25 }}
->>>>>>> 49a1b1e (updated)
         className="grid size-10 place-items-center rounded-[1rem] text-[var(--w-brand-contrast)] shadow-lg shadow-[oklch(0.62_0.18_45/0.4)]"
         style={{ background: "var(--w-brand)" }}
       >
@@ -93,11 +82,7 @@ function AccountChip() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-<<<<<<< HEAD
-        className="flex items-center gap-2 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] py-1 pl-1 pr-3 text-sm font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
-=======
         className="flex items-center gap-2  rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] py-1 pl-1 pr-1 sm:pr-3 text-sm font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
->>>>>>> 49a1b1e (updated)
         type="button"
       >
         <span
@@ -121,11 +106,7 @@ function AccountChip() {
               initial={{ opacity: 0, y: -8, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
-<<<<<<< HEAD
-              transition={{ duration: 0.16 }}
-=======
               transition={{ duration: 0.16, ease: "easeInOut" }}
->>>>>>> 49a1b1e (updated)
               className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl"
             >
               <div className="p-4">
@@ -189,11 +170,7 @@ function TopBar({ showAccount }: { showAccount: boolean }) {
               <span className="absolute right-2.5 top-2.5 size-1.5 rounded-full bg-[var(--w-brand)]" />
             </button>
           )}
-<<<<<<< HEAD
-          
-=======
 
->>>>>>> 49a1b1e (updated)
           <Link
             to="/"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] px-3 py-2 text-[11px] font-semibold text-[var(--w-fg)] transition hover:border-[var(--w-brand)]/50"
@@ -258,14 +235,8 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 Bid on it.
               </h1>
               <p className="mt-6 max-w-md text-base leading-relaxed text-[var(--w-muted)]">
-<<<<<<< HEAD
-                EmberPay is the pocket wallet for the Aethelred exhibition. One
-                token, one tap — bid on auctions, buy artworks, and settle with
-                fellow collectors instantly.
-=======
                 EmberPay is the pocket wallet for the Aethelred exhibition. One token, one tap — bid
                 on auctions, buy artworks, and settle with fellow collectors instantly.
->>>>>>> 49a1b1e (updated)
               </p>
               <ul className="mt-8 grid max-w-md gap-3 text-sm text-[var(--w-fg)]/90">
                 {[
@@ -309,13 +280,9 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 >
                   <span
                     className={`grid size-8 place-items-center rounded-[0.9rem] transition ${
-<<<<<<< HEAD
-                      active ? "" : "bg-[var(--w-bg-2)] text-[var(--w-fg)] group-hover:bg-[var(--w-input)]"
-=======
                       active
                         ? ""
                         : "bg-[var(--w-bg-2)] text-[var(--w-fg)] group-hover:bg-[var(--w-input)]"
->>>>>>> 49a1b1e (updated)
                     }`}
                     style={
                       active
@@ -362,28 +329,11 @@ export function WalletShell({ children }: { children: ReactNode }) {
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15, duration: 0.4, ease: "easeOut" }}
-<<<<<<< HEAD
-        className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-md justify-between gap-1 rounded-[1.6rem] border border-[var(--w-border)] bg-[var(--w-surface)]/95 p-1.5 shadow-2xl backdrop-blur-xl lg:hidden"
-=======
         className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-md justify-between gap-1 rounded-[1.6rem] border border-[var(--w-border)] bg-[var(--w-surface)]/95 p-1.5 pt-2.5 px-2 shadow-2xl backdrop-blur-xl lg:hidden"
->>>>>>> 49a1b1e (updated)
       >
         {nav.slice(0, 5).map(({ to, label, icon: Icon, exact }) => {
           const active = exact ? pathname === to : pathname.startsWith(to);
           return (
-<<<<<<< HEAD
-            <Link
-              key={to}
-              to={to}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-[1rem] px-2 py-2 text-[10px] font-bold transition ${
-                active ? "" : "text-[var(--w-muted)]"
-              }`}
-              style={active ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
-            >
-              <Icon className="size-4" strokeWidth={2.2} />
-              {label}
-            </Link>
-=======
             <span key={to} className="relative flex flex-1 w-full">
               <Link
                 to={to}
@@ -402,7 +352,6 @@ export function WalletShell({ children }: { children: ReactNode }) {
                 transition={{ type: "spring", stiffness: 500, damping: 12 }}
               />
             </span>
->>>>>>> 49a1b1e (updated)
           );
         })}
       </motion.nav>

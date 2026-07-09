@@ -10,18 +10,7 @@ import {
   Lock,
   Sparkles,
 } from "lucide-react";
-<<<<<<< HEAD
-import {
-  FormPage,
-  WAmount,
-  WInput,
-  WSelect,
-  WSubmit,
-  WRow,
-} from "@/components/wallet/FormPage";
-=======
 import { FormPage, WAmount, WInput, WSelect, WSubmit, WRow } from "@/components/wallet/FormPage";
->>>>>>> 49a1b1e (updated)
 import { useWallet, formatMoney } from "@/lib/wallet";
 
 export const Route = createFileRoute("/wallet/deposit")({
@@ -64,11 +53,7 @@ function DepositPage() {
     const note =
       method === "card"
         ? `Card · •••• ${card.replace(/\s+/g, "").slice(-4)}`
-<<<<<<< HEAD
-        : METHODS.find((m) => m.value === method)?.label ?? "Deposit";
-=======
         : (METHODS.find((m) => m.value === method)?.label ?? "Deposit");
->>>>>>> 49a1b1e (updated)
     const res = deposit(Number(amount), note);
     if (!res.ok) setError(res.error ?? "Failed");
     else setDone(Number(amount));
@@ -154,15 +139,11 @@ function DepositPage() {
                 />
               </WRow>
               <WRow>
-<<<<<<< HEAD
-                <WInput label="Cardholder" value={holder} onChange={(e) => setHolder(e.target.value)} />
-=======
                 <WInput
                   label="Cardholder"
                   value={holder}
                   onChange={(e) => setHolder(e.target.value)}
                 />
->>>>>>> 49a1b1e (updated)
                 <WInput label="Billing ZIP" value={zip} onChange={(e) => setZip(e.target.value)} />
               </WRow>
             </div>
@@ -248,13 +229,9 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="text-[var(--w-muted)]">{label}</dt>
-<<<<<<< HEAD
-      <dd className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}>
-=======
       <dd
         className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}
       >
->>>>>>> 49a1b1e (updated)
         {value}
       </dd>
     </div>

@@ -10,12 +10,9 @@ import { PartnerReasons } from "@/components/site/PartnerReasons";
 import { Sponsors } from "@/components/site/Sponsors";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
-<<<<<<< HEAD
-=======
 import { ChicagoArtwork, useArtInstitute } from "@/hooks/useChicagoArt";
 import { useArtworkContext } from "@/lib/useMetArtworksStore";
 import { Loader } from "@/components/site/Loader";
->>>>>>> 49a1b1e (updated)
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -31,8 +28,6 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-<<<<<<< HEAD
-=======
 export interface ModChicagoArtwork {
   id: number;
   image: string;
@@ -44,15 +39,12 @@ export interface ModChicagoArtwork {
   medium?: string;
 }
 
->>>>>>> 49a1b1e (updated)
 function HomePage() {
   const highlights = artworks.filter((a) => a.highlight).slice(0, 8);
   const newArrivals = artworks.filter((a) => a.year >= 2025).slice(0, 8);
   const featured = artworks.slice(0, 6);
   const spotlight = getArtist("elena-vos")!;
 
-<<<<<<< HEAD
-=======
   const { artworks: artworkStore, loadingAws, chicagoArtworks, loadingCA } = useArtworkContext();
 
   if (loadingAws || loadingCA) {
@@ -61,7 +53,6 @@ function HomePage() {
     );
   }
 
->>>>>>> 49a1b1e (updated)
   return (
     <>
       <HeroCarousel />
@@ -74,16 +65,6 @@ function HomePage() {
           </p>
           <div className="space-y-6 text-xl leading-relaxed text-ink/85 md:text-2xl">
             <p>
-<<<<<<< HEAD
-              Aethelred is a quiet room on the internet — a curated dialogue
-              between permanence and the ephemeral, between clay that takes a
-              week to set and a photograph that takes six hours of held breath.
-            </p>
-            <p className="text-base text-detail md:text-lg">
-              We hang one exhibition at a time, for one season at a time. Twelve
-              artists in permanent rotation, four shows a year, no algorithm,
-              no infinite scroll. Just the work, given room.
-=======
               Aethelred is a quiet room on the internet — a curated dialogue between permanence and
               the ephemeral, between clay that takes a week to set and a photograph that takes six
               hours of held breath.
@@ -92,18 +73,13 @@ function HomePage() {
               We hang one exhibition at a time, for one season at a time. Twelve artists in
               permanent rotation, four shows a year, no algorithm, no infinite scroll. Just the
               work, given room.
->>>>>>> 49a1b1e (updated)
             </p>
           </div>
         </div>
       </section>
 
       <ImageCarousel
-<<<<<<< HEAD
-        artworks={highlights}
-=======
         artworks={chicagoArtworks}
->>>>>>> 49a1b1e (updated)
         eyebrow="The curator has chosen"
         title="Highlights of the season"
         link={{ to: "/gallery", label: "All works" }}
@@ -116,13 +92,7 @@ function HomePage() {
             <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-detail">
               The exhibition, in part
             </p>
-<<<<<<< HEAD
-            <h2 className="font-display text-3xl italic md:text-4xl">
-              Selected Works
-            </h2>
-=======
             <h2 className="font-display text-3xl italic md:text-4xl">Selected Works</h2>
->>>>>>> 49a1b1e (updated)
           </div>
           <Link
             to="/gallery"
@@ -131,17 +101,6 @@ function HomePage() {
             View all &rarr;
           </Link>
         </div>
-<<<<<<< HEAD
-        <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
-          {featured.map((a, i) => (
-            <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
-          ))}
-        </div>
-      </section>
-
-      <ImageCarousel
-        artworks={newArrivals}
-=======
         {artworkStore.length === 0 ? (
           <>
             <Loader message="Loading Selected Works..." className="py-16 md:py-24" />
@@ -159,7 +118,6 @@ function HomePage() {
 
       <ImageCarousel
         artworks={chicagoArtworks.slice(10)}
->>>>>>> 49a1b1e (updated)
         eyebrow="Newly arrived"
         title="From the studios, this season"
       />
@@ -167,13 +125,7 @@ function HomePage() {
       {/* Categories preview */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">
-<<<<<<< HEAD
-          <h2 className="font-display text-3xl italic md:text-4xl">
-            By Mode of Design
-          </h2>
-=======
           <h2 className="font-display text-3xl italic md:text-4xl">By Mode of Design</h2>
->>>>>>> 49a1b1e (updated)
           <Link
             to="/categories"
             className="text-[11px] uppercase tracking-[0.22em] text-detail hover:text-ink"
@@ -189,29 +141,15 @@ function HomePage() {
               params={{ slug: c.slug }}
               className="group flex flex-col gap-3 bg-canvas p-8 transition-colors hover:bg-surface"
             >
-<<<<<<< HEAD
-              <span className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                Category
-              </span>
-              <h3 className="font-display text-3xl italic">{c.label}</h3>
-              <p className="text-sm leading-relaxed text-detail">
-                {c.description}
-              </p>
-=======
               <span className="text-[10px] uppercase tracking-[0.22em] text-detail">Category</span>
               <h3 className="font-display text-3xl italic">{c.label}</h3>
               <p className="text-sm leading-relaxed text-detail">{c.description}</p>
->>>>>>> 49a1b1e (updated)
             </Link>
           ))}
         </div>
       </section>
 
-<<<<<<< HEAD
-      <ArtistSpotlight artist={spotlight} />
-=======
       {/* <ArtistSpotlight artist={spotlight} /> */}
->>>>>>> 49a1b1e (updated)
 
       <PartnerReasons />
 

@@ -5,18 +5,12 @@ import { Link } from "@tanstack/react-router";
 import type { Artwork } from "@/data/artworks";
 import { formatPrice } from "@/data/artworks";
 import { SmartImage } from "./SmartImage";
-<<<<<<< HEAD
-
-interface Props {
-  artworks: Artwork[];
-=======
 import { ChicagoArtwork } from "@/hooks/useChicagoArt";
 import { ModChicagoArtwork } from "@/routes";
 import { Loader } from "./Loader";
 
 interface Props {
   artworks: ModChicagoArtwork[];
->>>>>>> 49a1b1e (updated)
   eyebrow?: string;
   title: string;
   link?: { to: "/gallery"; label: string };
@@ -50,13 +44,7 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
       <div className="mb-10 flex items-end justify-between gap-6 border-b border-ink/10 pb-6">
         <div>
           {eyebrow && (
-<<<<<<< HEAD
-            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-detail">
-              {eyebrow}
-            </p>
-=======
             <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-detail">{eyebrow}</p>
->>>>>>> 49a1b1e (updated)
           )}
           <h2 className="font-display text-3xl italic md:text-4xl">{title}</h2>
         </div>
@@ -75,11 +63,7 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
               aria-label="Previous"
               disabled={!canPrev}
               onClick={() => embla?.scrollPrev()}
-<<<<<<< HEAD
-              className="border border-ink/30 p-2 text-ink transition-opacity disabled:opacity-30 hover:bg-ink hover:text-canvas"
-=======
               className="border border-ink/30 p-2 text-ink transition-opacity disabled:pointer-events-none disabled:opacity-30 hover:bg-ink hover:text-canvas"
->>>>>>> 49a1b1e (updated)
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -88,11 +72,7 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
               aria-label="Next"
               disabled={!canNext}
               onClick={() => embla?.scrollNext()}
-<<<<<<< HEAD
-              className="border border-ink/30 p-2 text-ink transition-opacity disabled:opacity-30 hover:bg-ink hover:text-canvas"
-=======
               className="border border-ink/30 p-2 text-ink transition-opacity disabled:opacity-30 disabled:pointer-events-none hover:bg-ink hover:text-canvas"
->>>>>>> 49a1b1e (updated)
             >
               <ChevronRight className="size-4" />
             </button>
@@ -100,41 +80,6 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
         </div>
       </div>
 
-<<<<<<< HEAD
-      <div ref={emblaRef} className="overflow-hidden">
-        <div className="flex gap-6">
-          {artworks.map((a) => (
-            <Link
-              key={a.slug}
-              to="/artworks/$slug"
-              params={{ slug: a.slug }}
-              className="group block min-w-0 flex-[0_0_75%] sm:flex-[0_0_45%] lg:flex-[0_0_30%]"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden bg-surface">
-                <SmartImage
-                  src={a.image}
-                  alt={`${a.title} by ${a.artist}`}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="mt-4 flex items-baseline justify-between gap-4">
-                <div>
-                  <h3 className="font-display text-xl italic leading-tight">
-                    {a.title}
-                  </h3>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-detail">
-                    {a.artist}
-                  </p>
-                </div>
-                <span className="shrink-0 text-sm text-ink/80">
-                  {formatPrice(a.price)}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-=======
       {artworks.length == 0 ? (
         <>
           <Loader variant="soft" message="Loading Artworks" className="py-16" />
@@ -171,7 +116,6 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
           </div>
         </>
       )}
->>>>>>> 49a1b1e (updated)
     </section>
   );
 }

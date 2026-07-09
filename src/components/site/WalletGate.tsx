@@ -26,19 +26,9 @@ export function WalletGate({
           <span className="mx-auto grid size-14 place-items-center rounded-full bg-clay/10 text-clay">
             <WalletIcon className="size-6" strokeWidth={1.3} />
           </span>
-<<<<<<< HEAD
-          <p className="mt-6 text-[10px] uppercase tracking-[0.3em] text-detail">
-            Wallet required
-          </p>
-          <h2 className="mt-3 font-display text-4xl italic md:text-5xl">{title}</h2>
-          <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-detail">
-            {description}
-          </p>
-=======
           <p className="mt-6 text-[10px] uppercase tracking-[0.3em] text-detail">Wallet required</p>
           <h2 className="mt-3 font-display text-4xl italic md:text-5xl">{title}</h2>
           <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-detail">{description}</p>
->>>>>>> 49a1b1e (updated)
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/connect"

@@ -21,14 +21,7 @@ import {
   TabBar,
   BentoCard,
 } from "@/components/admin/primitives";
-<<<<<<< HEAD
-import {
-  RecordSheet,
-  type FieldDef,
-} from "@/components/admin/RecordSheet";
-=======
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
->>>>>>> 49a1b1e (updated)
 import {
   adminTxs as seedTxs,
   adminUsers as seedAccounts,
@@ -75,28 +68,16 @@ function WalletOps() {
       )
       .filter((t) => (status === "all" ? true : t.status === status))
       .filter(
-<<<<<<< HEAD
-        (t) =>
-          !q ||
-          t.user.toLowerCase().includes(ql) ||
-          t.id.includes(ql) ||
-          t.email.includes(ql),
-=======
         (t) => !q || t.user.toLowerCase().includes(ql) || t.id.includes(ql) || t.email.includes(ql),
->>>>>>> 49a1b1e (updated)
       );
   }, [tab, q, status, txs]);
 
   const accRows = useMemo(
-<<<<<<< HEAD
-    () => accounts.filter((u) => !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.includes(q.toLowerCase())),
-=======
     () =>
       accounts.filter(
         (u) =>
           !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.includes(q.toLowerCase()),
       ),
->>>>>>> 49a1b1e (updated)
     [accounts, q],
   );
 
@@ -117,14 +98,10 @@ function WalletOps() {
       key: "type",
       label: "Type",
       kind: "select",
-<<<<<<< HEAD
-      options: ["deposit", "withdraw", "transfer", "purchase", "sale"].map((v) => ({ value: v, label: v })),
-=======
       options: ["deposit", "withdraw", "transfer", "purchase", "sale"].map((v) => ({
         value: v,
         label: v,
       })),
->>>>>>> 49a1b1e (updated)
     },
     { key: "amount", label: "Amount", kind: "money" },
     { key: "method", label: "Method" },
@@ -160,16 +137,12 @@ function WalletOps() {
     { key: "balance", label: "Wallet balance", kind: "money" },
     { key: "id", label: "Account ID", editable: false },
     { key: "joined", label: "Joined", editable: false, render: (v) => fmtDateTime(v as string) },
-<<<<<<< HEAD
-    { key: "lastSeen", label: "Last seen", editable: false, render: (v) => fmtDateTime(v as string) },
-=======
     {
       key: "lastSeen",
       label: "Last seen",
       editable: false,
       render: (v) => fmtDateTime(v as string),
     },
->>>>>>> 49a1b1e (updated)
   ];
 
   return (
@@ -210,11 +183,7 @@ function WalletOps() {
           active={tab}
           onChange={(id) => setTab(id as Tab)}
         />
-<<<<<<< HEAD
-        <div className="flex items-center gap-2">
-=======
         <div className="flex items-center gap-2 flex-wrap">
->>>>>>> 49a1b1e (updated)
           {tab !== "accounts" && (
             <div className="flex rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-0.5">
               {["all", "completed", "pending", "review", "failed"].map((s) => (
@@ -223,11 +192,7 @@ function WalletOps() {
                   onClick={() => setStatus(s)}
                   className={`rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
                     status === s
-<<<<<<< HEAD
-                      ? "bg-[var(--a-bg-2)] text-[var(--a-fg)]"
-=======
                       ? "bg-[var(--a-accent-2)] text-[var(--a-fg)]"
->>>>>>> 49a1b1e (updated)
                       : "text-[var(--a-muted)] hover:text-[var(--a-fg)]"
                   }`}
                 >
@@ -242,11 +207,7 @@ function WalletOps() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search…"
-<<<<<<< HEAD
-              className="h-9 w-56 rounded-md border border-[var(--a-border)] bg-[var(--a-input)] pl-9 pr-3 text-sm text-[var(--a-fg)] placeholder:text-[var(--a-faint)] outline-none focus:border-[var(--a-border-hi)]"
-=======
               className="h-9 md:w-56 my-1 rounded-md border border-[var(--a-border)] bg-[var(--a-input)] pl-9 pr-3 text-sm text-[var(--a-fg)] placeholder:text-[var(--a-faint)] outline-none focus:border-[var(--a-border-hi)]"
->>>>>>> 49a1b1e (updated)
             />
           </div>
         </div>
@@ -266,15 +227,11 @@ function WalletOps() {
                     className="grid size-8 place-items-center rounded-md text-[11px] font-bold text-[var(--a-accent-ink)]"
                     style={{ background: r.avatar }}
                   >
-<<<<<<< HEAD
-                    {r.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
-=======
                     {r.name
                       .split(" ")
                       .map((p) => p[0])
                       .join("")
                       .slice(0, 2)}
->>>>>>> 49a1b1e (updated)
                   </span>
                   <div>
                     <p className="text-xs font-semibold text-[var(--a-fg)]">{r.name}</p>
@@ -286,13 +243,6 @@ function WalletOps() {
             {
               key: "balance",
               header: "Balance",
-<<<<<<< HEAD
-              render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(r.balance)}</span>,
-            },
-            { key: "role", header: "Role", render: (r) => <span className="text-xs text-[var(--a-fg-2)] capitalize">{r.role}</span> },
-            { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
-            { key: "joined", header: "Joined", render: (r) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.joined)}</span> },
-=======
               render: (r) => (
                 <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
                   {fmtMoney(r.balance)}
@@ -314,7 +264,6 @@ function WalletOps() {
                 <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.joined)}</span>
               ),
             },
->>>>>>> 49a1b1e (updated)
           ]}
         />
       ) : (
@@ -322,15 +271,11 @@ function WalletOps() {
           rows={txRows}
           onRowClick={(r) => setSelectedTx(r)}
           columns={[
-<<<<<<< HEAD
-            { key: "id", header: "Tx ID", render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.id}</span> },
-=======
             {
               key: "id",
               header: "Tx ID",
               render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.id}</span>,
             },
->>>>>>> 49a1b1e (updated)
             {
               key: "user",
               header: "User",
@@ -350,12 +295,6 @@ function WalletOps() {
                 </span>
               ),
             },
-<<<<<<< HEAD
-            { key: "method", header: "Method", render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.method}</span> },
-            { key: "amount", header: "Amount", render: (r) => <span className="a-mono text-xs font-bold text-[var(--a-fg)]">{fmtMoney(r.amount)}</span> },
-            { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
-            { key: "date", header: "When", render: (r) => <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.createdAt)}</span> },
-=======
             {
               key: "method",
               header: "Method",
@@ -378,7 +317,6 @@ function WalletOps() {
                 <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.createdAt)}</span>
               ),
             },
->>>>>>> 49a1b1e (updated)
           ]}
         />
       )}
@@ -398,12 +336,6 @@ function WalletOps() {
             <div>
               <p className="a-eyebrow mb-2">Ledger entry</p>
               <ul className="space-y-2 text-xs text-[var(--a-fg-2)]">
-<<<<<<< HEAD
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Channel</span><span className="a-mono">{selectedTx.method}</span></li>
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Fee est.</span><span className="a-mono">{fmtMoney(Math.round(selectedTx.amount * 0.012))}</span></li>
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Net</span><span className="a-mono">{fmtMoney(Math.round(selectedTx.amount * 0.988))}</span></li>
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Date</span><span className="a-mono">{fmtDateTime(selectedTx.createdAt)}</span></li>
-=======
                 <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Channel</span>
                   <span className="a-mono">{selectedTx.method}</span>
@@ -420,7 +352,6 @@ function WalletOps() {
                   <span className="text-[var(--a-muted)]">Date</span>
                   <span className="a-mono">{fmtDateTime(selectedTx.createdAt)}</span>
                 </li>
->>>>>>> 49a1b1e (updated)
               </ul>
             </div>
           )
@@ -428,16 +359,6 @@ function WalletOps() {
         operations={
           selectedTx
             ? [
-<<<<<<< HEAD
-                { id: "approve", label: "Approve", icon: CheckCircle2, tone: "success", onRun: () => patchTx(selectedTx.id, { status: "completed" }) },
-                { id: "reject", label: "Reject", icon: XCircle, tone: "danger", confirm: "Reject this transaction?", onRun: () => patchTx(selectedTx.id, { status: "failed" }) },
-                { id: "hold", label: "Send to review", icon: Flag, onRun: () => patchTx(selectedTx.id, { status: "review" }) },
-                ...(selectedTx.type === "withdraw"
-                  ? [{ id: "release", label: "Release payout", icon: ArrowUpRight, tone: "primary" as const, onRun: () => patchTx(selectedTx.id, { status: "completed" }) }]
-                  : []),
-                ...(selectedTx.status === "completed"
-                  ? [{ id: "refund", label: "Issue refund", icon: RotateCcw, tone: "danger" as const, confirm: "Refund this transaction?", onRun: () => alert(`Refunded ${fmtMoney(selectedTx.amount)} (mock).`) }]
-=======
                 {
                   id: "approve",
                   label: "Approve",
@@ -481,7 +402,6 @@ function WalletOps() {
                         onRun: () => alert(`Refunded ${fmtMoney(selectedTx.amount)} (mock).`),
                       },
                     ]
->>>>>>> 49a1b1e (updated)
                   : []),
               ]
             : undefined
@@ -502,13 +422,6 @@ function WalletOps() {
           selectedAcc && (
             <div>
               <p className="a-eyebrow mb-2">Balance</p>
-<<<<<<< HEAD
-              <p className="font-display text-3xl font-extrabold text-[var(--a-accent)]">{fmtMoney(selectedAcc.balance)}</p>
-              <p className="mt-1 text-[10px] text-[var(--a-muted)]">Spendable</p>
-              <ul className="mt-4 space-y-2 text-xs">
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Tx count</span><span className="a-mono text-[var(--a-fg-2)]">{txs.filter((t) => t.email === selectedAcc.email).length}</span></li>
-                <li className="flex justify-between"><span className="text-[var(--a-muted)]">Last seen</span><span className="a-mono text-[var(--a-fg-2)]">{fmtDateTime(selectedAcc.lastSeen)}</span></li>
-=======
               <p className="font-display text-3xl font-extrabold text-[var(--a-accent)]">
                 {fmtMoney(selectedAcc.balance)}
               </p>
@@ -526,7 +439,6 @@ function WalletOps() {
                     {fmtDateTime(selectedAcc.lastSeen)}
                   </span>
                 </li>
->>>>>>> 49a1b1e (updated)
               </ul>
             </div>
           )
@@ -534,14 +446,6 @@ function WalletOps() {
         operations={
           selectedAcc
             ? [
-<<<<<<< HEAD
-                { id: "verify", label: "Mark verified", icon: ShieldCheck, tone: "success", onRun: () => patchAcc(selectedAcc.id, { status: "active" }) },
-                { id: "suspend", label: "Suspend account", icon: Ban, tone: "danger", confirm: `Suspend ${selectedAcc.name}?`, onRun: () => patchAcc(selectedAcc.id, { status: "suspended" }) },
-                { id: "credit", label: "Credit $100", icon: WalletIcon, onRun: () => patchAcc(selectedAcc.id, { balance: selectedAcc.balance + 100 }) },
-                { id: "debit", label: "Debit $100", icon: WalletIcon, tone: "danger", onRun: () => patchAcc(selectedAcc.id, { balance: Math.max(0, selectedAcc.balance - 100) }) },
-                { id: "reset", label: "Force password reset", icon: KeyRound, onRun: () => alert(`Reset email sent to ${selectedAcc.email} (mock).`) },
-                { id: "message", label: "Message user", icon: Mail, onRun: () => alert(`Opened message thread with ${selectedAcc.name} (mock).`) },
-=======
                 {
                   id: "verify",
                   label: "Mark verified",
@@ -583,7 +487,6 @@ function WalletOps() {
                   icon: Mail,
                   onRun: () => alert(`Opened message thread with ${selectedAcc.name} (mock).`),
                 },
->>>>>>> 49a1b1e (updated)
               ]
             : undefined
         }

@@ -119,17 +119,12 @@ const STATUS_STYLES: Record<string, string> = {
   review: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   suspended: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
   failed: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
-<<<<<<< HEAD
-};
-export function StatusChip({ value }: { value: string }) {
-=======
   leading: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
   won: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   outbid: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   lost: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
 };
 export function StatusChip({ value }: { value: keyof typeof STATUS_STYLES }) {
->>>>>>> 49a1b1e (updated)
   const cls = STATUS_STYLES[value] || "bg-[var(--a-surface-2)] text-[var(--a-muted)]";
   return (
     <span

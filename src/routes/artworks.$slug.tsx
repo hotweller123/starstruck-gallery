@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
-import {
-  artworks,
-  formatPrice,
-  getArtworkBySlug,
-  getArtworksByArtist,
-=======
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
 import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
@@ -21,62 +11,12 @@ import {
   getArtworksByArtist,
   orientationFrom,
   SizeCategory,
->>>>>>> 49a1b1e (updated)
 } from "@/data/artworks";
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { SmartImage } from "@/components/site/SmartImage";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-<<<<<<< HEAD
-
-export const Route = createFileRoute("/artworks/$slug")({
-  component: ArtworkPage,
-  loader: ({ params }) => {
-    const artwork = getArtworkBySlug(params.slug);
-    if (!artwork) throw notFound();
-    return { artwork };
-  },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData
-          ? `${loaderData.artwork.title} — ${loaderData.artwork.artist} — Aethelred`
-          : "Artwork — Aethelred",
-      },
-      {
-        name: "description",
-        content: loaderData?.artwork.description ?? "",
-      },
-    ],
-  }),
-});
-
-function ArtworkPage() {
-  const { artwork } = Route.useLoaderData();
-  const artist = getArtist(artwork.artistSlug);
-  const { isFavorite, toggleFavorite, addToCart } = useStore();
-  const [qty, setQty] = useState(1);
-  const fav = isFavorite(artwork.slug);
-  const related = getArtworksByArtist(artwork.artistSlug)
-    .filter((a) => a.slug !== artwork.slug)
-    .concat(artworks.filter((a) => a.category === artwork.category))
-    .filter((a, i, arr) => arr.findIndex((b) => b.slug === a.slug) === i)
-    .filter((a) => a.slug !== artwork.slug)
-    .slice(0, 3);
-
-  return (
-    <article>
-      <div className="mx-auto max-w-7xl px-6 pt-12">
-        <Link
-          to="/gallery"
-          className="text-[11px] uppercase tracking-[0.22em] text-detail hover:text-ink"
-        >
-          &larr; Back to gallery
-        </Link>
-      </div>
-
-=======
 import { useArtworkContext } from "@/lib/useMetArtworksStore";
 import { EMPTY_TEXT } from "@/lib/emptyState";
 import { useMetArtist } from "@/hooks/useMetArtist";
@@ -198,7 +138,6 @@ function ArtworkPage() {
   return (
     <article>
       <Nav />
->>>>>>> 49a1b1e (updated)
       <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1.4fr_1fr] lg:gap-24">
         <div className="bg-surface">
           <SmartImage
@@ -228,35 +167,6 @@ function ArtworkPage() {
             </Link>
           </div>
 
-<<<<<<< HEAD
-          <p className="text-lg leading-relaxed text-ink/80">
-            {artwork.description}
-          </p>
-
-          <dl className="grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10 sm:grid-cols-4">
-            <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                Medium
-              </dt>
-              <dd className="mt-2 text-sm">{artwork.medium}</dd>
-            </div>
-            <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                Dimensions
-              </dt>
-              <dd className="mt-2 text-sm">{artwork.dimensions}</dd>
-            </div>
-            <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                Year
-              </dt>
-              <dd className="mt-2 text-sm">{artwork.year}</dd>
-            </div>
-            <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                Price
-              </dt>
-=======
           <p className="text-lg leading-relaxed text-ink/80">{artwork.description}</p>
 
           <dl className="grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10 sm:grid-cols-4">
@@ -274,7 +184,6 @@ function ArtworkPage() {
             </div>
             <div className="bg-canvas p-5">
               <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Price</dt>
->>>>>>> 49a1b1e (updated)
               <dd className="mt-2 font-display text-xl italic text-ink">
                 {formatPrice(artwork.price)}
               </dd>
@@ -282,21 +191,6 @@ function ArtworkPage() {
           </dl>
 
           <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs text-detail sm:grid-cols-3">
-<<<<<<< HEAD
-            <li><span className="text-ink/60">Theme</span> — {artwork.theme}</li>
-            <li><span className="text-ink/60">Style</span> — {artwork.style}</li>
-            <li><span className="text-ink/60">Technique</span> — {artwork.technique}</li>
-            <li><span className="text-ink/60">Orientation</span> — {artwork.orientation}</li>
-            <li><span className="text-ink/60">Country</span> — {artwork.country}</li>
-            <li><span className="text-ink/60">Palette</span> — {artwork.dominantColor}</li>
-          </ul>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="flex items-center border border-ink/20">
-              <button
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="px-3 py-3 text-detail hover:text-ink"
-=======
             <li>
               <span className="text-ink/60">Theme</span> — {artwork.theme}
             </li>
@@ -322,7 +216,6 @@ function ArtworkPage() {
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
                 className="px-3 py-3 text-detail hover:text-ink "
->>>>>>> 49a1b1e (updated)
                 aria-label="Decrease quantity"
               >
                 <Minus className="size-3.5" strokeWidth={1.5} />
@@ -330,11 +223,7 @@ function ArtworkPage() {
               <span className="min-w-8 text-center text-sm">{qty}</span>
               <button
                 onClick={() => setQty((q) => q + 1)}
-<<<<<<< HEAD
-                className="px-3 py-3 text-detail hover:text-ink"
-=======
                 className="px-3 py-3 text-detail hover:text-ink "
->>>>>>> 49a1b1e (updated)
                 aria-label="Increase quantity"
               >
                 <Plus className="size-3.5" strokeWidth={1.5} />
@@ -348,14 +237,10 @@ function ArtworkPage() {
               Add to cart · {formatPrice(artwork.price * qty)}
             </button>
             <button
-<<<<<<< HEAD
-              onClick={() => toggleFavorite(artwork.slug)}
-=======
               onClick={() => {
                 toggleFavorite(artwork.slug);
                 console.log(cart);
               }}
->>>>>>> 49a1b1e (updated)
               aria-label={fav ? "Remove from favourites" : "Add to favourites"}
               className={cn(
                 "inline-flex size-12 items-center justify-center border transition-colors",
@@ -364,15 +249,7 @@ function ArtworkPage() {
                   : "border-ink/20 text-ink hover:border-ink",
               )}
             >
-<<<<<<< HEAD
-              <Heart
-                className="size-4"
-                strokeWidth={1.5}
-                fill={fav ? "currentColor" : "none"}
-              />
-=======
               <Heart className="size-4" strokeWidth={1.5} fill={fav ? "currentColor" : "none"} />
->>>>>>> 49a1b1e (updated)
             </button>
           </div>
           <Link
@@ -383,24 +260,6 @@ function ArtworkPage() {
           </Link>
 
           {artist && (
-<<<<<<< HEAD
-            <div className="mt-4 flex items-center gap-4 border-t border-ink/10 pt-8">
-              <SmartImage
-                src={artist.portrait}
-                alt={artist.name}
-                width={80}
-                height={80}
-                className="size-16 object-cover"
-              />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                  About the artist
-                </p>
-                <p className="mt-1 font-display text-xl italic">{artist.name}</p>
-                <p className="text-xs text-detail">{artist.discipline}</p>
-              </div>
-            </div>
-=======
             <>
               <div>
                 <div className="mt-4 flex items-center gap-4 border-t border-ink/10 pt-8">
@@ -422,17 +281,12 @@ function ArtworkPage() {
                 <p className="text-[10px] text-clay mt-3">{artist.bio}</p>
               </div>
             </>
->>>>>>> 49a1b1e (updated)
           )}
         </aside>
       </section>
 
       {related.length > 0 && (
-<<<<<<< HEAD
-        <section className="mx-auto max-w-7xl px-6 pb-32">
-=======
         <section className="mx-auto max-w-7xl px-6 pb-20">
->>>>>>> 49a1b1e (updated)
           <h2 className="mb-12 border-b border-ink/10 pb-6 font-display text-3xl italic">
             Related works
           </h2>
@@ -443,8 +297,6 @@ function ArtworkPage() {
           </div>
         </section>
       )}
-<<<<<<< HEAD
-=======
 
       {/* {isLoading && (
         <>
@@ -465,7 +317,6 @@ function ArtworkPage() {
           </div>
         </section>
       )} */}
->>>>>>> 49a1b1e (updated)
     </article>
   );
 }

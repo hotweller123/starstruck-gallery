@@ -27,14 +27,7 @@ export function ActiveFilterChips({ value, onChange }: Props) {
 
   const chips: Chip[] = [];
 
-<<<<<<< HEAD
-  if (
-    value.priceMin !== filterOptions.priceMin ||
-    value.priceMax !== filterOptions.priceMax
-  ) {
-=======
   if (value.priceMin !== filterOptions.priceMin || value.priceMax !== filterOptions.priceMax) {
->>>>>>> 49a1b1e (updated)
     chips.push({
       label: `${formatPrice(value.priceMin)} — ${formatPrice(value.priceMax)}`,
       onRemove: () =>
@@ -79,13 +72,7 @@ export function ActiveFilterChips({ value, onChange }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-<<<<<<< HEAD
-      <span className="mr-1 text-[10px] uppercase tracking-[0.22em] text-detail">
-        Filtered by
-      </span>
-=======
       <span className="mr-1 text-[10px] uppercase tracking-[0.22em] text-detail">Filtered by</span>
->>>>>>> 49a1b1e (updated)
       {chips.map((c, i) => (
         <button
           key={i}
