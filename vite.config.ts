@@ -21,7 +21,7 @@ export default defineConfig(async ({ mode }) => {
   return {
     define: envDefine,
     preview: {
-      allowedHosts: ["starstruck-gallery.onrender.com"],
+      allowedHosts: true,
     },
 
     resolve: {
