@@ -53,26 +53,28 @@ export function HeroCarousel() {
     };
   }, [embla]);
 
-  const current = chicagoArtworks[index + 6];
+  const current = chicagoArtworks.filter((ca) => ca.image)[index + 6];
 
   if (chicagoArtworks)
     return (
       <section className="relative h-[88vh] min-h-[640px] w-full overflow-hidden bg-ink">
         <div ref={emblaRef} className="absolute inset-0 h-full overflow-hidden">
           <div className="flex h-full ">
-            {chicagoArtworks.slice(6, 10).map((a, i) => (
-              <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
-                <SmartImage
-                  src={a?.image || ""}
-                  key={a?.id}
-                  alt={a?.name}
-                  aria-hidden
-                  priority={i === 0}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/30" />
-              </div>
-            ))}
+            {chicagoArtworks
+              .filter((ca) => ca.image)
+              .map((a, i) => (
+                <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
+                  <SmartImage
+                    src={a?.image || ""}
+                    key={a?.id}
+                    alt={a?.name}
+                    aria-hidden
+                    priority={i === 0}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/30" />
+                </div>
+              ))}
           </div>
         </div>
 

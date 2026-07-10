@@ -71,16 +71,28 @@ export const orientationFrom = (w: number, h: number): Orientation =>
   w === h ? "square" : h > w ? "portrait" : "landscape";
 
 export const changeChicagoToMod = <T extends ChicagoArtwork>(arr: T[]): ModChicagoArtwork[] =>
-  arr.map((ca) => ({
-    image: getImageUrl(ca.image_id),
-    title: ca.title,
-    id: ca.id,
-    name: ca.artist_display,
-    width: ca.thumbnail?.width || 100,
-    height: ca.thumbnail?.height || 100,
-    medium: ca.medium_display,
-    price: ca.id / 100,
-  }));
+  arr
+    .map((ca) => ({
+      image: getImageUrl(ca.image_id),
+      title: ca.title,
+      id: ca.id,
+      name: ca.artist_display,
+      width: ca.thumbnail?.width || 100,
+      height: ca.thumbnail?.height || 100,
+      medium: ca.medium_display,
+      price: ca.id / 100,
+    }))
+    .filter(
+      (img): img is ModChicagoArtwork =>
+        !!img.image &&
+        !!img.title &&
+        !!img.id &&
+        !!img.name &&
+        !!img.width &&
+        !!img.height &&
+        img.medium !== undefined &&
+        !!img.price,
+    );
 
 export const changeMetArtWorkProps = <T extends MetArtwork>(arr: T[] = []) =>
   arr.map((a) => ({
