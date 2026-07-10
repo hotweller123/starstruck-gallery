@@ -2,10 +2,10 @@ services:
   - type: web
     name: starstruck-gallery
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
-    buildCommand: npm install && npm run build
-    startCommand: node render-server.js
+    buildCommand: npm run build
+    startCommand: npm run preview
     envVars:
       - key: NODE_VERSION
         value: 20
@@ -13,3 +13,5 @@ services:
         value: production
     healthCheckPath: /
     autoDeploy: true
+    repo: https://github.com/hotweller123/starstruck-gallery.git
+    branch: main
