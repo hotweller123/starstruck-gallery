@@ -7,7 +7,7 @@ import type {
 } from "../types/metTypes";
 
 const proxy = "https://corsproxy.io/?";
-const BASE_URL = `${proxy}https://collectionapi.metmuseum.org/public/collection/v1`;
+const BASE_URL = `https://collectionapi.metmuseum.org/public/collection/v1`;
 
 export const metApi = {
   // Search artworks — returns array of object IDs
