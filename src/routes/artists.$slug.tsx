@@ -1,15 +1,10 @@
-import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
-import { getArtist } from "@/data/artists";
-import { changeChicagoToMod, changeMetArtWorkProps, getArtworksByArtist } from "@/data/artworks";
-import { ArtworkCard } from "@/components/site/ArtworkCard";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { changeChicagoToMod } from "@/data/artworks";
 import { SmartImage } from "@/components/site/SmartImage";
-import { useArtworkContext } from "@/lib/useMetArtworksStore";
-import { useMetArtist } from "@/hooks/useMetArtist";
 import { Loader } from "@/components/site/Loader";
 import { useArtInstitute } from "@/hooks/useChicagoArt";
 import { useEffect, useState } from "react";
 import { convert } from "html-to-text";
-import { useToast } from "@/lib/useToast";
 
 export const Route = createFileRoute("/artists/$slug")({
   component: ArtistPage,
@@ -115,7 +110,6 @@ function ArtistPage() {
             .slice(0, 5)
             .filter((w) => w.image)
             .map((w) => (
-              // <ArtworkCard key={a.id} artwork={a} />
               <section key={w.id} className="group">
                 <div className="overflow-hidden bg-surface outline outline-1 -outline-offset-1 outline-ink/5">
                   <SmartImage
@@ -130,16 +124,11 @@ function ArtistPage() {
                 </div>
                 <div className="mt-4">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                    {artist?.title}
+                    {w.name || artist?.title || slug}
                   </p>
                   <h3 className="mt-1 font-display text-2xl italic leading-tight text-ink">
-                    {artist?.bio}
+                    {w.title}
                   </h3>
-                  {/* <p className="mt-1.5 text-xs text-detail">{artwork.medium}</p> */}
-                  {/* <div className="mt-2 flex items-baseline gap-3 justify-between border-t border-ink/10 pt-2.5">
-                    <span className="text-xs text-detail line-clamp-1">{artwork.dimensions}</span>
-                    <span className="text-sm text-ink">{formatPrice(artwork.price)}</span>
-                  </div> */}
                 </div>
               </section>
             ))}
