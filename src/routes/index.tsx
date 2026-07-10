@@ -49,7 +49,15 @@ function HomePage() {
 
   if (loadingAws || loadingCA) {
     return (
-      <Loader variant="soft" className="flex flex-col gap-3" fullScreen message="Loading Museum" />
+      <>
+        <div className="min-h-screen min-w-screen bg-canvas"></div>
+        <Loader
+          variant="soft"
+          className="flex flex-col gap-3 overscroll-contain! z-20"
+          fullScreen
+          message="Loading Museum"
+        />
+      </>
     );
   }
 

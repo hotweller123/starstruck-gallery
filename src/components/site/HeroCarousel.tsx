@@ -62,6 +62,7 @@ export function HeroCarousel() {
           <div className="flex h-full ">
             {chicagoArtworks
               .filter((ca) => ca.image)
+              .slice(6, 10)
               .map((a, i) => (
                 <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
                   <SmartImage
