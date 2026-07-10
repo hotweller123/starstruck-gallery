@@ -10,7 +10,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 // Error handling for SSR is handled in src/server.ts (for production) + normal Vite error overlay (for dev).
 // =================================================================
 
-export default defineConfig(async ({ mode }) => {
+export default defineConfig(({ mode }) => {
   // Inject VITE_* env vars
   const envDefine: Record<string, string> = {};
   const loadedEnv = loadEnv(mode, process.cwd(), "VITE_");
