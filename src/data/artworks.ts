@@ -70,7 +70,7 @@ const getImageUrl = (imageId?: string) => {
 export const orientationFrom = (w: number, h: number): Orientation =>
   w === h ? "square" : h > w ? "portrait" : "landscape";
 
-export const changeChicagoToMod = <T extends ChicagoArtwork[]>(arr: T): ModChicagoArtwork[] =>
+export const changeChicagoToMod = <T extends ChicagoArtwork>(arr: T[]): ModChicagoArtwork[] =>
   arr.map((ca) => ({
     image: getImageUrl(ca.image_id),
     title: ca.title,
@@ -123,8 +123,8 @@ const seed: Omit<Artwork, "orientation" | "measurement">[] = [
   {
     slug: "linen-study-no-4",
     title: "Linen Study No. 4",
-    artistSlug: "vincent-van-gogh",
-    artist: "Vincent van Gogh",
+    artistSlug: "soren-kjeldsen",
+    artist: "Søren Kjeldsen",
     category: "abstract",
     categoryLabel: "Abstract",
     year: 2024,
@@ -140,15 +140,15 @@ const seed: Omit<Artwork, "orientation" | "measurement">[] = [
     theme: "Abstract Form",
     style: "Colour Field",
     technique: "Oil",
-    country: "Netherlands",
+    country: "Denmark",
     dominantColor: "Warm",
     highlight: true,
   },
   {
     slug: "vessel-i",
     title: "Vessel I",
-    artistSlug: "vincent-van-gogh",
-    artist: "Vincent van Gogh",
+    artistSlug: "elena-vos",
+    artist: "Elena Vos",
     category: "sculpture",
     categoryLabel: "Sculpture",
     year: 2024,
@@ -164,7 +164,7 @@ const seed: Omit<Artwork, "orientation" | "measurement">[] = [
     theme: "Still Life",
     style: "Minimal",
     technique: "Hand-thrown",
-    country: "Netherlands",
+    country: "Belgium",
     dominantColor: "Neutral",
     highlight: false,
   },
@@ -717,9 +717,9 @@ export const getArtworkBySlug = (slug: string, list: Artwork[] = []) => {
   // return list.find((item) => {
   //   if (!item || typeof item !== "object") return false;
 
-  //   // Collect every possible identifier the item might use.
-  //   // Local data usually has "slug".
-  //   // Met Museum API data usually has "objectID" (number).
+  // Collect every possible identifier the item might use.
+  // Local data usually has "slug".
+  // Met Museum API data usually has "objectID" (number).
   //   const possibleIds = [
   //     item.slug,
   //     item.objectID,

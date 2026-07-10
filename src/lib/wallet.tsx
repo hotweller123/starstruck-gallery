@@ -13,16 +13,24 @@ export type TxType =
 export interface WalletAccount {
   id: string;
   email: string;
-  name: string;
+  fullName: string;
   passwordHash: string;
+  currency: string;
+  symbol: string;
   token: string;
-  balance: number;
+  wallet: {
+    bidBalance: number;
+    balance: number;
+  };
+  blocked: boolean;
+  status: "active" | "pending" | "suspended";
+  role: "user" | "admin";
   createdAt: string;
 }
 
 export interface WalletTx {
   id: string;
-  accountId: string;
+  userID: string;
   type: TxType;
   amount: number; // always positive; sign derived from type
   balanceAfter: number;
@@ -45,7 +53,7 @@ interface Result {
 interface Wallet extends State {
   currentAccount: WalletAccount | null;
   signedIn: boolean;
-  register: (input: { name: string; email: string; password: string }) => Result;
+  register: (input: { fullName: string; email: string; password: string }) => Result;
   signIn: (input: { email: string; password: string }) => Result;
   signOut: () => void;
   deposit: (amount: number, note?: string) => Result;
@@ -117,17 +125,25 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const currentAccount = state.accounts.find((a) => a.id === state.currentAccountId) ?? null;
 
-  const pushTx = (
-    s: State,
-    accountId: string,
-    type: TxType,
-    amount: number,
-    balanceAfter: number,
-    note?: string,
-    counterparty?: string,
-  ): WalletTx => ({
+  const pushTx = ({
+    s,
+    userID,
+    type,
+    amount,
+    balanceAfter,
+    note,
+    counterparty,
+  }: {
+    s: State;
+    userID: string;
+    type: TxType;
+    amount: number;
+    balanceAfter: number;
+    note?: string;
+    counterparty?: string;
+  }): WalletTx => ({
     id: uid(),
-    accountId,
+    userID,
     type,
     amount,
     balanceAfter,
@@ -141,19 +157,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     currentAccount,
     signedIn: !!currentAccount,
 
-    register: ({ name, email, password }) => {
+    register: ({ fullName, email, password }) => {
       const e = email.trim().toLowerCase();
-      if (!name.trim() || !e || password.length < 6)
+      if (!fullName.trim() || !e || password.length < 6)
         return { ok: false, error: "Fill all fields. Password ≥ 6 chars." };
       if (state.accounts.some((a) => a.email === e))
         return { ok: false, error: "An account with that email exists." };
       const acc: WalletAccount = {
         id: uid(),
+        blocked: false,
+        role: "user",
+        status: "active",
+        currency: "USD",
+        symbol: "$",
         email: e,
-        name: name.trim(),
+        fullName: fullName.trim(),
         passwordHash: password,
         token: makeToken(),
-        balance: 0,
+        wallet: {
+          balance: 0,
+          bidBalance: 0,
+        },
         createdAt: new Date().toISOString(),
       };
       setState((s) => ({
@@ -181,12 +205,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const acc = s.accounts.find((a) => a.id === currentAccount.id);
         if (!acc) return s;
-        const newBal = acc.balance + amount;
+        const newBal = acc.wallet.balance + amount;
         return {
           ...s,
-          accounts: s.accounts.map((a) => (a.id === acc.id ? { ...a, balance: newBal } : a)),
+          accounts: s.accounts.map((a) =>
+            a.id === acc.id ? { ...a, wallet: { ...a.wallet, balance: newBal } } : a,
+          ),
           transactions: [
-            pushTx(s, acc.id, "deposit", amount, newBal, note ?? "Card deposit"),
+            pushTx({
+              s,
+              userID: acc.id,
+              type: "deposit",
+              amount,
+              balanceAfter: newBal,
+              note: note ?? "Card deposit",
+              counterparty: undefined,
+            }),
             ...s.transactions,
           ],
         };
@@ -197,16 +231,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     withdraw: (amount, note) => {
       if (!currentAccount) return { ok: false, error: "Sign in first." };
       if (amount <= 0) return { ok: false, error: "Amount must be positive." };
-      if (currentAccount.balance < amount) return { ok: false, error: "Insufficient funds." };
+      if (currentAccount.wallet.balance < amount)
+        return { ok: false, error: "Insufficient funds." };
       setState((s) => {
         const acc = s.accounts.find((a) => a.id === currentAccount.id);
         if (!acc) return s;
-        const newBal = acc.balance - amount;
+        const newBal = acc.wallet.balance - amount;
         return {
           ...s,
-          accounts: s.accounts.map((a) => (a.id === acc.id ? { ...a, balance: newBal } : a)),
+          accounts: s.accounts.map((a) =>
+            a.id === acc.id ? { ...a, wallet: { ...a.wallet, balance: newBal } } : a,
+          ),
           transactions: [
-            pushTx(s, acc.id, "withdraw", amount, newBal, note ?? "Bank withdrawal"),
+            pushTx({
+              s,
+              userID: acc.id,
+              type: "withdraw",
+              amount,
+              balanceAfter: newBal,
+              note: note ?? "Bank withdrawal",
+            }),
             ...s.transactions,
           ],
         };
@@ -220,25 +264,42 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const to = state.accounts.find((a) => a.token === toToken.trim().toUpperCase());
       if (!to) return { ok: false, error: "Recipient token not found." };
       if (to.id === currentAccount.id) return { ok: false, error: "Can't transfer to yourself." };
-      if (currentAccount.balance < amount) return { ok: false, error: "Insufficient funds." };
+      if (currentAccount.wallet.balance < amount)
+        return { ok: false, error: "Insufficient funds." };
       setState((s) => {
         const from = s.accounts.find((a) => a.id === currentAccount.id);
         const recipient = s.accounts.find((a) => a.id === to.id);
         if (!from || !recipient) return s;
-        const fromBal = from.balance - amount;
-        const toBal = recipient.balance + amount;
+        const fromBal = from.wallet.balance - amount;
+        const toBal = recipient.wallet.balance + amount;
         return {
           ...s,
           accounts: s.accounts.map((a) =>
             a.id === from.id
-              ? { ...a, balance: fromBal }
+              ? { ...a, wallet: { ...a.wallet, balance: fromBal } }
               : a.id === recipient.id
-                ? { ...a, balance: toBal }
+                ? { ...a, wallet: { ...a.wallet, balance: toBal } }
                 : a,
           ),
           transactions: [
-            pushTx(s, from.id, "transfer_out", amount, fromBal, note, recipient.name),
-            pushTx(s, recipient.id, "transfer_in", amount, toBal, note, from.name),
+            pushTx({
+              s,
+              userID: from.id,
+              type: "transfer_out",
+              amount,
+              balanceAfter: fromBal,
+              note,
+              counterparty: recipient.fullName,
+            }),
+            pushTx({
+              s,
+              userID: recipient.id,
+              type: "transfer_in",
+              amount,
+              balanceAfter: toBal,
+              note,
+              counterparty: from.fullName,
+            }),
             ...s.transactions,
           ],
         };
@@ -249,15 +310,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     debitAccount: (accountId, amount, type, note) => {
       const acc = state.accounts.find((a) => a.id === accountId);
       if (!acc) return { ok: false, error: "Wallet not found." };
-      if (acc.balance < amount) return { ok: false, error: "Insufficient wallet balance." };
+      if (acc.wallet.balance < amount) return { ok: false, error: "Insufficient wallet balance." };
       setState((s) => {
         const a = s.accounts.find((x) => x.id === accountId);
         if (!a) return s;
-        const newBal = a.balance - amount;
+        const newBal = a.wallet.balance - amount;
         return {
           ...s,
-          accounts: s.accounts.map((x) => (x.id === a.id ? { ...x, balance: newBal } : x)),
-          transactions: [pushTx(s, a.id, type, amount, newBal, note), ...s.transactions],
+          accounts: s.accounts.map((x) =>
+            x.id === a.id ? { ...x, wallet: { ...x.wallet, balance: newBal } } : x,
+          ),
+          transactions: [
+            pushTx({
+              s,
+              userID: a.id,
+              type,
+              amount,
+              balanceAfter: newBal,
+              note,
+            }),
+            ...s.transactions,
+          ],
         };
       });
       return { ok: true };
@@ -269,11 +342,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const a = s.accounts.find((x) => x.id === accountId);
         if (!a) return s;
-        const newBal = a.balance + amount;
+        const newBal = a.wallet.balance + amount;
         return {
           ...s,
-          accounts: s.accounts.map((x) => (x.id === a.id ? { ...x, balance: newBal } : x)),
-          transactions: [pushTx(s, a.id, type, amount, newBal, note), ...s.transactions],
+          accounts: s.accounts.map((x) =>
+            x.id === a.id ? { ...x, wallet: { ...x.wallet, balance: newBal } } : x,
+          ),
+          transactions: [
+            pushTx({
+              s,
+              userID: a.id,
+              type,
+              amount,
+              balanceAfter: newBal,
+              note,
+            }),
+            ...s.transactions,
+          ],
         };
       });
       return { ok: true };
@@ -282,7 +367,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     getAccount: (id) => (id ? (state.accounts.find((a) => a.id === id) ?? null) : null),
     getAccountByToken: (token) =>
       state.accounts.find((a) => a.token === token.trim().toUpperCase()) ?? null,
-    txsFor: (accountId) => state.transactions.filter((t) => t.accountId === accountId),
+    txsFor: (accountId) => state.transactions.filter((t) => t.userID === accountId),
 
     regenerateToken: () => {
       if (!currentAccount) return { ok: false, error: "Sign in first." };

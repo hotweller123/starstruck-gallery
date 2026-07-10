@@ -41,7 +41,7 @@ function DepositPage() {
   const [card, setCard] = useState("4242 4242 4242 4242");
   const [exp, setExp] = useState("12/28");
   const [cvc, setCvc] = useState("123");
-  const [holder, setHolder] = useState(currentAccount?.name ?? "");
+  const [holder, setHolder] = useState(currentAccount?.fullName ?? "");
   const [zip, setZip] = useState("10001");
   const [save, setSave] = useState(true);
   const [done, setDone] = useState<number | null>(null);
@@ -59,7 +59,7 @@ function DepositPage() {
     else setDone(Number(amount));
   };
 
-  if (done !== null) return <Success amount={done} balance={currentAccount?.balance ?? 0} />;
+  if (done !== null) return <Success amount={done} balance={currentAccount?.wallet.balance ?? 0} />;
 
   return (
     <FormPage
@@ -161,7 +161,7 @@ function DepositPage() {
               <p className="text-sm font-extrabold text-[var(--w-fg)]">Bank details</p>
             </div>
             <div className="mt-4 grid gap-3">
-              <WInput label="Account holder" defaultValue={currentAccount?.name} />
+              <WInput label="Account holder" defaultValue={currentAccount?.fullName} />
               <WRow>
                 <WInput label="Routing / SWIFT" defaultValue="ETHRGB22" className="font-mono" />
                 <WInput label="Account number" defaultValue="••••5310" className="font-mono" />

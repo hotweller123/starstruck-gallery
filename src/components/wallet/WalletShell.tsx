@@ -64,7 +64,7 @@ function AccountChip() {
   const [copied, setCopied] = useState(false);
   if (!currentAccount) return null;
 
-  const initials = currentAccount.name
+  const initials = currentAccount.fullName
     .split(" ")
     .map((p) => p[0])
     .slice(0, 2)
@@ -91,7 +91,7 @@ function AccountChip() {
         >
           {initials || "A"}
         </span>
-        <span className="hidden sm:inline">{currentAccount.name.split(" ")[0]}</span>
+        <span className="hidden sm:inline">{currentAccount.fullName.split(" ")[0]}</span>
       </button>
 
       <AnimatePresence>
@@ -110,7 +110,7 @@ function AccountChip() {
               className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl"
             >
               <div className="p-4">
-                <p className="text-sm font-bold text-[var(--w-fg)]">{currentAccount.name}</p>
+                <p className="text-sm font-bold text-[var(--w-fg)]">{currentAccount.fullName}</p>
                 <p className="text-xs text-[var(--w-muted)]">{currentAccount.email}</p>
               </div>
               <div className="border-t border-[var(--w-border)] p-3">

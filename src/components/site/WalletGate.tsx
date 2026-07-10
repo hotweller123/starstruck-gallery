@@ -54,8 +54,8 @@ export function WalletGate({
       <div className="border-b border-ink/10 bg-surface/30">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
           <span>
-            Wallet connected · {account.name} ·{" "}
-            <span className="text-ink">{formatMoney(account.balance)}</span>
+            Wallet connected · {account.fullName} ·{" "}
+            <span className="text-ink">{formatMoney(account.wallet.balance)}</span>
           </span>
           <Link to="/wallet" className="text-ink hover:text-clay">
             Open wallet →

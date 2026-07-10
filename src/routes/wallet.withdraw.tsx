@@ -1,22 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import {
-  ArrowUpFromLine,
-  Building2,
-  CheckCircle2,
-  Globe,
-  Hash,
-  User,
-} from "lucide-react";
-import {
-  FormPage,
-  WAmount,
-  WInput,
-  WSelect,
-  WSubmit,
-  WRow,
-} from "@/components/wallet/FormPage";
+import { ArrowUpFromLine, Building2, CheckCircle2, Globe, Hash, User } from "lucide-react";
+import { FormPage, WAmount, WInput, WSelect, WSubmit, WRow } from "@/components/wallet/FormPage";
 import { useWallet, formatMoney } from "@/lib/wallet";
 
 export const Route = createFileRoute("/wallet/withdraw")({
@@ -43,7 +29,7 @@ function WithdrawPage() {
   const [speed, setSpeed] = useState("instant");
   const [country, setCountry] = useState("PT");
   const [bank, setBank] = useState("Banco Português");
-  const [holder, setHolder] = useState(currentAccount?.name ?? "");
+  const [holder, setHolder] = useState(currentAccount?.wallet.balance ?? "");
   const [iban, setIban] = useState("PT50 0000 0000 0000 0000 0");
   const [swift, setSwift] = useState("BBPIPTPL");
   const [reference, setReference] = useState("EmberPay withdrawal");
@@ -79,7 +65,7 @@ function WithdrawPage() {
             {formatMoney(done)} withdrawn
           </h1>
           <p className="mt-2 text-sm text-[var(--w-muted)]">
-            New balance {formatMoney(currentAccount?.balance ?? 0)}
+            New balance {formatMoney(currentAccount?.wallet.balance ?? 0)}
           </p>
           <Link
             to="/wallet"
@@ -99,7 +85,7 @@ function WithdrawPage() {
     <FormPage
       eyebrow="Cash out"
       title="Withdraw"
-      subtitle={`Available · ${formatMoney(currentAccount?.balance ?? 0)}`}
+      subtitle={`Available · ${formatMoney(currentAccount?.wallet.balance ?? 0)}`}
       icon={<ArrowUpFromLine className="size-6" strokeWidth={2.2} />}
       aside={
         <div className="sticky top-28 rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl">
@@ -121,7 +107,7 @@ function WithdrawPage() {
       }
     >
       <form onSubmit={submit} className="flex flex-col gap-5">
-        <WAmount value={amount} onChange={setAmount} max={currentAccount?.balance ?? 0} />
+        <WAmount value={amount} onChange={setAmount} max={currentAccount?.wallet.balance ?? 0} />
 
         <WSelect label="Withdrawal speed" value={speed} onChange={setSpeed} options={SPEEDS} />
 
@@ -186,7 +172,9 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="text-[var(--w-muted)]">{label}</dt>
-      <dd className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}>
+      <dd
+        className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}
+      >
         {value}
       </dd>
     </div>

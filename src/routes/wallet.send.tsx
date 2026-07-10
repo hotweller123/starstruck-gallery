@@ -1,14 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import {
-  Send,
-  CheckCircle2,
-  KeyRound,
-  MessageSquare,
-  Tag as TagIcon,
-  Zap,
-} from "lucide-react";
+import { Send, CheckCircle2, KeyRound, MessageSquare, Tag as TagIcon, Zap } from "lucide-react";
 import {
   FormPage,
   WAmount,
@@ -72,11 +65,9 @@ function SendPage() {
           >
             <CheckCircle2 className="size-8" strokeWidth={2} />
           </motion.span>
-          <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
-            {formatMoney(done)} sent
-          </h1>
+          <h1 className="mt-6 text-3xl font-extrabold tracking-tight">{formatMoney(done)} sent</h1>
           <p className="mt-2 text-sm text-[var(--w-muted)]">
-            New balance {formatMoney(currentAccount?.balance ?? 0)}
+            New balance {formatMoney(currentAccount?.wallet.balance ?? 0)}
           </p>
           <Link
             to="/wallet"
@@ -112,7 +103,7 @@ function SendPage() {
                   className="grid size-12 place-items-center rounded-full text-base font-extrabold"
                   style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
                 >
-                  {recipient.name
+                  {recipient.fullName
                     .split(" ")
                     .map((p) => p[0])
                     .slice(0, 2)
@@ -121,7 +112,7 @@ function SendPage() {
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-extrabold text-[var(--w-fg)]">
-                    {recipient.name}
+                    {recipient.fullName}
                   </p>
                   <p className="truncate text-xs text-[var(--w-muted)]">{recipient.email}</p>
                 </div>
@@ -137,13 +128,13 @@ function SendPage() {
               {formatMoney(amount)}
             </h3>
             <dl className="mt-5 flex flex-col gap-3 text-sm">
-              <Row label="Available" value={formatMoney(currentAccount?.balance ?? 0)} />
+              <Row label="Available" value={formatMoney(currentAccount?.wallet.balance ?? 0)} />
               <Row label="Fee" value="Free" />
               <Row label="Speed" value={priority === "instant" ? "Instant" : "Standard"} />
               <div className="border-t border-[var(--w-border)] pt-3">
                 <Row
                   label="After"
-                  value={formatMoney(Math.max((currentAccount?.balance ?? 0) - amount, 0))}
+                  value={formatMoney(Math.max((currentAccount?.wallet.balance ?? 0) - amount, 0))}
                   bold
                 />
               </div>
@@ -164,7 +155,7 @@ function SendPage() {
           hint="Ask the recipient for their wallet token (from their Security page)."
         />
 
-        <WAmount value={amount} onChange={setAmount} max={currentAccount?.balance ?? 0} />
+        <WAmount value={amount} onChange={setAmount} max={currentAccount?.wallet.balance ?? 0} />
 
         <WRow>
           <WSelect label="Purpose" value={purpose} onChange={setPurpose} options={PURPOSES} />
@@ -248,7 +239,9 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="text-[var(--w-muted)]">{label}</dt>
-      <dd className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}>
+      <dd
+        className={`text-right ${bold ? "text-base font-extrabold text-[var(--w-fg)]" : "font-semibold text-[var(--w-fg)]"}`}
+      >
         {value}
       </dd>
     </div>

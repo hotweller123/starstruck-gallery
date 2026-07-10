@@ -52,10 +52,12 @@ function ConnectPage() {
                 <CheckCircle2 className="size-5 text-clay" strokeWidth={1.4} />
                 <p className="text-[11px] uppercase tracking-[0.3em] text-clay">Wallet connected</p>
               </div>
-              <p className="mt-6 font-display text-3xl italic">{connected.name}</p>
+              <p className="mt-6 font-display text-3xl italic">{connected.fullName}</p>
               <p className="text-sm text-detail">{connected.email}</p>
               <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">Balance</p>
-              <p className="font-display text-4xl italic">{formatMoney(connected.balance)}</p>
+              <p className="font-display text-4xl italic">
+                {formatMoney(connected.wallet.balance)}
+              </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link

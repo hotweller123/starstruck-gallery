@@ -6,7 +6,7 @@ type Mode = "signin" | "register";
 
 export function AuthForms() {
   const [mode, setMode] = useState<Mode>("register");
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -17,7 +17,7 @@ export function AuthForms() {
     e.preventDefault();
     setError(null);
     const res =
-      mode === "register" ? register({ name, email, password }) : signIn({ email, password });
+      mode === "register" ? register({ fullName, email, password }) : signIn({ email, password });
     if (!res.ok) setError(res.error ?? "Something went wrong.");
   };
 
@@ -67,8 +67,8 @@ export function AuthForms() {
             {mode === "register" && (
               <Field
                 label="Full name"
-                value={name}
-                onChange={setName}
+                value={fullName}
+                onChange={setFullName}
                 placeholder="Eloise Marchand"
                 icon={<User className="size-4" />}
                 required

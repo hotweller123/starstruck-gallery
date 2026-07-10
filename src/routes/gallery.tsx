@@ -78,7 +78,7 @@ function GalleryPage() {
       </div>
 
       <section className="mx-auto max-w-7xl px-6 pb-32 pt-6">
-        <MasonryGallery artworks={filtered.slice(0, 20)} />
+        <MasonryGallery artworks={filtered} />
       </section>
     </>
   );

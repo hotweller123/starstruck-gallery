@@ -89,7 +89,7 @@ function Dashboard() {
               className="mt-3 flex items-center gap-3 text-left"
             >
               <span className="text-5xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-7xl">
-                {showBal ? formatMoney(currentAccount.balance) : "••••••"}
+                {showBal ? formatMoney(currentAccount.wallet.balance) : "••••••"}
               </span>
               <span className="grid size-9 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-bg-2)] text-[var(--w-muted)]">
                 {showBal ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
@@ -97,7 +97,7 @@ function Dashboard() {
             </motion.button>
             <p className="mt-2 flex items-center gap-2 text-xs text-[var(--w-muted)]">
               <span className="inline-block size-1.5 rounded-full bg-[var(--w-brand)]" />
-              {currentAccount.name} · {currentAccount.email}
+              {currentAccount.fullName} · {currentAccount.email}
             </p>
           </div>
 

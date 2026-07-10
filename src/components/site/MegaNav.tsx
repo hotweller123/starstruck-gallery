@@ -558,7 +558,7 @@ function WalletNavIcon() {
         activeProps={{ className: "border-clay text-clay" }}
       >
         <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />$
-        {account.balance.toLocaleString()}
+        {account?.wallet?.balance.toLocaleString()}
       </Link>
     );
   }
