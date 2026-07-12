@@ -1,24 +1,12 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
-import {
-  artworks,
-  CategorySlug,
-  changeMetArtWorkProps,
-  DominantColor,
-  formatPrice,
-  getArtworkBySlug,
-  getArtworksByArtist,
-  orientationFrom,
-  SizeCategory,
-} from "@/data/artworks";
-import { getArtist } from "@/data/artists";
+import { formatPrice, getArtworkBySlug, changeMetArtWorkProps } from "@/data/artworks";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { SmartImage } from "@/components/site/SmartImage";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { useArtworkContext } from "@/lib/useMetArtworksStore";
-import { EMPTY_TEXT } from "@/lib/emptyState";
 import { useMetArtist } from "@/hooks/useMetArtist";
 import { Loader } from "@/components/site/Loader";
 
@@ -45,13 +33,16 @@ export const Route = createFileRoute("/artworks/$slug")({
 });
 
 function ArtworkPage() {
-  const { artworks, loadingAws } = useArtworkContext();
+  const { artworks: contextArtworks, loadingAws } = useArtworkContext();
   const { slug } = useParams({ from: "/artworks/$slug" });
 
   const artwork = useMemo(() => {
-    return getArtworkBySlug(slug, artworks);
-  }, [slug, artworks]);
+    return getArtworkBySlug(slug, contextArtworks);
+  }, [slug, contextArtworks]);
 
+  // console.log({ artwork, contextArtworks });
+
+  // Best practice: TanStack Query powered hook for related artist works
   const {
     artist,
     artworks: artistArtworks,
@@ -69,15 +60,15 @@ function ArtworkPage() {
 
   const related = useMemo(
     () =>
-      artworks.length > 0
-        ? artworks
+      contextArtworks.length > 0
+        ? contextArtworks
             .filter(
               (a) =>
                 a.slug !== artwork?.slug &&
                 a.category === artwork?.category &&
                 a.artist.toLowerCase() !== artwork.artist.toLowerCase(),
             )
-            .concat(artworks.filter((a) => a.category === artwork?.category))
+            .concat(contextArtworks.filter((a) => a.category === artwork?.category))
             .filter((a, i, arr) => arr.findIndex((b) => b.slug === a.slug) === i)
             .filter(
               (a) =>
@@ -87,7 +78,7 @@ function ArtworkPage() {
             )
             .slice(0, 3)
         : [],
-    [artwork?.category, artwork?.slug, artworks, artwork?.artist],
+    [artwork?.category, artwork?.slug, contextArtworks, artwork?.artist],
   );
 
   const otherImagesFromArtist = changeMetArtWorkProps(artist?.artworks)
@@ -97,7 +88,7 @@ function ArtworkPage() {
     .slice(0, 4);
 
   const Nav = () => (
-    <div className="mx-auto max-w-7xl px-6 pt-12">
+    <div className="mx-auto max-w-7xl px-6 pt-12 ">
       <Link
         to="/gallery"
         className="text-[11px] uppercase tracking-[0.22em] text-detail hover:text-ink"

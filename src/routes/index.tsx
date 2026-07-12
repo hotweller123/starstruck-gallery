@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { artworks } from "@/data/artworks";
+import { changeMetArtWorkProps, artworks as staticArtworks } from "@/data/artworks";
 import { categories } from "@/data/categories";
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
-import { ArtistSpotlight } from "@/components/site/ArtistSpotlight";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { ImageCarousel } from "@/components/site/ImageCarousel";
 import { PartnerReasons } from "@/components/site/PartnerReasons";
 import { Sponsors } from "@/components/site/Sponsors";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
-import { ChicagoArtwork, useArtInstitute } from "@/hooks/useChicagoArt";
-import { useArtworkContext } from "@/lib/useMetArtworksStore";
+import { useChicagoArtworksByCategory } from "@/queries";
+import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
 
 export const Route = createFileRoute("/")({
@@ -40,14 +39,28 @@ export interface ModChicagoArtwork {
 }
 
 function HomePage() {
-  const highlights = artworks.filter((a) => a.highlight).slice(0, 8);
-  const newArrivals = artworks.filter((a) => a.year >= 2025).slice(0, 8);
-  const featured = artworks.slice(0, 6);
-  const spotlight = getArtist("elena-vos")!;
+  // Local static data (highlights, etc.)
+  const highlights = staticArtworks.filter((a) => a.highlight).slice(0, 8);
+  const newArrivals = staticArtworks.filter((a) => a.year >= 2025).slice(0, 8);
 
-  const { artworks: artworkStore, loadingAws, chicagoArtworks, loadingCA } = useArtworkContext();
+  // === TanStack Query powered fetches (best practice) ===
+  const { artworks: metArtworks, isLoading } = useMetArtworks();
+  const modMetArtworks = changeMetArtWorkProps(metArtworks);
+  const { data, isLoading: caLoading } = useChicagoArtworksByCategory("Painting", 12);
 
-  if (loadingAws || loadingCA) {
+  // Transform for display (Chicago data needs light mapping for ImageCarousel)
+  const chicagoArtworks = (data ?? []).map((a) => ({
+    id: a.id,
+    image: a.image_id ? `https://www.artic.edu/iiif/2/${a.image_id}/full/843,/0/default.jpg` : "",
+    title: a.title,
+    price: 1200 + (a.id % 8000),
+    height: a.thumbnail?.height || 600,
+    width: a.thumbnail?.width || 800,
+    name: a.artist_display || "Unknown",
+    medium: a.medium_display,
+  }));
+
+  if (isLoading || caLoading) {
     return (
       <>
         <div className="min-h-screen min-w-screen bg-canvas"></div>
@@ -93,7 +106,7 @@ function HomePage() {
         link={{ to: "/gallery", label: "All works" }}
       />
 
-      {/* Featured Masonry */}
+      {/* Featured Masonry - powered by TanStack Query (Met Museum) */}
       <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">
           <div>
@@ -109,23 +122,20 @@ function HomePage() {
             View all &rarr;
           </Link>
         </div>
-        {artworkStore.length === 0 ? (
-          <>
-            <Loader message="Loading Selected Works..." className="py-16 md:py-24" />
-          </>
+
+        {modMetArtworks.length === 0 ? (
+          <Loader message="Loading Selected Works..." className="py-16 md:py-24" />
         ) : (
-          <>
-            <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
-              {artworkStore.slice(0, 6).map((a, i) => (
-                <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
-              ))}
-            </div>
-          </>
+          <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
+            {modMetArtworks.slice(0, 6).map((a, i) => (
+              <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
+            ))}
+          </div>
         )}
       </section>
 
       <ImageCarousel
-        artworks={chicagoArtworks.slice(10)}
+        artworks={chicagoArtworks.slice(0, 8)}
         eyebrow="Newly arrived"
         title="From the studios, this season"
       />

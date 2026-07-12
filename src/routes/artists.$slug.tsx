@@ -2,8 +2,8 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { changeChicagoToMod } from "@/data/artworks";
 import { SmartImage } from "@/components/site/SmartImage";
 import { Loader } from "@/components/site/Loader";
-import { useArtInstitute } from "@/hooks/useChicagoArt";
-import { useEffect, useState } from "react";
+import { useChicagoArtist, useChicagoArtworksByArtist } from "@/queries";
+import { useState } from "react";
 import { convert } from "html-to-text";
 
 export const Route = createFileRoute("/artists/$slug")({
@@ -25,31 +25,27 @@ function ArtistPage() {
   const { slug } = useParams({ from: "/artists/$slug" });
   const [showFullText, setShowFullText] = useState(false);
 
-  const {
-    artworks,
-    selectedArtist: artist,
-    fetchArtistByName,
-    searchByArtist,
-    loading,
-  } = useArtInstitute();
+  // Best practice: direct TanStack Query hooks
+  const artistQuery = useChicagoArtist(slug);
+  const artworksQuery = useChicagoArtworksByArtist(slug, 12);
 
-  useEffect(() => {
-    fetchArtistByName(slug);
-    searchByArtist(slug);
-    setShowFullText(false);
-  }, [fetchArtistByName, searchByArtist, slug]);
+  const artist = artistQuery.data;
+  const artworks = artworksQuery.data ?? [];
+  const loading = artistQuery.isLoading || artworksQuery.isLoading;
 
   const works = changeChicagoToMod(artworks);
+
   const converted = convert(artist?.description, {
-    wordwrap: true, // or 80 for line wrapping
+    wordwrap: true,
     selectors: [
       { selector: "h1", format: "heading" },
       { selector: "strong", format: "inline" },
       { selector: "p", format: "paragraph" },
       { selector: "a", format: "inline" },
     ],
-    linkHrefBaseUrl: "", // optional
+    linkHrefBaseUrl: "",
   });
+
   if (loading) {
     return <Loader message="Loading..." className="flex flex-col gap-3 py-16 md:py-24" />;
   }

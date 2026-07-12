@@ -62,7 +62,7 @@ export function SmartImage({
   return (
     <div
       className={cn("relative overflow-hidden bg-surface", className)}
-      style={{ aspectRatio: `${width || 100} / ${(height > 500 ? 400 : height) || 100}` }}
+      style={{ aspectRatio: `${width || 100} / ${height || 100}` }}
     >
       <motion.img
         ref={imgRef}

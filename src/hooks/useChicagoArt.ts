@@ -1,51 +1,41 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import * as React from "react";
+import { chicagoQueries, getChicagoImageUrl } from "@/queries";
 import { MET_ARTWORK_SEARCH_TERMS } from "./useMetArtWork";
 
-export interface ChicagoArtwork {
-  id: number;
-  title: string;
-  artist_display: string;
-  date_display?: string;
-  medium_display?: string;
-  image_id?: string;
-  classification_titles: string[];
-  thumbnail?: { lqip: string; height: number; width: number };
-}
+import type { ChicagoArtwork, ChicagoArtist } from "@/queries/chicago";
 
-interface Category {
-  name: string;
-}
+export { type ChicagoArtwork, type ChicagoArtist } from "@/queries/chicago";
 
-export interface ChicagoArtist {
-  id: number;
-  title: string; // Artist name
-  description?: string;
-  birth_date?: string;
-  death_date?: string;
-  [key: string]: any;
-  // ... other fields like nationality, etc.
-}
+// Original localStorage key the user was using
+const CHICAGO_LOCAL_STORAGE_KEY = "aetherel_chicago_artworks";
 
-interface State {
+interface ChicagoPersistedState {
   artworks: ChicagoArtwork[];
   artist: ChicagoArtist | null;
 }
 
-const state = {
-  artworks: [],
-  artist: null,
-};
-
-const key = "aetherel_chicago_artworks";
-
-function load(): State {
-  if (typeof document == "undefined") return state;
+function loadChicagoFromLocalStorage(): ChicagoPersistedState {
+  if (typeof window === "undefined") return { artworks: [], artist: null };
   try {
-    const getItem = localStorage.getItem(key);
-    if (!getItem) return state;
-    return { ...state, ...JSON.parse(getItem) };
-  } catch (error) {
-    return state;
+    const raw = localStorage.getItem(CHICAGO_LOCAL_STORAGE_KEY);
+    if (!raw) return { artworks: [], artist: null };
+    const parsed = JSON.parse(raw);
+    return {
+      artworks: Array.isArray(parsed?.artworks) ? parsed.artworks : [],
+      artist: parsed?.artist ?? null,
+    };
+  } catch {
+    return { artworks: [], artist: null };
+  }
+}
+
+function saveChicagoToLocalStorage(data: ChicagoPersistedState) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(CHICAGO_LOCAL_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // ignore write errors
   }
 }
 
@@ -53,151 +43,99 @@ export const RELIABLE_ARTISTS = [
   "Vincent van Gogh",
   "Henri de Toulouse-Lautrec",
   "Rembrandt van Rijn",
-  // "Jean-Michel Basquiat",
-  // "Andy Warhol",
   "Élisabeth Vigée Le Brun",
-  // "Puvis de Chavannes",
   "Jean Auguste Dominique Ingres",
-  // "Mary Cassatt",
-  // "Edward Hopper",
-  // "Georgia O'Keeffe",
-  // "Pierre-Auguste Renoir",
 ] as const;
 
-export const useArtInstitute = () => {
-  const [categories] = useState<Category[]>([
+interface Category {
+  name: string;
+}
+
+/**
+ * useArtInstitute (Legacy Compatibility Wrapper)
+ *
+ * ⚠️  For new code, prefer these direct hooks:
+ *   import {
+ *     useChicagoArtworksByCategory,
+ *     useChicagoArtworksByArtist,
+ *     useChicagoArtist,
+ *   } from '@/queries';
+ *
+ * This hook is kept only for backward compatibility during migration.
+ */
+export const useArtInstitute = (options?: { initialCategory?: string }) => {
+  const categories: Category[] = [
     { name: "Painting" },
     { name: "Prints" },
     { name: "Photography" },
     { name: "Sculpture" },
     { name: "Drawing" },
-  ]);
+  ];
 
-  const [selectedArtist, setSelectedArtist] = useState<ChicagoArtist | null>(null);
-  const [artworks, setArtworks] = useState<ChicagoArtwork[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const defaultCategory =
+    options?.initialCategory ||
+    MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length)];
 
-  useEffect(() => {
-    const { artist, artworks } = load();
-    setArtworks(artworks);
-    setSelectedArtist(artist);
-    setHydrated(true);
-  }, []);
+  // Load previously saved state from localStorage (original key restored)
+  const [persisted] = React.useState(() => loadChicagoFromLocalStorage());
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(key, JSON.stringify({ artworks, artist: selectedArtist }));
-    } catch (error) {
-      console.log(error);
+  // Main artworks query (category-based)
+  const artworksQuery = useQuery({
+    ...chicagoQueries.artworksByCategory(defaultCategory, 20),
+    initialData: persisted.artworks.length > 0 ? persisted.artworks : undefined,
+  });
+
+  // Lazy artist query
+  const [artistName, setArtistName] = React.useState<string | null>(null);
+  const artistQuery = useQuery({
+    ...chicagoQueries.artist(artistName || ""),
+    enabled: !!artistName,
+    initialData: persisted.artist ?? undefined,
+  });
+
+  // Lazy search by artist
+  const [searchArtist, setSearchArtist] = React.useState<string | null>(null);
+  const searchQuery = useQuery({
+    ...chicagoQueries.artworksByArtist(searchArtist || "", 20),
+    enabled: !!searchArtist,
+  });
+
+  // Persist to localStorage when data changes (restored original behavior)
+  React.useEffect(() => {
+    const currentArtworks = searchArtist ? (searchQuery.data ?? []) : (artworksQuery.data ?? []);
+    const currentArtist = artistQuery.data ?? persisted.artist;
+
+    if (currentArtworks.length > 0 || currentArtist) {
+      saveChicagoToLocalStorage({
+        artworks: currentArtworks,
+        artist: currentArtist,
+      });
     }
-  }, [hydrated, selectedArtist, artworks]);
+  }, [artworksQuery.data, artistQuery.data, searchQuery.data, searchArtist, persisted.artist]);
 
-  // Fetch artworks by category - FIXED VERSION
-  const fetchArtworksByCategory = useCallback(async (category: string, limit = 20) => {
-    setLoading(true);
-    setError(null);
+  const fetchArtistByName = (name: string) => setArtistName(name);
+  const searchByArtist = (name: string) => setSearchArtist(name);
 
-    try {
-      const response = await fetch(
-        `https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(
-          category,
-        )}&limit=${limit}&fields=id,title,artist_display,date_display,medium_display,image_id,classification_titles,thumbnail`,
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch");
-
-      const data = await response.json();
-
-      setArtworks(data.data || []);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load artworks. Please try again.");
-      setArtworks([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Search by artist
-  const searchByArtist = useCallback(async (artistName: string, limit = 20) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(
-          artistName,
-        )}&limit=${limit}&fields=id,title,artist_display,date_display,medium_display,image_id,classification_titles,thumbnail`,
-      );
-      const data = await response.json();
-      setArtworks(data.data || []);
-    } catch (err) {
-      console.log(err);
-      setError("Artist search failed");
-      setArtworks([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch artist by name (more reliable)
-  const fetchArtistByName = useCallback(async (artistName: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Clean the name (remove dates, extra text)
-      const cleanName = artistName.split("↵")[0].trim().split(",")[0].trim();
-
-      const res = await fetch(
-        `https://api.artic.edu/api/v1/artists/search?q=${encodeURIComponent(
-          cleanName,
-        )}&limit=5&fields=id,title,alt_titles,description,birth_date,death_date,birth_place,death_place,nationality,date_display,thumbnail`,
-      );
-
-      const data = await res.json();
-      if (data.data && data.data.length > 0) {
-        setSelectedArtist(data.data[0]); // Take the best match
-      } else {
-        setSelectedArtist(null);
-      }
-    } catch (err) {
-      setError("Could not load artist details");
-      console.log(err);
-      setSelectedArtist(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const getImageUrl = (imageId?: string) => {
-    if (!imageId) return "";
-    return `https://www.artic.edu/iiif/2/${imageId}/full/843,/0/default.jpg`;
+  const fetchArtworksByCategory = (category: string) => {
+    // For now this is a no-op in the hook. Prefer direct use of the query hooks.
+    console.log(
+      "[useArtInstitute] fetchArtworksByCategory — use useChicagoArtworksByCategory directly for best results",
+    );
   };
-
-  const randomCategory = () => {
-    const index = Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length);
-    return MET_ARTWORK_SEARCH_TERMS[index];
-  };
-
-  // Load some default artworks on mount
-  useEffect(() => {
-    const rando = randomCategory();
-    fetchArtworksByCategory(rando, 20);
-  }, [fetchArtworksByCategory]);
 
   return {
     categories,
-    artworks,
-    loading,
-    error,
-    selectedArtist,
+    artworks: searchArtist ? (searchQuery.data ?? []) : (artworksQuery.data ?? []),
+    loading: artworksQuery.isLoading || searchQuery.isLoading || artistQuery.isLoading,
+    error:
+      (artworksQuery.error as Error)?.message ||
+      (searchQuery.error as Error)?.message ||
+      (artistQuery.error as Error)?.message ||
+      null,
+    selectedArtist: artistQuery.data ?? null,
     fetchArtistByName,
     fetchArtworksByCategory,
     searchByArtist,
-    getImageUrl,
+    getImageUrl: getChicagoImageUrl,
   };
 };

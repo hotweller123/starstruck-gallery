@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { artworks as mockArtworks, filterOptions, Artwork } from "@/data/artworks";
+import { filterOptions, Artwork, changeMetArtWorkProps } from "@/data/artworks";
 import { MasonryGallery } from "@/components/site/MasonryGallery";
 import { CategoryChips } from "@/components/site/CategoryChips";
 import { PageHeader } from "@/components/site/PageHeader";
 import { FilterDrawer } from "@/components/site/FilterDrawer";
 import { ActiveFilterChips } from "@/components/site/ActiveFilterChips";
 import { makeDefaultFilters, type Filters } from "@/components/site/filters-types";
-import { useArtworkContext } from "@/lib/useMetArtworksStore";
+import { useMetArtworks } from "@/hooks/useMetArtWork";
+import { useChicagoArtworksByCategory } from "@/queries";
 
 export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
@@ -45,8 +46,17 @@ function GalleryPage() {
     makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
   );
 
-  const { artworks } = useArtworkContext();
-  const filtered = useMemo(() => applyFilters(filters, artworks), [filters, artworks]);
+  // Best practice: fetch directly with TanStack Query
+  const met = useMetArtworks();
+  const chicago = useChicagoArtworksByCategory("Painting", 30);
+
+  // Prefer Met data (already transformed to local Artwork shape)
+  // Fall back to Chicago if Met is empty
+  const modMetArtworks = changeMetArtWorkProps(met.artworks);
+
+  const filtered = useMemo(() => applyFilters(filters, modMetArtworks), [filters, modMetArtworks]);
+
+  const isLoading = met.isLoading || chicago.isLoading;
 
   return (
     <>
@@ -71,7 +81,7 @@ function GalleryPage() {
           <FilterDrawer
             value={filters}
             onChange={setFilters}
-            totalCount={artworks.length}
+            totalCount={modMetArtworks.length}
             matchCount={filtered.length}
           />
         </div>

@@ -18,6 +18,7 @@ export interface WalletAccount {
   currency: string;
   symbol: string;
   token: string;
+  category?: string;
   wallet: {
     bidBalance: number;
     balance: number;
@@ -169,6 +170,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         role: "user",
         status: "active",
         currency: "USD",
+        category: "users",
         symbol: "$",
         email: e,
         fullName: fullName.trim(),

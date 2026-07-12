@@ -1,15 +1,49 @@
 // hooks/useMetArtworks.ts
-import { useCallback, useEffect, useRef, useState } from "react";
+// Best-practice TanStack Query implementation for Met Museum API
+// with localStorage persistence (restored original implementation)
+
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { metApi } from "../services/metApi";
 import type { MetArtwork } from "../types/metTypes";
 
+// Original localStorage key used by the user
+const LOCAL_STORAGE_KEY = "aethered_met_arkworks";
+
+interface PersistedMetData {
+  artworks: MetArtwork[];
+  total: number;
+  timestamp?: number;
+}
+
+function loadFromLocalStorage(): PersistedMetData | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.artworks)) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function saveToLocalStorage(data: PersistedMetData) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // ignore write errors (quota, private mode, etc.)
+  }
+}
+
 /**
- * High-quality, varied search terms that work well with the Met Museum API.
- * These return diverse types of artworks (different mediums, cultures, subjects).
- * Pass any of these to `search()` or let the hook pick randomly for variety.
+ * High-quality search terms for the Met API.
  */
 export const MET_ARTWORK_SEARCH_TERMS = [
-  // By subject
   "portrait",
   "landscape",
   "still life",
@@ -31,27 +65,12 @@ export const MET_ARTWORK_SEARCH_TERMS = [
   "dance",
   "music",
   "religion",
-
-  // By medium / technique
   "sculpture",
   "photograph",
   "drawing",
   "print",
   "ceramic",
   "furniture",
-  "textile",
-  "armor",
-  "jewelry",
-  "gold",
-  "silver",
-  "ivory",
-  "wood",
-  "stone",
-  "glass",
-  "manuscript",
-  "costume",
-
-  // By culture / period (very different visual styles)
   "egyptian",
   "greek",
   "roman",
@@ -67,140 +86,86 @@ export const MET_ARTWORK_SEARCH_TERMS = [
 
 export type MetArtworkSearchTerm = (typeof MET_ARTWORK_SEARCH_TERMS)[number];
 
+function getRandomCategory(): string {
+  return MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length)];
+}
+
 interface UseMetArtworksReturn {
   artworks: MetArtwork[];
   isLoading: boolean;
   error: string | null;
   total: number;
   search: (query: string) => void;
-  /** Fetch a completely different category of artworks */
   fetchRandomCategory: () => void;
   currentCategory: string;
 }
 
-const key = "aethered_met_arkworks";
-
-const state: MetArtwork[] = [];
-
-function load(): MetArtwork[] {
-  if (typeof document == "undefined") return [];
-  try {
-    const getItem = localStorage.getItem(key);
-    if (!getItem) return state;
-
-    const value = JSON.parse(getItem);
-    return [...state, ...value];
-  } catch (error) {
-    return [...state];
-  }
-}
-
+/**
+ * useMetArtworks — Recommended pattern using TanStack Query
+ *
+ * Single useQuery that performs the full two-step process:
+ * 1. Search for IDs
+ * 2. Hydrate full artwork objects
+ *
+ * This is the cleanest way to use TanStack Query with this API shape.
+ */
 export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
-  const [artworks, setArtworks] = useState<MetArtwork[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState<number>(0);
+  const [currentCategory, setCurrentCategory] = React.useState(initialQuery || getRandomCategory());
 
-  const [hydrated, setHydrated] = useState(false);
+  // Load previously saved artworks from localStorage on first render
+  const [initialDataFromStorage] = React.useState(() => {
+    const saved = loadFromLocalStorage();
+    return saved ? { artworks: saved.artworks, total: saved.total } : undefined;
+  });
 
-  useEffect(() => {
-    setArtworks(load());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(key, JSON.stringify(artworks));
-    } catch (error) {
-      console.log(load());
-    }
-  }, [hydrated, artworks]);
-
-  const search = useCallback(async (query: string): Promise<void> => {
-    console.log(query);
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Step 1 — get matching object IDs
-      const { objectIDs, total } = await metApi.search(query, {
+  const artworksQuery = useQuery({
+    queryKey: ["met", "full-search", currentCategory],
+    queryFn: async () => {
+      const searchRes = await metApi.search(currentCategory, {
         hasImages: true,
         isPublicDomain: true,
       });
 
-      if (!objectIDs || objectIDs.length === 0) {
-        setArtworks([]);
-        setTotal(0);
-        return;
+      if (!searchRes.objectIDs?.length) {
+        return { artworks: [], total: 0 };
       }
 
-      setTotal(total);
+      const artworks = await metApi.getArtworks(searchRes.objectIDs, 40);
 
-      // Step 2 — fetch details for first 20 IDs
-      const data = await metApi.getArtworks(objectIDs, 100);
-      setArtworks(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      // Save fresh results to localStorage (original behavior restored)
+      saveToLocalStorage({
+        artworks,
+        total: searchRes.total || artworks.length,
+        timestamp: Date.now(),
+      });
 
-  // Track current category for display / debugging
-  const [currentCategory, setCurrentCategory] = useState<string>(initialQuery || "");
+      console.log(artworks);
 
-  // Run initial search on mount.
-  // If no initialQuery is passed, we automatically pick a random term
-  // from the list below so you get very different types of artworks every time.
-  const hasFetched = useRef(false);
+      return {
+        artworks,
+        total: searchRes.total || artworks.length,
+      };
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    initialData: initialDataFromStorage,
+  });
 
-  /** Pick a random good search term and fetch completely different artworks */
-  const fetchRandomCategory = useCallback(() => {
-    const randomTerm = getRandomCategory();
-    console.log({ randomTerm });
-    setCurrentCategory(randomTerm);
-    search(randomTerm);
-  }, [search]);
+  const search = (queryStr: string) => {
+    setCurrentCategory(queryStr);
+  };
 
-  useEffect(() => {
-    setArtworks(load());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(key, JSON.stringify(artworks));
-    } catch (error) {
-      console.log(load());
-    }
-  }, [hydrated, artworks]);
-
-  useEffect(() => {
-    if (hasFetched.current) return;
-
-    // const startingQuery = getRandomCategory();
-    // setCurrentCategory(startingQuery);
-    // search(startingQuery);
-    fetchRandomCategory();
-
-    hasFetched.current = true;
-  }, [initialQuery, search, fetchRandomCategory]);
+  const fetchRandomCategory = () => {
+    const next = getRandomCategory();
+    setCurrentCategory(next);
+  };
 
   return {
-    artworks,
-    isLoading,
-    error,
-    total,
+    artworks: artworksQuery.data?.artworks ?? [],
+    isLoading: artworksQuery.isLoading,
+    error: artworksQuery.error ? (artworksQuery.error as Error).message : null,
+    total: artworksQuery.data?.total ?? 0,
     search,
     fetchRandomCategory,
     currentCategory,
   };
-}
-
-/** Returns a random high-quality search term that usually yields good results from the Met API */
-function getRandomCategory(): string {
-  const index = Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length);
-  return MET_ARTWORK_SEARCH_TERMS[index];
 }

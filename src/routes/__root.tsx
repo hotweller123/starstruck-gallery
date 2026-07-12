@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   Outlet,
   Link,
@@ -162,6 +163,9 @@ function RootComponent() {
           </ToastProvider>
         </WalletProvider>
       </StoreProvider>
+
+      {/* TanStack Query Devtools (only shows in development) */}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
