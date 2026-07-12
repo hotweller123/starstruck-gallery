@@ -230,7 +230,6 @@ function ArtworkPage() {
             <button
               onClick={() => {
                 toggleFavorite(artwork.slug);
-                console.log(cart);
               }}
               aria-label={fav ? "Remove from favourites" : "Add to favourites"}
               className={cn(

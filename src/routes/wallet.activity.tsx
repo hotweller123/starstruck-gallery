@@ -75,7 +75,11 @@ function ActivityPage() {
                   ? "border-transparent shadow"
                   : "border-[var(--w-border)] bg-[var(--w-input)] text-[var(--w-muted)] hover:text-[var(--w-fg)]"
               }`}
-              style={active ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" } : undefined}
+              style={
+                active
+                  ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" }
+                  : undefined
+              }
             >
               {t.label}
             </motion.button>

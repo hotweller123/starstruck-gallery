@@ -17,6 +17,7 @@ import { StoreProvider } from "@/lib/store";
 import { WalletProvider } from "@/lib/wallet";
 import ArtWorkProvider from "@/lib/useMetArtworksStore";
 import { ToastProvider } from "@/components/ui/toast";
+import { AnimatePresence, motion } from "motion/react";
 
 function NotFoundComponent() {
   return (
@@ -154,7 +155,17 @@ function RootComponent() {
                 <div className="flex min-h-screen flex-col bg-canvas">
                   <MegaNav />
                   <main className="flex-1">
-                    <Outlet />
+                    <AnimatePresence mode="wait" key={pathname}>
+                      <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, y: 12, filter: "blur(100px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: 0, filter: "blur(2000px)" }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <Outlet />
+                      </motion.div>
+                    </AnimatePresence>
                   </main>
                   <Footer />
                 </div>

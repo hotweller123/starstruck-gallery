@@ -12,6 +12,7 @@ import { HistoryTimeline } from "@/components/site/HistoryTimeline";
 import { useChicagoArtworksByCategory } from "@/queries";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
+import { useArtInstitute } from "@/hooks/useChicagoArt";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -46,7 +47,8 @@ function HomePage() {
   // === TanStack Query powered fetches (best practice) ===
   const { artworks: metArtworks, isLoading } = useMetArtworks();
   const modMetArtworks = changeMetArtWorkProps(metArtworks);
-  const { data, isLoading: caLoading } = useChicagoArtworksByCategory("Painting", 12);
+  // const { data, isLoading: caLoading } = useChicagoArtworksByCategory("Painting", 20);
+  const { artworks: data, loading: caLoading } = useArtInstitute();
 
   // Transform for display (Chicago data needs light mapping for ImageCarousel)
   const chicagoArtworks = (data ?? []).map((a) => ({
@@ -135,7 +137,7 @@ function HomePage() {
       </section>
 
       <ImageCarousel
-        artworks={chicagoArtworks.slice(0, 8)}
+        artworks={chicagoArtworks.slice(8)}
         eyebrow="Newly arrived"
         title="From the studios, this season"
       />

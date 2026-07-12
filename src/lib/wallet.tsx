@@ -29,6 +29,8 @@ export interface WalletAccount {
   createdAt: string;
 }
 
+export type TransactionStatus = "Approved" | "Pending" | "On Hold" | "Failed";
+
 export interface WalletTx {
   id: string;
   userID: string;
@@ -38,6 +40,27 @@ export interface WalletTx {
   note?: string;
   counterparty?: string;
   createdAt: string;
+
+  //note: todo...turn the optional to mandatory
+  title?: string;
+  fullName?: string;
+  email?: string;
+  status?: TransactionStatus;
+  channel?: string;
+  currency?: string;
+  symbol?: string;
+  details?: Record<string, object>;
+}
+
+export interface NotificationType {
+  id: string;
+  userID: string;
+  kind: TxType;
+  title: string;
+  body: string;
+  time: string | number;
+  unread: boolean;
+  timeStamp?: string;
 }
 
 interface State {

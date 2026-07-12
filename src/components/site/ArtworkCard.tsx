@@ -14,9 +14,7 @@ export function ArtworkCard({ artwork, priority }: Props) {
       to="/artworks/$slug"
       params={{ slug: artwork.slug }}
       className="group mb-10 block break-inside-avoid"
-      onClick={() => {
-        console.log(artwork);
-      }}
+      onClick={() => {}}
     >
       <div className="overflow-hidden bg-surface outline outline-1 -outline-offset-1 outline-ink/5">
         <SmartImage
