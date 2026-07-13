@@ -5,7 +5,7 @@ import { formatPrice, getArtworkBySlug, changeMetArtWorkProps } from "@/data/art
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { SmartImage } from "@/components/site/SmartImage";
 import { useStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/gen";
 import { useArtworkContext } from "@/lib/useMetArtworksStore";
 import { useMetArtist } from "@/hooks/useMetArtist";
 import { Loader } from "@/components/site/Loader";

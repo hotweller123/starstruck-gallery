@@ -18,8 +18,10 @@ import {
   Sparkles,
   ChevronRight,
 } from "lucide-react";
-import { useWallet } from "@/lib/wallet";
 import { AuthForms } from "./AuthForms";
+import { useAuthStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import useAuth from "@/hooks/useAuth";
 
 const nav: ReadonlyArray<{
   to: string;
@@ -59,12 +61,18 @@ function Brand() {
 }
 
 function AccountChip() {
-  const { currentAccount, signOut } = useWallet();
+  const { user, loggedIn } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      loggedIn: state.loggedIn,
+    })),
+  );
+  const { logOut } = useAuth();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  if (!currentAccount) return null;
+  if (!user) return null;
 
-  const initials = currentAccount.fullName
+  const initials = user.fullName
     .split(" ")
     .map((p) => p[0])
     .slice(0, 2)
@@ -72,7 +80,7 @@ function AccountChip() {
     .toUpperCase();
 
   const copyToken = () => {
-    navigator.clipboard.writeText(currentAccount.token).then(() => {
+    navigator.clipboard.writeText(user.token).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
@@ -91,7 +99,7 @@ function AccountChip() {
         >
           {initials || "A"}
         </span>
-        <span className="hidden sm:inline">{currentAccount.fullName.split(" ")[0]}</span>
+        <span className="hidden sm:inline">{user.fullName.split(" ")[0]}</span>
       </button>
 
       <AnimatePresence>
@@ -110,8 +118,8 @@ function AccountChip() {
               className="absolute right-0 top-12 z-20 w-72 overflow-hidden rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-surface)] shadow-2xl"
             >
               <div className="p-4">
-                <p className="text-sm font-bold text-[var(--w-fg)]">{currentAccount.fullName}</p>
-                <p className="text-xs text-[var(--w-muted)]">{currentAccount.email}</p>
+                <p className="text-sm font-bold text-[var(--w-fg)]">{user.fullName}</p>
+                <p className="text-xs text-[var(--w-muted)]">{user.email}</p>
               </div>
               <div className="border-t border-[var(--w-border)] p-3">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)]">
@@ -123,7 +131,7 @@ function AccountChip() {
                   type="button"
                 >
                   <code className="truncate font-mono text-[11px] text-[var(--w-fg)]">
-                    {currentAccount.token}
+                    {user.token}
                   </code>
                   {copied ? (
                     <Check className="size-3.5 shrink-0 text-[var(--w-brand)]" />
@@ -133,7 +141,7 @@ function AccountChip() {
                 </button>
               </div>
               <button
-                onClick={signOut}
+                onClick={logOut}
                 className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
               >
                 <LogOut className="size-4" />
@@ -209,10 +217,16 @@ function Ticker() {
 }
 
 export function WalletShell({ children }: { children: ReactNode }) {
-  const { signedIn, currentAccount } = useWallet();
+  const { user, loggedIn } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      loggedIn: state.loggedIn,
+    })),
+  );
+
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
-  if (!signedIn || !currentAccount) {
+  if (!loggedIn || !user) {
     return (
       <>
         <TopBar showAccount={false} />

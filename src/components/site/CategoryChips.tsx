@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { categories } from "@/data/categories";
 import type { CategorySlug } from "@/data/artworks";
-import { scrollToCenter } from "@/lib/utils";
+import { scrollToCenter } from "@/utils/gen";
 
 interface Props {
   active?: CategorySlug | "all";

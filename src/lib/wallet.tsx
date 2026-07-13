@@ -1,78 +1,6 @@
+import { Result, State, TxType, WalletAccount, WalletTx } from "@/types";
+import { Timestamp } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
-export type TxType =
-  | "deposit"
-  | "withdraw"
-  | "transfer_out"
-  | "transfer_in"
-  | "purchase"
-  | "bid_hold"
-  | "bid_release"
-  | "sale";
-
-export interface WalletAccount {
-  id: string;
-  email: string;
-  fullName: string;
-  passwordHash: string;
-  currency: string;
-  symbol: string;
-  token: string;
-  category?: string;
-  wallet: {
-    bidBalance: number;
-    balance: number;
-  };
-  blocked: boolean;
-  status: "active" | "pending" | "suspended";
-  role: "user" | "admin";
-  createdAt: string;
-}
-
-export type TransactionStatus = "Approved" | "Pending" | "On Hold" | "Failed";
-
-export interface WalletTx {
-  id: string;
-  userID: string;
-  type: TxType;
-  amount: number; // always positive; sign derived from type
-  balanceAfter: number;
-  note?: string;
-  counterparty?: string;
-  createdAt: string;
-
-  //note: todo...turn the optional to mandatory
-  title?: string;
-  fullName?: string;
-  email?: string;
-  status?: TransactionStatus;
-  channel?: string;
-  currency?: string;
-  symbol?: string;
-  details?: Record<string, object>;
-}
-
-export interface NotificationType {
-  id: string;
-  userID: string;
-  kind: TxType;
-  title: string;
-  body: string;
-  time: string | number;
-  unread: boolean;
-  timeStamp?: string;
-}
-
-interface State {
-  accounts: WalletAccount[];
-  currentAccountId: string | null;
-  transactions: WalletTx[];
-}
-
-interface Result {
-  ok: boolean;
-  error?: string;
-}
 
 interface Wallet extends State {
   currentAccount: WalletAccount | null;
@@ -114,7 +42,7 @@ function hash(s: string): string {
   return (h >>> 0).toString(36) + s.length.toString(36);
 }
 
-function makeToken(): string {
+export function makeToken(): string {
   const part = () =>
     Math.random()
       .toString(36)
@@ -189,6 +117,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         return { ok: false, error: "An account with that email exists." };
       const acc: WalletAccount = {
         id: uid(),
+        userID: "",
         blocked: false,
         role: "user",
         status: "active",
@@ -197,7 +126,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         symbol: "$",
         email: e,
         fullName: fullName.trim(),
-        passwordHash: password,
+        password: password,
         token: makeToken(),
         wallet: {
           balance: 0,
@@ -216,7 +145,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     signIn: ({ email, password }) => {
       const e = email.trim().toLowerCase();
       const acc = state.accounts.find((a) => a.email === e);
-      if (!acc || acc.passwordHash !== password)
+      if (!acc || acc.password !== password)
         return { ok: false, error: "Invalid email or password." };
       setState((s) => ({ ...s, currentAccountId: acc.id }));
       return { ok: true };

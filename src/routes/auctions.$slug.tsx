@@ -12,7 +12,7 @@ import { SmartImage } from "@/components/site/SmartImage";
 import { Countdown } from "@/components/site/Countdown";
 import { AuctionCard } from "@/components/site/AuctionCard";
 import { useStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/gen";
 
 export const Route = createFileRoute("/auctions/$slug")({
   loader: ({ params }) => {

@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { getCurrencySymbol } from "@/utils";
 
 export function FormPage({
   title,
@@ -204,9 +205,11 @@ export function WAmount({
           You enter
         </p>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-[var(--w-muted)]">$</span>
+          <span className="text-3xl font-bold text-[var(--w-muted)]">
+            {getCurrencySymbol(currency)}
+          </span>
           <input
-            type="number"
+            type="text"
             inputMode="decimal"
             min={0}
             max={max}

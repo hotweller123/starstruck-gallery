@@ -1,39 +1,108 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Sparkles } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Sparkles, List, Loader2 } from "lucide-react";
 import { useWallet } from "@/lib/wallet";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { CURRENCIES, getCurrencySymbol } from "@/utils";
+import useAuth from "@/hooks/useAuth";
+import { useNavigate } from "@tanstack/react-router";
+import { useToast } from "../ui/toast";
+
 type Mode = "signin" | "register";
 export interface FormField {
   fullName: string;
   email: string;
   password: string;
+  currency: string;
 }
+const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 export function AuthForms() {
   const [mode, setMode] = useState<Mode>("register");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // const { register, signIn } = useWallet();
+  const navigate = useNavigate();
+  const { registerUser, loginUser } = useAuth();
+  const { toast } = useToast();
 
-  const formControl = useForm<FormField>({
+  const registerSchema = z.object({
+    fullName: z.string().min(1, { message: "FullName is required" }),
+    email: z.string().email({ message: "Enter a valid Email Address" }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" })
+      .regex(
+        strongPasswordRegex,
+        "Password must contain uppercase, lowercase, number and special character",
+      ),
+    currency: z.string().min(1, { message: "Currency is required" }),
+  });
+
+  const loginSchema = z.object({
+    email: z.string().email({ message: "Enter a valid Email Address" }),
+    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  });
+
+  const partSchema = mode == "register" ? registerSchema : loginSchema;
+
+  const formControl = useForm({
+    resolver: zodResolver(partSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
+      ...(mode == "register"
+        ? {
+            fullName: "",
+            email: "",
+            password: "",
+            currency: "",
+          }
+        : {
+            email: "",
+            password: "",
+          }),
     },
   });
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    // const res =
-    //   mode === "register" ? register({ fullName, email, password }) : signIn({ email, password });
-    // if (!res.ok) setError(res.error ?? "Something went wrong.");
-  };
+  const handleSubmission = formControl.handleSubmit(async (user) => {
+    try {
+      if (mode === "register") {
+        await registerUser(user as FormField);
+      } else {
+        const { email, password } = user as Pick<FormField, "email" | "password">;
+        await loginUser(email, password);
+      }
+      // navigate({ to: "/wallet" });
+      await toast({
+        title: mode == "register" ? "Registration Successful" : "Welcome Back",
+        position: "bottom-left",
+        variant: "collection",
+        duration: 4000,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed Operation";
+      console.log(message);
+      await toast({
+        title: "Error...",
+        description: error.code,
+        position: "bottom-left",
+        variant: "error",
+        duration: 4000,
+      });
+    }
+  });
+
+  const loading = formControl.formState.isSubmitting;
+  console.log({
+    loading,
+  });
 
   return (
     <motion.div
@@ -78,30 +147,25 @@ export function AuthForms() {
           </div>
 
           <FormProvider {...formControl}>
-            <form
-              onSubmit={formControl.handleSubmit((data) => {
-                console.log(data);
-              })}
-              className="mt-6 flex flex-col gap-4"
-            >
+            <form onSubmit={handleSubmission} className="mt-6 flex flex-col gap-2">
               {mode === "register" && (
                 <Field
-                  name="fullName"
+                  fieldName="fullName"
                   label="Full name"
                   placeholder="Eloise Marchand"
                   icon={<User className="size-4" />}
                 />
               )}
               <Field
-                name="email"
+                fieldName="email"
                 label="Email"
-                type="email"
+                type="text"
                 placeholder="you@aethelred.gallery"
                 icon={<Mail className="size-4" />}
               />
               <div>
                 <Field
-                  name="password"
+                  fieldName="password"
                   label="Password"
                   type={showPw ? "text" : "password"}
                   placeholder="At least 6 characters"
@@ -117,33 +181,40 @@ export function AuthForms() {
                     </button>
                   }
                 />
+                {mode === "register" && (
+                  <SelectField
+                    label="Currencies"
+                    fieldName="currency"
+                    icon={<List className="size-4" />}
+                    placeholder="Select A Currency"
+                  />
+                )}
               </div>
-
-              {error && (
-                <motion.p
-                  initial={{ opacity: 0, x: -6 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)] animate__animated animate__headShake"
-                >
-                  {error}
-                </motion.p>
-              )}
 
               <motion.button
                 whileTap={{ scale: 0.98, opacity: 0.8 }}
                 whileHover={{ y: -1 }}
                 type="submit"
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg"
+                disabled={loading}
+                className={`mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg  ${loading ? "pointer-events-none opacity-40" : ""}`}
                 style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
               >
-                <Sparkles className="size-4" />
-                {mode === "register" ? "Create my wallet" : "Sign in"}
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-4" />
+                    {mode === "register" ? "Create my wallet" : "Sign in"}
+                  </>
+                )}
               </motion.button>
             </form>
           </FormProvider>
 
           <p className="mt-5 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)]">
-            Demo wallet · data stored locally
+            Your Data is stored with us
           </p>
         </div>
       </div>
@@ -153,14 +224,14 @@ export function AuthForms() {
 
 function Field({
   label,
-  name,
+  fieldName,
   type = "text",
   placeholder,
   icon,
   suffix,
 }: {
   label: string;
-  name: keyof FormField;
+  fieldName: keyof FormField;
   type?: string;
   placeholder?: string;
   icon?: React.ReactNode;
@@ -171,12 +242,7 @@ function Field({
     formState: { errors },
   } = useFormContext();
 
-  const options = {
-    required: {
-      message: `${name} is required`,
-      value: true,
-    },
-  };
+  const options = {};
 
   return (
     <>
@@ -192,15 +258,102 @@ function Field({
           )}
           <input
             type={type}
-            {...register(name, { ...options })}
+            {...register(fieldName, { ...options })}
             placeholder={placeholder}
-            className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-3 ${icon ? "pl-11" : "pl-4"} ${suffix ? "pr-11" : "pr-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
+            className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-2 ${icon ? "pl-11" : "pl-4"} ${suffix ? "pr-11" : "pr-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
           />
           {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</span>}
         </div>
       </label>
-      {typeof errors[name]?.message === "string" && (
-        <p className="text-red-500 capitalize">{errors[name]?.message}</p>
+      {typeof errors[fieldName]?.message === "string" && (
+        <motion.p
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)] animate__animated animate__headShake"
+        >
+          {errors[fieldName]?.message}
+        </motion.p>
+      )}
+    </>
+  );
+}
+
+interface SelectFieldProp {
+  label: string;
+  fieldName: keyof FormField;
+  placeholder?: string;
+  icon?: React.ReactNode;
+}
+
+function SelectField({ label, fieldName, placeholder, icon }: SelectFieldProp) {
+  const {
+    register,
+    watch,
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const options = {};
+
+  return (
+    <>
+      <label className="flex flex-col mt-1.5 gap-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)] flex justify-between mt-1.5">
+          {label}
+          <span className="text-[var(--w-brand)]">{getCurrencySymbol(watch("currency"))}</span>
+        </span>
+        <div className="relative">
+          {icon && (
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--w-muted)]">
+              {icon}
+            </span>
+          )}
+
+          <Controller
+            control={control}
+            name="currency"
+            render={({ field }) => (
+              <>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger
+                    className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-3 ${icon ? "pl-11" : "pl-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60! transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
+                  >
+                    <SelectValue
+                      placeholder={placeholder}
+                      className="*:placeholder:text-[var(--w-muted)]/60!"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem
+                          value={c.code}
+                          key={c.code}
+                          className={
+                            c.code === watch("currency")
+                              ? "!bg-slate-600 z-10 text-white"
+                              : "hover:bg-slate-600/30! z-10"
+                          }
+                        >
+                          {c.code}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+          />
+        </div>
+      </label>
+      {typeof errors[fieldName]?.message === "string" && (
+        <motion.p
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs text-[var(--w-danger)] animate__animated animate__headShake"
+        >
+          {errors[fieldName]?.message}
+        </motion.p>
       )}
     </>
   );

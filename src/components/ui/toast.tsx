@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Check, Info, AlertTriangle, Heart, Bookmark, Share2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { X, Check, Info, AlertTriangle, Heart, Bookmark, Share2, ShieldClose } from "lucide-react";
+import { cn } from "@/utils/gen";
 
 export type ToastVariant =
   | "default"
@@ -141,7 +141,7 @@ const VARIANT_ICONS: Record<ToastVariant, React.ReactNode> = {
   success: <Check className="h-[14px] w-[14px]" />,
   info: <Info className="h-[14px] w-[14px]" />,
   warning: <AlertTriangle className="h-[14px] w-[14px]" />,
-  error: <X className="h-[14px] w-[14px]" />,
+  error: <ShieldClose className="h-[14px] w-[14px]" />,
   collection: <Heart className="h-[14px] w-[14px]" />,
   reserved: <Bookmark className="h-[14px] w-[14px]" />,
   shared: <Share2 className="h-[14px] w-[14px]" />,
@@ -340,7 +340,16 @@ export function useToast() {
 
 // Internal factory to avoid repetitive addToast wrappers
 const makeToast =
-  (variant: ToastVariant) => (title: string, description?: string, position?: ToastPosition) =>
+  (variant: ToastVariant) =>
+  ({
+    title,
+    description,
+    position,
+  }: {
+    title: string;
+    description?: string;
+    position?: ToastPosition;
+  }) =>
     addToast({ title, description, variant, position });
 
 // Gallery-flavored convenience methods

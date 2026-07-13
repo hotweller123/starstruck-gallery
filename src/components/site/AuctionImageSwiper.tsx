@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SmartImage } from "./SmartImage";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/gen";
 
 interface Props {
   images: string[];

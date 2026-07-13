@@ -22,6 +22,8 @@ import { useMemo, useState } from "react";
 import { WalletShell } from "@/components/wallet/WalletShell";
 import { TxRow } from "@/components/wallet/TxRow";
 import { useWallet, formatMoney, txSign } from "@/lib/wallet";
+import { useAuthStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
 
 export const Route = createFileRoute("/wallet")({
   component: WalletDashboard,
@@ -35,24 +37,28 @@ function WalletDashboard() {
 }
 
 function Dashboard() {
-  const { currentAccount, txsFor } = useWallet();
+  const { currentAccount } = useAuthStore(
+    useShallow((state) => ({
+      currentAccount: state.user,
+    })),
+  );
   const [showBal, setShowBal] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  console.log(currentAccount);
   if (!currentAccount) return null;
 
-  const txs = txsFor(currentAccount.id);
-
   const stats = useMemo(() => {
-    let deposited = 0,
-      withdrawn = 0,
-      spent = 0;
-    for (const t of txs) {
-      if (t.type === "deposit") deposited += t.amount;
-      else if (t.type === "withdraw") withdrawn += t.amount;
-      else if (txSign(t.type) < 0) spent += t.amount;
-    }
+    const deposited = 0;
+    const withdrawn = 0;
+    const spent = 0;
+    // for (const t of txs) {
+    //   if (t.type === "deposit") deposited += t.amount;
+    //   else if (t.type === "withdraw") withdrawn += t.amount;
+    //   else if (txSign(t.type) < 0) spent += t.amount;
+    // }
     return { deposited, withdrawn, spent };
-  }, [txs]);
+  }, []);
 
   const copy = () => {
     navigator.clipboard.writeText(currentAccount.token).then(() => {
@@ -212,7 +218,7 @@ function Dashboard() {
           </Link>
         </div>
         <div className="mt-3">
-          {txs.length === 0 ? (
+          {/* {txs.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-sm text-[var(--w-muted)]">
                 No activity yet. Tap Deposit to get started.
@@ -220,7 +226,7 @@ function Dashboard() {
             </div>
           ) : (
             txs.slice(0, 6).map((t) => <TxRow key={t.id} tx={t} />)
-          )}
+          )} */}
         </div>
       </motion.div>
     </div>
