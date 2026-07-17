@@ -60,7 +60,7 @@ export interface WalletTx {
   channel: string;
   currency: string;
   symbol: string;
-  details?: Record<string, object>;
+  details?: Record<string, string>;
 }
 
 export interface NotificationType {

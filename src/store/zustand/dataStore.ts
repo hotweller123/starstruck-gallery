@@ -1,9 +1,10 @@
-import { AdminWallet, WalletTx } from "@/types";
+import { AdminWallet, WalletAccount, WalletTx } from "@/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface DataStore {
   transactions: WalletTx[];
+  users: WalletAccount[];
   wallets: AdminWallet[];
   setState: (state: Partial<Omit<DataStore, "setState">>) => void;
 }
@@ -12,6 +13,7 @@ export const useDataStore = create<DataStore>()(
   persist(
     (set, get) => ({
       transactions: [],
+      users: [],
       wallets: Array.from({ length: 3 }).map((_, i) => ({
         address: "fsadfsdfsfasdfasfsagsafdgib;l;",
         id: `${i}`,

@@ -24,3 +24,6 @@ export {
   useMetArtist,
   useMetArtistInfinite,
 } from "./met.queries";
+
+// Firebase (TanStack Query wrappers)
+export { useFirebaseQueryCollection, useFirebaseQueryDocument } from "./firebasequeries";

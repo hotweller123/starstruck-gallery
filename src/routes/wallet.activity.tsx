@@ -3,9 +3,9 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Search, Inbox } from "lucide-react";
 import { TxRow } from "@/components/wallet/TxRow";
-import { useWallet, TX_LABEL } from "@/lib/wallet";
+import { TX_LABEL } from "@/lib/wallet";
 import { useShallow } from "zustand/shallow";
-import { useAuthStore } from "@/store/zustand";
+import { useAuthStore, useDataStore } from "@/store/zustand";
 import { TxType } from "@/types";
 
 export const Route = createFileRoute("/wallet/activity")({
@@ -24,16 +24,17 @@ const TYPES: Array<{ value: TxType | "all"; label: string }> = [
 ];
 
 function ActivityPage() {
-  const { user } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
+  const { user } = useAuthStore();
+  const [filter, setFilter] = useState<TxType | "all">("all");
+  const { transactions } = useDataStore(
+    useShallow((s) => ({
+      transactions: s.transactions,
     })),
   );
-  const [filter, setFilter] = useState<TxType | "all">("all");
   const [q, setQ] = useState("");
   if (!user) return null;
-  const all = [];
-  let list = filter === "all" ? all : all.filter((t) => t.type === filter);
+
+  let list = filter === "all" ? transactions : transactions.filter((t) => t.type === filter);
   if (q.trim()) {
     const needle = q.toLowerCase();
     list = list.filter(

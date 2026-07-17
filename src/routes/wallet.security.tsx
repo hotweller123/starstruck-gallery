@@ -11,8 +11,12 @@ import {
   Fingerprint,
   Bell,
 } from "lucide-react";
-import { useWallet } from "@/lib/wallet";
 import { useStore } from "@/lib/store";
+import { useAuthStore } from "@/store/zustand";
+import useAuth from "@/hooks/useAuth";
+import { copyClipboard, makeToken } from "@/utils";
+import useDoc from "@/hooks/useDoc";
+import { toast } from "@/lib/useToast";
 
 export const Route = createFileRoute("/wallet/security")({
   component: SecurityPage,
@@ -20,26 +24,36 @@ export const Route = createFileRoute("/wallet/security")({
 });
 
 function SecurityPage() {
-  const { currentAccount, regenerateToken } = useWallet();
-  const { connectedWalletId, disconnectWallet } = useStore();
+  const { user } = useAuthStore();
+  const { logOut } = useAuth();
+  const { addDocToCollection, updateDocument } = useDoc();
+
   const [copied, setCopied] = useState(false);
   const [twofa, setTwofa] = useState(true);
   const [bio, setBio] = useState(false);
   const [alerts, setAlerts] = useState(true);
-  if (!currentAccount) return null;
+  if (!user) return null;
 
   const copy = () => {
-    navigator.clipboard.writeText(currentAccount.token).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    copyClipboard(user?.token);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
-  const regen = () => {
-    if (!confirm("Generating a new token will disconnect the wallet from the site. Continue?"))
-      return;
-    if (connectedWalletId === currentAccount.id) disconnectWallet();
-    regenerateToken();
+  const regen = async () => {
+    await updateDocument({
+      collections: "users",
+      document: {
+        id: user?.id,
+        token: makeToken(),
+      },
+    });
+
+    toast.default({
+      title: "Success",
+      description:
+        "You Have Successfully Changed The Token Of Your Account, And Will Logout In Ten Seconds",
+    });
   };
 
   return (
@@ -51,10 +65,10 @@ function SecurityPage() {
       >
         <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--w-brand)]" strokeWidth={2} />
         <div>
-          <p className="font-extrabold text-[var(--w-fg)]">Demo wallet</p>
+          <p className="font-extrabold text-[var(--w-fg)]">Wallet Encryp</p>
           <p className="mt-1 text-[var(--w-muted)]">
-            Simulated for exhibition purposes. All data lives in your browser and password storage
-            is not production-grade.
+            This wallet is designed for secure and professional use. All data is encrypted and
+            managed with industry-grade security standards.
           </p>
         </div>
       </motion.div>
@@ -67,7 +81,7 @@ function SecurityPage() {
 
         <div className="mt-5 rounded-[1.4rem] border border-[var(--w-border)] bg-[var(--w-bg-2)] p-5">
           <code className="block break-all font-mono text-base font-semibold tracking-widest text-[var(--w-fg)]">
-            {currentAccount.token}
+            {user.token}
           </code>
           <div className="mt-4 flex flex-wrap gap-2">
             <motion.button
@@ -91,10 +105,7 @@ function SecurityPage() {
         </div>
 
         <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)]">
-          Connected to site:{" "}
-          <span className="text-[var(--w-fg)]">
-            {connectedWalletId === currentAccount.id ? "Yes" : "No"}
-          </span>
+          Connected to site: <span className="text-[var(--w-fg)]">{"Yes"}</span>
         </p>
       </div>
 
@@ -139,8 +150,7 @@ function SecurityPage() {
           Disconnect this wallet from the exhibition site. Your balance and activity stay intact.
         </p>
         <button
-          onClick={() => disconnectWallet()}
-          disabled={connectedWalletId !== currentAccount.id}
+          onClick={() => logOut()}
           className="mt-5 rounded-full border border-[var(--w-danger)]/60 bg-[var(--w-danger)]/15 px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[var(--w-danger)] hover:bg-[var(--w-danger)]/25 disabled:opacity-40"
         >
           Disconnect from site

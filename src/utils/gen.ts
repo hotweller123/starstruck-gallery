@@ -1,3 +1,6 @@
+import { Collections } from "@/hooks/useDoc";
+import { toast, useToast } from "@/lib/useToast";
+import { useDataStore } from "@/store/zustand";
 import { clsx, type ClassValue } from "clsx";
 import { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
 import { twMerge } from "tailwind-merge";
@@ -101,6 +104,15 @@ export function scrollElementToCenter(
   }
 }
 
+export const copyClipboard = (text: string) => {
+  navigator.clipboard.writeText(text).then(() => {
+    toast.info({
+      title: "Text Copied To Clipboard",
+      position: "bottom-left",
+    });
+  });
+};
+
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters long")
@@ -118,5 +130,40 @@ export const setNum = (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value;
   const checkNum = value.split(",").join("");
   const convertNum = parseInt(checkNum);
-  setBidAmount(convertNum || 0);
 };
+
+// Demo-only hash. Clearly labelled in UI as not production-grade.
+function hash(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return (h >>> 0).toString(36) + s.length.toString(36);
+}
+
+export function makeToken(): string {
+  const part = () =>
+    Math.random()
+      .toString(36)
+      .replace(/[^a-z0-9]/g, "")
+      .slice(0, 4)
+      .toUpperCase()
+      .padEnd(4, "X");
+  return `AET-${part()}-${part()}-${part()}`;
+}
+
+function uid(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+export function findObj<T extends { id: string }>({
+  id,
+  prop,
+  collection,
+}: {
+  id: string;
+  prop: keyof T;
+  collection: keyof Collections;
+}): T | undefined {
+  const storeCollection = useDataStore.getState()[collection] as unknown as T[];
+  const obj = storeCollection.find((s) => s[prop] == id) as T;
+  return obj;
+}

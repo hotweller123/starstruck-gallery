@@ -1,48 +1,211 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { motion } from "motion/react";
-import { ArrowUpFromLine, Building2, CheckCircle2, Globe, Hash, User } from "lucide-react";
+import { getValueAsType, motion } from "motion/react";
+import {
+  ArrowUpFromLine,
+  Building2,
+  CheckCircle2,
+  CpuIcon,
+  DecimalsArrowLeftIcon,
+  Globe,
+  Hash,
+  Network,
+  RadarIcon,
+  User,
+} from "lucide-react";
 import { FormPage, WAmount, WInput, WSelect, WSubmit, WRow } from "@/components/wallet/FormPage";
-import { useWallet, formatMoney } from "@/lib/wallet";
+import { FormProvider, useForm } from "react-hook-form";
+import { useAuthStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { WalletTx } from "@/types";
+import { toast } from "@/lib/useToast";
+import { serverTimestamp, Timestamp } from "firebase/firestore";
+import { WalletLoader } from "@/components/wallet";
+import { formatMoney } from "@/utils";
+import useDoc from "@/hooks/useDoc";
 
 export const Route = createFileRoute("/wallet/withdraw")({
   component: WithdrawPage,
   head: () => ({ meta: [{ title: "Withdraw — EmberPay" }] }),
 });
 
+export interface WithdrawalSchema {
+  amount: number;
+}
+
 const SPEEDS = [
   { value: "instant", label: "Instant · 1% fee" },
   { value: "standard", label: "Standard · 1–2 days · free" },
 ];
 
-const COUNTRIES = [
-  { value: "PT", label: "Portugal" },
-  { value: "US", label: "United States" },
-  { value: "GB", label: "United Kingdom" },
-  { value: "DE", label: "Germany" },
-  { value: "FR", label: "France" },
+const CHANNELS = [
+  { value: "crypto", label: "Crypto" },
+  { value: "bank", label: "Bank" },
 ];
 
+const COUNTRIES = [
+  { value: "Portugal", label: "Portugal" },
+  { value: "United States", label: "United States" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Germany", label: "Germany" },
+  { value: "France", label: "France" },
+];
+
+const forBank = {
+  country: z.string().min(1, { message: "Select A Country" }),
+  holder: z.string().min(1, { message: "Account Holder is required" }),
+  iban: z.string().min(1, { message: "IBAN is required" }),
+  swift: z.string().min(1, { message: "Swift Code is required" }),
+  reference: z.string().min(1, { message: "Reference is required" }),
+};
+
+const forCrypto = {
+  network: z.string().min(1, { message: "Wallet Network is required" }),
+  address: z.string().min(40, { message: "Wallet Address Should Be At Least 40 Characters" }),
+};
+
 function WithdrawPage() {
-  const { withdraw, currentAccount } = useWallet();
-  const [amount, setAmount] = useState(50);
-  const [speed, setSpeed] = useState("instant");
-  const [country, setCountry] = useState("PT");
-  const [bank, setBank] = useState("Banco Português");
-  const [holder, setHolder] = useState(currentAccount?.wallet.balance ?? "");
-  const [iban, setIban] = useState("PT50 0000 0000 0000 0000 0");
-  const [swift, setSwift] = useState("BBPIPTPL");
-  const [reference, setReference] = useState("EmberPay withdrawal");
-  const [done, setDone] = useState<number | null>(null);
+  const { user, isAuthHydrated, loading } = useAuthStore(
+    useShallow((s) => ({
+      user: s.user,
+      isAuthHydrated: s.isAuthHydrated,
+      loading: s.loading,
+    })),
+  );
+
+  if (!user || loading || !isAuthHydrated) {
+    return <WalletLoader fullscreen showSkeleton={false} message="Preparing Withdrawals..." />;
+  }
+
+  const { addDocToCollection, updateDocument } = useDoc();
+  const [channel, setChannel] = useState("crypto");
+  const [country, setCountry] = useState("");
+  const [bank, setBank] = useState("");
+
+  const [done, setDone] = useState<number | string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const res = withdraw(Number(amount), `${bank} · ${iban.slice(-4).padStart(4, "•")}`);
-    if (!res.ok) setError(res.error ?? "Failed");
-    else setDone(Number(amount));
-  };
+  const withdrawalSchema = z.object({
+    amount: z
+      .number()
+      .positive("Enter an amount")
+      .max(1_000_0000, { message: "Amount Must Be Less Than 10,000,000" }),
+    name: z.string().min(1, { message: "Name is required" }),
+    ...(channel == "crypto" ? { ...forCrypto } : { ...forBank }),
+  });
+
+  const formControl = useForm({
+    resolver: zodResolver(withdrawalSchema),
+    mode: "onChange",
+    defaultValues: {
+      amount: 0,
+      name: "",
+      ...(channel == "crypto"
+        ? {
+            network: "",
+            address: "",
+          }
+        : {
+            country: "",
+            iban: "",
+            swift: "",
+            reference: "",
+            holder: "",
+          }),
+    },
+  });
+
+  const amount = formControl.watch("amount");
+  const submit = formControl.handleSubmit(
+    async (data) => {
+      if (user?.wallet.balance < amount) {
+        toast.error({
+          title: "Insufficient Balance",
+        });
+        return;
+      }
+      const balanceAfter = Math.max(0, user?.wallet.balance - amount);
+
+      try {
+        const payload: Omit<WalletTx, "id"> = {
+          channel,
+          amount,
+          balanceAfter,
+          date: serverTimestamp() as unknown as Timestamp,
+          createdAt: new Date().toISOString(),
+          currency: user?.currency,
+          symbol: user?.symbol,
+          email: user?.email,
+          fullName: user?.fullName,
+          status: "Pending",
+          title: "Withdrawal",
+          type: "withdraw",
+          userID: user?.userID,
+          counterparty: "counterparty",
+          note: "Withdrawal note",
+          details: {
+            name: formControl.getValues("name"),
+            ...(channel == "crypto"
+              ? {
+                  network: (formControl.getValues("network") as string) || "",
+                  address: (formControl.getValues("address") as string) || "",
+                }
+              : {
+                  country: (formControl.getValues("country") as string) || "",
+                  iban: (formControl.getValues("iban") as string) || "",
+                  swift: (formControl.getValues("swift") as string) || "",
+                  reference: (formControl.getValues("reference") as string) || "",
+                  holder: (formControl.getValues("holder") as string) || "",
+                }),
+          },
+        };
+
+        await addDocToCollection({
+          collections: "transactions",
+          document: payload,
+        });
+
+        await updateDocument({
+          collections: "users",
+          document: {
+            id: user?.userID,
+            wallet: {
+              bidBalance: user?.wallet?.bidBalance,
+              balance: balanceAfter,
+            },
+          },
+        });
+
+        setDone(
+          formatMoney(amount, user?.currency, {
+            withSymbol: true,
+            decimals: 2,
+          }),
+        );
+
+        toast.success({
+          title: "Success",
+          description: "Your Withdrawal is in process",
+          position: "bottom-left",
+        });
+      } catch (error) {
+        toast.error({
+          title: "Error Message",
+          description: error?.message,
+          position: "top-left",
+        });
+      }
+    },
+    (invalidate) => {
+      toast.error({
+        title: "Form Invalid",
+        description: invalidate.form?.message,
+        position: "top-left",
+      });
+    },
+  );
 
   if (done !== null) {
     return (
@@ -62,10 +225,18 @@ function WithdrawPage() {
             <CheckCircle2 className="size-8" strokeWidth={2} />
           </motion.span>
           <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
-            {formatMoney(done)} withdrawn
+            {formatMoney(amount, user?.currency, {
+              withSymbol: true,
+              decimals: 2,
+            })}{" "}
+            withdrawn
           </h1>
           <p className="mt-2 text-sm text-[var(--w-muted)]">
-            New balance {formatMoney(currentAccount?.wallet.balance ?? 0)}
+            New balance{" "}
+            {formatMoney(user?.wallet?.balance, user?.currency, {
+              withSymbol: true,
+              decimals: 2,
+            })}
           </p>
           <Link
             to="/wallet"
@@ -79,13 +250,13 @@ function WithdrawPage() {
     );
   }
 
-  const fee = speed === "instant" ? Math.round(amount * 0.01 * 100) / 100 : 0;
+  // const fee = speed === "instant" ? Math.round(amount * 0.01 * 100) / 100 : 0;
 
   return (
     <FormPage
       eyebrow="Cash out"
       title="Withdraw"
-      subtitle={`Available · ${formatMoney(currentAccount?.wallet.balance ?? 0)}`}
+      subtitle={`Available · ${formatMoney(user?.wallet.balance, user?.currency)}`}
       icon={<ArrowUpFromLine className="size-6" strokeWidth={2.2} />}
       aside={
         <div className="sticky top-28 rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-6 shadow-xl">
@@ -93,77 +264,135 @@ function WithdrawPage() {
             Summary
           </p>
           <h3 className="mt-1 text-2xl font-extrabold tracking-tight text-[var(--w-fg)]">
-            {formatMoney(amount)}
+            {`${user?.symbol} ${amount.toLocaleString()}`}
           </h3>
           <dl className="mt-5 flex flex-col gap-3 text-sm">
-            <Row label="Destination" value={`${bank}, ${country}`} />
-            <Row label="Speed" value={speed === "instant" ? "Instant" : "Standard"} />
-            <Row label="Fee" value={formatMoney(fee)} />
+            <Row
+              label="Destination"
+              value={`${(formControl.watch("name") || "N/A") + ","} ${country}`}
+            />
+            {/* <Row label="Speed" value={speed === "instant" ? "Instant" : "Standard"} /> */}
+            {/* <Row label="Fee" value={formatMoney(fee)} /> */}
             <div className="border-t border-[var(--w-border)] pt-3">
-              <Row label="They receive" value={formatMoney(amount - fee)} bold />
+              {/* <Row label="They receive" value={formatMoney(amount - fee)} bold /> */}
             </div>
           </dl>
         </div>
       }
     >
-      <form onSubmit={submit} className="flex flex-col gap-5">
-        <WAmount value={amount} onChange={setAmount} max={currentAccount?.wallet.balance ?? 0} />
+      <FormProvider {...formControl}>
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <WAmount schema="withdraw" name="amount" currency={user?.currency} />
 
-        <WSelect label="Withdrawal speed" value={speed} onChange={setSpeed} options={SPEEDS} />
+          <WSelect
+            name="channel"
+            label="Channel"
+            value={channel}
+            onChange={setChannel}
+            options={CHANNELS}
+          />
 
-        <div className="rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-bg-2)] p-5">
-          <div className="flex items-center gap-3">
-            <Building2 className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
-            <p className="text-sm font-extrabold text-[var(--w-fg)]">Bank destination</p>
+          <div className="rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-bg-2)] p-5">
+            <div className="flex items-center gap-3">
+              <Building2 className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
+              <p className="text-sm font-extrabold text-[var(--w-fg)] capitalize">
+                {channel} Method
+              </p>
+            </div>
+            {channel == "bank" && (
+              <>
+                <div className="mt-4 grid gap-3">
+                  <WRow>
+                    <WSelect
+                      label="Country"
+                      name="country"
+                      onChange={(v) => {
+                        setCountry(v);
+                        console.log(v);
+                        formControl.setValue("country", v);
+                      }}
+                      value={country}
+                      options={COUNTRIES}
+                    />
+                    <WInput
+                      label="Bank name"
+                      name="name"
+                      schema="withdraw"
+                      icon={<Globe className="size-4" />}
+                    />
+                  </WRow>
+                  <WInput
+                    label="Account holder"
+                    name="holder"
+                    schema="withdraw"
+                    icon={<User className="size-4" />}
+                  />
+                  <WRow>
+                    <WInput
+                      label="IBAN / Account"
+                      name="iban"
+                      schema="withdraw"
+                      icon={<Hash className="size-4" />}
+                      className="font-mono"
+                    />
+                    <WInput
+                      label="SWIFT / BIC"
+                      name="swift"
+                      schema="withdraw"
+                      className="font-mono"
+                      icon={<RadarIcon className="size-4" />}
+                    />
+                  </WRow>
+                  <WInput
+                    label="Reference"
+                    name="reference"
+                    schema="withdraw"
+                    hint="Shown on your bank statement."
+                    icon={<DecimalsArrowLeftIcon className="size-4" />}
+                  />
+                </div>
+              </>
+            )}
+            {channel == "crypto" && (
+              <>
+                <div className="space-y-2 mt-2">
+                  <WRow>
+                    <WInput
+                      label="Name"
+                      name="name"
+                      schema="withdraw"
+                      icon={<Hash className="size-4" />}
+                      className="font-mono"
+                    />
+                    <WInput
+                      label="Network"
+                      name="network"
+                      schema="withdraw"
+                      className="font-mono"
+                      icon={<Network className="size-4" />}
+                    />
+                  </WRow>
+                  <WInput
+                    label="Address"
+                    name="address"
+                    schema="withdraw"
+                    hint="Your Valid Wallet Address"
+                    icon={<CpuIcon className="size-4" />}
+                  />
+                </div>
+              </>
+            )}
           </div>
-          <div className="mt-4 grid gap-3">
-            <WRow>
-              <WSelect label="Country" value={country} onChange={setCountry} options={COUNTRIES} />
-              <WInput
-                label="Bank name"
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
-                icon={<Globe className="size-4" />}
-              />
-            </WRow>
-            <WInput
-              label="Account holder"
-              value={holder}
-              onChange={(e) => setHolder(e.target.value)}
-              icon={<User className="size-4" />}
-            />
-            <WRow>
-              <WInput
-                label="IBAN / Account"
-                value={iban}
-                onChange={(e) => setIban(e.target.value)}
-                icon={<Hash className="size-4" />}
-                className="font-mono"
-              />
-              <WInput
-                label="SWIFT / BIC"
-                value={swift}
-                onChange={(e) => setSwift(e.target.value)}
-                className="font-mono"
-              />
-            </WRow>
-            <WInput
-              label="Reference"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              hint="Shown on your bank statement."
-            />
-          </div>
-        </div>
 
-        {error && (
-          <p className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs font-medium text-[var(--w-danger)] animate__animated animate__headShake">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="rounded-xl border border-[var(--w-danger)]/40 bg-[var(--w-danger)]/10 px-3 py-2 text-xs font-medium text-[var(--w-danger)] animate__animated animate__headShake">
+              {error}
+            </p>
+          )}
 
-        <WSubmit type="submit">Withdraw {formatMoney(amount)}</WSubmit>
-      </form>
+          <WSubmit type="submit">Withdraw {formatMoney(amount, user?.currency)}</WSubmit>
+        </form>
+      </FormProvider>
     </FormPage>
   );
 }

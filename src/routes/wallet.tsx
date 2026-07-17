@@ -21,9 +21,10 @@ import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { WalletShell } from "@/components/wallet/WalletShell";
 import { TxRow } from "@/components/wallet/TxRow";
-import { useWallet, formatMoney, txSign } from "@/lib/wallet";
-import { useAuthStore } from "@/store/zustand";
+import { formatMoney } from "@/utils";
+import { useAuthStore, useDataStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
+import { txSign } from "@/lib/wallet";
 
 export const Route = createFileRoute("/wallet")({
   component: WalletDashboard,
@@ -45,18 +46,23 @@ function Dashboard() {
   const [showBal, setShowBal] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  console.log(currentAccount);
   if (!currentAccount) return null;
 
+  const { txs } = useDataStore(
+    useShallow((s) => ({
+      txs: s.transactions,
+    })),
+  );
+
   const stats = useMemo(() => {
-    const deposited = 0;
-    const withdrawn = 0;
-    const spent = 0;
-    // for (const t of txs) {
-    //   if (t.type === "deposit") deposited += t.amount;
-    //   else if (t.type === "withdraw") withdrawn += t.amount;
-    //   else if (txSign(t.type) < 0) spent += t.amount;
-    // }
+    let deposited = 0;
+    let withdrawn = 0;
+    let spent = 0;
+    for (const t of txs) {
+      if (t.type === "deposit") deposited += t.amount;
+      else if (t.type === "withdraw") withdrawn += t.amount;
+      else if (txSign(t.type) < 0) spent += t.amount;
+    }
     return { deposited, withdrawn, spent };
   }, []);
 
@@ -74,7 +80,7 @@ function Dashboard() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="relative overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl wallet-ring md:p-9"
+        className="relative z-20 !overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl wallet-ring md:p-9"
       >
         <div className="absolute inset-0 wallet-dotgrid opacity-30" aria-hidden />
         {/* orange corner accent */}
@@ -95,7 +101,11 @@ function Dashboard() {
               className="mt-3 flex items-center gap-3 text-left"
             >
               <span className="text-5xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-7xl">
-                {showBal ? formatMoney(currentAccount.wallet.balance) : "••••••"}
+                {showBal
+                  ? formatMoney(currentAccount.wallet.balance, currentAccount?.currency, {
+                      withSymbol: true,
+                    })
+                  : "••••••"}
               </span>
               <span className="grid size-9 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-bg-2)] text-[var(--w-muted)]">
                 {showBal ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
@@ -163,7 +173,7 @@ function Dashboard() {
           label="Withdrawn"
           value={stats.withdrawn}
           icon={TrendingDown}
-          tint="var(--w-fg)"
+          tint="var(--w-brand)"
           delay={0.1}
         />
         <Stat
@@ -268,6 +278,8 @@ function Stat({
   tint: string;
   delay?: number;
 }) {
+  const { user } = useAuthStore();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -281,13 +293,13 @@ function Stat({
         </p>
         <span
           className="grid size-7 place-items-center rounded-lg text-[var(--w-brand-contrast)]"
-          style={{ backgroundColor: tint }}
+          // style={{ backgroundColor: tint }}
         >
-          <Icon className="size-3.5" strokeWidth={2.2} />
+          <Icon className={`size-4.5 text-[${tint}]`} strokeWidth={2.2} />
         </span>
       </div>
       <p className="mt-2 text-xl font-extrabold tracking-tight text-[var(--w-fg)]">
-        {formatMoney(value)}
+        {formatMoney(value, user?.currency)}
       </p>
     </motion.div>
   );

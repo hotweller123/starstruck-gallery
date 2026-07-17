@@ -22,6 +22,7 @@ import { renownedArtists } from "@/data/renowned-artists";
 import art09 from "@/assets/art-09.jpg";
 import artist02 from "@/assets/artist-02.jpg";
 import art10 from "@/assets/art-10.jpg";
+import { useAuthStore } from "@/store/zustand";
 
 type PanelKey = "categories" | "artists" | "about" | null;
 
@@ -546,10 +547,8 @@ function IconLink({
 }
 
 function WalletNavIcon() {
-  const { connectedWalletId } = useStore();
-  const { getAccount } = useWallet();
-  const account = getAccount(connectedWalletId);
-  if (account) {
+  const { user } = useAuthStore();
+  if (user) {
     return (
       <Link
         to="/wallet"
@@ -558,7 +557,7 @@ function WalletNavIcon() {
         activeProps={{ className: "border-clay text-clay" }}
       >
         <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />$
-        {account?.wallet?.balance.toLocaleString()}
+        {user?.wallet?.balance.toLocaleString()}
       </Link>
     );
   }

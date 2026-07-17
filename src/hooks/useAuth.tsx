@@ -1,27 +1,16 @@
-import { makeToken } from "@/lib/wallet";
+import { makeToken } from "@/utils";
 import { auth, db } from "@/services/firebase";
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  UserCredential,
+  User,
 } from "firebase/auth";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  namedQuery,
-  serverTimestamp,
-  setDoc,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
 
 import { WalletAccount } from "@/types";
 import { getCurrencySymbol } from "@/utils";
-import { useCallback, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useAuthStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 
@@ -36,9 +25,9 @@ interface AuthField {
  * @param { fullName email password}
  */
 export default function useAuth() {
-  const { setState } = useAuthStore(
+  const { setUser } = useAuthStore(
     useShallow((state) => ({
-      setState: state.setState,
+      setUser: state.setUser,
     })),
   );
 
@@ -70,11 +59,8 @@ export default function useAuth() {
         joinedDate: new Date().toISOString(),
       };
 
-      console.log(acc);
-      setState({
-        user: acc,
-        loggedIn: true,
-      });
+      // Use the canonical setter (also marks hydrated)
+      setUser(acc);
 
       await setDoc(currentUser, acc);
 
@@ -91,40 +77,33 @@ export default function useAuth() {
     async (email: string, password: string) => {
       try {
         const userLogin = await signInWithEmailAndPassword(auth, email, password);
-        const user = doc(db, "users", userLogin.user.uid);
-        const currentUserDoc = await getDoc(user);
+        const userRef = doc(db, "users", userLogin.user.uid);
+        const currentUserDoc = await getDoc(userRef);
         if (currentUserDoc.exists()) {
-          const props = currentUserDoc.data() as WalletAccount;
-          setState({
-            user: props,
-            loggedIn: true,
-          });
-        } else
-          setState({
-            user: null,
-            loggedIn: false,
-          });
+          const props = { id: currentUserDoc.id, ...currentUserDoc.data() } as WalletAccount;
+          // Canonical setter: updates user + loggedIn + clears loading + sets hydrated
+          setUser(props);
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : "Login failed";
         throw new Error(message);
       }
     },
-    [setState],
+    [setUser],
   );
 
   const logOut = useCallback(async () => {
-    await signOut(auth)
-      .then(() => {
-        setState({
-          user: null,
-          loggedIn: false,
-        });
-      })
-      .catch((error) => {
-        const message = error instanceof Error ? error.message : "Register failed";
-        throw new Error(message);
-      });
-  }, []);
+    try {
+      await signOut(auth);
+      // This will also be caught by the root listener, but we clear immediately for snappy UX
+      setUser(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Sign out failed";
+      throw new Error(message);
+    }
+  }, [setUser]);
 
   return {
     registerUser,

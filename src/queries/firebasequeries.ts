@@ -1,14 +1,14 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { QueryConstraint } from "firebase/firestore";
-import { fetchCollection } from "./";
+import { fetchCollection, fetchDocument } from "./";
+import { Collections } from "@/hooks/useDoc";
 
 const key = "aethrel_firebase_collection";
+const userKey = "authStore";
 
 const emptyState = {
   users: [],
-  deposits: [],
-  withdrawals: [],
-  transfers: [],
+  transactions: [],
 };
 
 type CollectionKey = keyof typeof emptyState;
@@ -30,20 +30,33 @@ export const getLocalData = (): typeof emptyState => {
 };
 
 const firebaseQuery = {
-  getCollection: <T>(collection: string, options: QueryConstraint[] = []) =>
+  getCollection: <T>(collection: keyof Collections, options: QueryConstraint[] = []) =>
     queryOptions({
-      queryKey: [collection],
+      queryKey: [collection, ...options.map((o) => JSON.stringify(o))],
       queryFn: () => fetchCollection<T>({ collectionName: collection, options }),
       enabled: !!collection,
       initialData: () => {
         const data = getLocalData();
-        const collectionData = data[collection as CollectionKey];
+        const collectionData = data[collection as CollectionKey] ?? [];
         return collectionData.length > 0 ? collectionData : undefined;
       },
-      staleTime: 1000 * 60 * 10, // 10 minutes
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    }),
+
+  getDocument: (collection: keyof Collections, id: string) =>
+    queryOptions({
+      queryKey: [collection, id],
+      queryFn: () => fetchDocument({ collectionName: collection, id }),
     }),
 };
 
-export function useFirebaseQuery(collection: string, options: QueryConstraint[]) {
+export function useFirebaseQueryCollection(
+  collection: keyof Collections,
+  options: QueryConstraint[] = [],
+) {
   return useQuery(firebaseQuery.getCollection(collection, options));
+}
+
+export function useFirebaseQueryDocument(collection: keyof Collections, id: string) {
+  return useQuery(firebaseQuery.getDocument(collection, id));
 }

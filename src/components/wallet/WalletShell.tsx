@@ -323,7 +323,7 @@ export function WalletShell({ children }: { children: ReactNode }) {
           </nav>
         </aside>
 
-        <main className="min-w-0">
+        <main className="min-w-0 min-h-screen">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}

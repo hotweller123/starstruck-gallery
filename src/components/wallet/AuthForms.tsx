@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Sparkles, List, Loader2 } from "lucide-react";
-import { useWallet } from "@/lib/wallet";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,8 +89,8 @@ export function AuthForms() {
       const message = error instanceof Error ? error.message : "Failed Operation";
       console.log(message);
       await toast({
-        title: "Error...",
-        description: error.code,
+        title: "Error Message",
+        description: message,
         position: "bottom-left",
         variant: "error",
         duration: 4000,
@@ -100,9 +99,6 @@ export function AuthForms() {
   });
 
   const loading = formControl.formState.isSubmitting;
-  console.log({
-    loading,
-  });
 
   return (
     <motion.div

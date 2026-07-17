@@ -8,7 +8,8 @@ import {
   Tag,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { formatMoney, TX_LABEL, txSign, type WalletTx } from "@/lib/wallet";
+import { formatMoney, TX_LABEL, txSign } from "@/lib/wallet";
+import { WalletTx } from "@/types";
 
 const ICONS = {
   deposit: ArrowDownLeft,
