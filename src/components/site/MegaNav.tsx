@@ -266,14 +266,19 @@ export function MegaNav() {
             <div className="relative">
               <img
                 src={
-                  openPanel === "categories" ? art09 : openPanel === "artists" ? artist02 : art10
+                  openPanel === "categories"
+                    ? art09
+                    : openPanel === "artists"
+                      ? "https://afar.brightspotcdn.com/dims4/default/9416106/2147483647/strip/true/crop/2000x1333+1+0/resize/1800x1200!/format/webp/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2F3a%2F99%2Fd822ba7d4bff9525f0f14b7c5f98%2Fmassachusetts-peabody-essex-museum-shutterstock-edmonia-lewis-pr.jpg"
+                      : art10
                 }
                 alt=""
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-[4/5] w-full object-cover pointer-events-none"
               />
               <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-detail">
                 {openPanel === "categories" && "Horizon Field — Søren Kjeldsen, 2024"}
-                {openPanel === "artists" && "Marcus Thorne, in studio — Glasgow"}
+                {openPanel === "artists" &&
+                  "When she was 19, Edmonia Lewis met Frederick Douglass, who inspired her to pursue her art"}
                 {openPanel === "about" && "From the spring catalogue — printed in editions of 200"}
               </p>
             </div>

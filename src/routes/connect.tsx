@@ -1,40 +1,114 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { KeyRound, Wallet as WalletIcon, CheckCircle2 } from "lucide-react";
-import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
 import { useAuthStore } from "@/store/zustand";
+import { findObj } from "@/utils";
+import { WalletAccount } from "@/types";
+import { toast } from "@/lib/useToast";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "@/components/site/Loader";
+import useAuth from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/connect")({
   component: ConnectPage,
   head: () => ({ meta: [{ title: "Connect Wallet — Aethelred" }] }),
 });
 
+const TOKEN_REGEX = /^AET-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+
+const tokenSchema = z.object({
+  token: z
+    .string()
+    .regex(TOKEN_REGEX, "Invalid token format. Expected: AET-XXXX-XXXX-XXXX")
+    .min(17, "Token must be 17 characters"),
+});
+
 function ConnectPage() {
-  // const { getAccountByToken } = useWallet();
   const { user: connected } = useAuthStore();
-  const [token, setToken] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const { loginUser } = useAuth();
 
-  // const connected = connectedWalletId
-  //   ? getAccountByToken(
-  //       // round-trip through the wallet
-  //       useWalletAccount(connectedWalletId)?.token ?? "",
-  //     )
-  //   : null;
+  const formControl = useForm({
+    resolver: zodResolver(tokenSchema),
+    mode: "onChange",
+    defaultValues: {
+      token: "",
+    },
+  });
 
-  const submit = (e: FormEvent) => {
-    // e.preventDefault();
-    // setError(null);
-    // const acc = getAccountByToken(token);
-    // if (!acc) {
-    //   setError("That token doesn't match any wallet on this device.");
-    //   return;
-    // }
-    // connectWallet(acc.id);
-    // navigate({ to: "/profile" });
+  const {
+    register,
+    getValues,
+    setError,
+    formState: { errors, isValid, isLoading, isSubmitting },
+  } = formControl;
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const acc = findObj<WalletAccount>({
+        collection: "users",
+        id: getValues("token"),
+        prop: "token",
+      });
+
+      if (!acc) {
+        setError("token", {
+          message: "Please Make Sure You Enter A Valid Token From Your Wallet Account",
+        });
+        setTimeout(() => {
+          toast.error({
+            title: "Error Message",
+            description: "Token is Invalid",
+          });
+        }, 3000);
+        return;
+      }
+      console.log(acc);
+
+      await loginUser(acc.email, acc.password).catch((err) => {
+        toast.error({
+          title: "Error Message",
+          description: err.message,
+        });
+      });
+
+      navigate({ to: "/profile" });
+      toast.default({
+        title: "Success",
+        description: "Wallet Successfully Connected",
+        position: "bottom",
+      });
+    } catch (error) {
+      toast.error({
+        title: "Error Message",
+        description: error.message,
+      });
+    } finally {
+      setTimeout(() => setLoading(false), 3000);
+    }
   };
+
+  const error = errors["token"]?.message;
+
+  if (loading)
+    return (
+      <>
+        {" "}
+        <Loader
+          fullScreen
+          message="Connecting..."
+          variant="dots"
+          size="sm"
+          className="gap-2 flex flex-col h-screen"
+        />
+      </>
+    );
 
   return (
     <>
@@ -88,14 +162,15 @@ function ConnectPage() {
               </div>
 
               <input
-                value={token}
-                onChange={(e) => setToken(e.target.value.toUpperCase())}
+                {...register("token", {
+                  required: true,
+                })}
                 placeholder="AET-XXXX-XXXX-XXXX"
                 className="mt-5 w-full border border-ink/20 bg-canvas px-4 py-4 font-mono text-base tracking-widest text-ink focus:border-ink focus:outline-none"
                 autoFocus
               />
 
-              {error && (
+              {typeof error == "string" && (
                 <p className="mt-3 border border-clay/40 bg-clay/5 px-3 py-2 text-xs text-clay">
                   {error}
                 </p>
@@ -103,7 +178,8 @@ function ConnectPage() {
 
               <button
                 type="submit"
-                className="mt-6 w-full border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+                disabled={!isValid || isLoading || isSubmitting}
+                className="mt-6 w-full disabled:pointer-events-none disabled:opacity-80 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
               >
                 Connect wallet
               </button>

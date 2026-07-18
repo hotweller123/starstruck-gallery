@@ -69,7 +69,7 @@ function SendPage() {
 
   const sendSchema = z
     .object({
-      token: z.string().min(18, "Token must be at least 18 characters"),
+      token: z.string().min(18, "Token must be at least 17 characters"),
       amount: z
         .number()
         .positive("Amount must be greater than 0")

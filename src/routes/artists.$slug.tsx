@@ -5,7 +5,7 @@ import { Loader } from "@/components/site/Loader";
 import { useChicagoArtist, useChicagoArtworksByArtist } from "@/queries";
 import { useState } from "react";
 import { convert } from "html-to-text";
-
+import { artists } from "@/data/artists";
 export const Route = createFileRoute("/artists/$slug")({
   component: ArtistPage,
   // loader: ({ params }) => {
@@ -35,6 +35,9 @@ function ArtistPage() {
 
   const works = changeChicagoToMod(artworks);
 
+  const localArtist = artists.find((a) => a.slug == slug);
+
+  console.log(slug);
   const converted = convert(artist?.description, {
     wordwrap: true,
     selectors: [
@@ -63,16 +66,16 @@ function ArtistPage() {
 
       {artist && (
         <section className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:py-24 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
-          {/* <div className="bg-surface">
+          <div className="bg-surface">
             <SmartImage
-              src={artist?.portrait || ""}
-              alt={`Portrait of ${artist?.name}`}
+              src={localArtist?.portrait || ""}
+              alt={`Portrait of ${localArtist?.name}`}
               width={800}
               height={1000}
               priority
               className="block aspect-[4/5] w-full object-cover"
             />
-          </div> */}
+          </div>
           <div className="flex flex-col gap-8 lg:pt-8">
             <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
               Birth Date{artist?.birth_date} &middot; Death Date {artist?.death_date}

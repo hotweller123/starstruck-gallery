@@ -14,10 +14,10 @@ import type { CategorySlug } from "./artworks";
 import { artists, type Artist } from "./artists";
 
 export interface AuctionLot {
-  slug: string;
-  lotNumber: string;
+  slug: string; //...generate something unique as an id for the slug
+  lotNumber: string; //...should be generate as a special number?
   title: string;
-  sellerSlug: string;
+  sellerSlug: string; //username...gotten from the gmail address....it's unique anyway
   category: CategorySlug;
   categoryLabel: string;
   year: number;
@@ -33,7 +33,7 @@ export interface AuctionLot {
   currentBid: number;
   bidCount: number;
   reserveMet: boolean;
-  status?: "active" | "pending" | "suspended";
+  status: "active" | "pending" | "suspended";
   endsAt: string; // ISO
 }
 
