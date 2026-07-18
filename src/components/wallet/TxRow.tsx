@@ -8,8 +8,9 @@ import {
   Tag,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { formatMoney, TX_LABEL, txSign } from "@/lib/wallet";
+import { TX_LABEL, txSign } from "@/lib/wallet";
 import { WalletTx } from "@/types";
+import { formatMoney } from "@/utils";
 
 const ICONS = {
   deposit: ArrowDownLeft,
@@ -59,10 +60,10 @@ export function TxRow({ tx }: { tx: WalletTx }) {
           }`}
         >
           {positive ? "+" : "−"}
-          {formatMoney(tx.amount)}
+          {formatMoney(tx.amount, tx.currency)}
         </p>
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--w-muted)]">
-          Bal {formatMoney(tx.balanceAfter)}
+          Bal {formatMoney(tx.balanceAfter, tx.currency)}
         </p>
       </div>
     </motion.div>

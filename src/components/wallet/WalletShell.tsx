@@ -17,6 +17,7 @@ import {
   Search,
   Sparkles,
   ChevronRight,
+  LockKeyhole,
 } from "lucide-react";
 import { AuthForms } from "./AuthForms";
 import { useAuthStore } from "@/store/zustand";
@@ -140,6 +141,13 @@ function AccountChip() {
                   )}
                 </button>
               </div>
+              <Link
+                className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
+                to="/wallet/security"
+              >
+                <LockKeyhole className="size-4" />
+                Account Settings
+              </Link>
               <button
                 onClick={logOut}
                 className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"

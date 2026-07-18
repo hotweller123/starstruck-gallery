@@ -322,17 +322,19 @@ function SendPage() {
           <WTextarea
             label="Note (optional)"
             name="note"
+            className="!text-base"
             placeholder="For the framing of the Marchand triptych…"
           />
 
           <WSubmit type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
             {/* <Send className="size-4" /> */}
-            Send {formatMoney(amount, u.currency)}
+            {/* Send {formatMoney(amount, u.currency)} */}
+            Proceed
           </WSubmit>
 
-          {!form.formState.isValid && Object.keys(form.formState.errors).length > 0 && (
+          {/* {!form.formState.isValid && Object.keys(form.formState.errors).length > 0 && (
             <p className="text-center text-[11px] text-red-500">Please fix the errors above.</p>
-          )}
+          )} */}
         </form>
       </FormProvider>
     </FormPage>

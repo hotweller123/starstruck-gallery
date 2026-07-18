@@ -5,7 +5,6 @@ import { auth, db } from "@/services/firebase";
 import { useAuthStore } from "@/store/zustand";
 import type { WalletAccount } from "@/types";
 import { useShallow } from "zustand/shallow";
-import { saveUserDataLocally } from "@/routes/__root";
 
 /**
  * Best-practice Firebase auth listener for wallet.

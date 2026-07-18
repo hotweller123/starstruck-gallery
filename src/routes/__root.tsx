@@ -147,28 +147,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-const userKey = "authStore";
-
-export const getLocalUserData = () => {
-  try {
-    if (typeof document === "undefined") return undefined;
-    const raw = localStorage.getItem(userKey);
-    if (!raw) return undefined;
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-export const saveUserDataLocally = (data: WalletAccount) => {
-  try {
-    localStorage.setItem(userKey, JSON.stringify(data));
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -205,7 +183,17 @@ function RootComponent() {
                   {showWalletLoader ? (
                     <WalletLoader fullscreen message="Loading your wallet" showSkeleton />
                   ) : (
-                    <Outlet />
+                    <AnimatePresence mode="wait">
+                      {/* <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, y: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 0, scale: 0.9 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      > */}
+                      <Outlet />
+                      {/* </motion.div> */}
+                    </AnimatePresence>
                   )}
                 </div>
               ) : (
@@ -213,13 +201,17 @@ function RootComponent() {
                   <div className="flex min-h-screen flex-col bg-canvas">
                     <MegaNav />
                     <main className="flex-1">
-                      <AnimatePresence mode="wait" key={pathname}>
+                      <AnimatePresence mode="wait">
                         <motion.div
                           key={pathname}
                           initial={{ opacity: 0, y: 12, filter: "blur(100px)" }}
                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                           exit={{ opacity: 0, y: 0, filter: "blur(2000px)" }}
-                          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                          transition={{
+                            delayChildren: 0.15,
+                            duration: 0.35,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
                         >
                           <Outlet />
                         </motion.div>

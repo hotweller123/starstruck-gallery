@@ -267,10 +267,12 @@ function WithdrawPage() {
             {`${user?.symbol} ${amount.toLocaleString()}`}
           </h3>
           <dl className="mt-5 flex flex-col gap-3 text-sm">
-            <Row
-              label="Destination"
-              value={`${(formControl.watch("name") || "N/A") + ","} ${country}`}
-            />
+            {channel == "bank" && (
+              <Row
+                label="Destination"
+                value={`${(formControl.watch("name") || "N/A") + ","} ${country}`}
+              />
+            )}
             {/* <Row label="Speed" value={speed === "instant" ? "Instant" : "Standard"} /> */}
             {/* <Row label="Fee" value={formatMoney(fee)} /> */}
             <div className="border-t border-[var(--w-border)] pt-3">
@@ -390,7 +392,10 @@ function WithdrawPage() {
             </p>
           )}
 
-          <WSubmit type="submit">Withdraw {formatMoney(amount, user?.currency)}</WSubmit>
+          <WSubmit type="submit">
+            {/* Withdraw {formatMoney(amount, user?.currency)} */}
+            Proceed
+          </WSubmit>
         </form>
       </FormProvider>
     </FormPage>

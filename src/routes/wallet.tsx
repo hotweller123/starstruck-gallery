@@ -180,7 +180,7 @@ function Dashboard() {
           label="Spent"
           value={stats.spent}
           icon={ShoppingBag}
-          tint="var(--w-neg)"
+          tint="var(--w-brand)"
           delay={0.15}
         />
       </div>
@@ -295,10 +295,10 @@ function Stat({
           className="grid size-7 place-items-center rounded-lg text-[var(--w-brand-contrast)]"
           // style={{ backgroundColor: tint }}
         >
-          <Icon className={`size-4.5 text-[${tint}]`} strokeWidth={2.2} />
+          <Icon className={`size-2.5 text-[${tint}]`} strokeWidth={2.2} />
         </span>
       </div>
-      <p className="mt-2 text-xl font-extrabold tracking-tight text-[var(--w-fg)]">
+      <p className="mt-2 text-xl font-extrabold tracking-tight text-[var(--w-fg)] break-all line-clamp-1">
         {formatMoney(value, user?.currency)}
       </p>
     </motion.div>

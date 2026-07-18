@@ -133,7 +133,7 @@ export function WInput({
         <input
           {...props}
           {...register(name)}
-          className={`w-full rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] py-3.5 ${icon ? "pl-11 pr-4" : "px-4"} text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)] ${props.className ?? ""}`}
+          className={`w-full rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] py-3.5 ${icon ? "pl-11 pr-4" : "px-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)] ${props.className ?? ""}`}
         />
       </div>
       {hint && <span className="text-[11px] text-[var(--w-muted)]">{hint}</span>}
@@ -168,7 +168,7 @@ export function WTextarea({
         {...props}
         {...register(name)}
         rows={props.rows ?? 3}
-        className={`resize-none rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)] ${props.className ?? ""}`}
+        className={`resize-none text-base rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)] ${props.className ?? ""}`}
       />
       {hint && <span className="text-[11px] text-[var(--w-muted)]">{hint}</span>}
       {typeof errorMessage == "string" && <Err msg={errorMessage} />}
@@ -219,7 +219,7 @@ export function WSelect({
                 }}
                 defaultValue={field.value}
               >
-                <SelectTrigger className="appearance-none rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-3.5 text-sm font-medium text-[var(--w-fg)] focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]">
+                <SelectTrigger className="appearance-none rounded-[1.1rem] border border-[var(--w-border)] bg-[var(--w-input)] px-4 py-6 text-sm font-medium text-[var(--w-fg)] focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]">
                   <SelectValue
                     placeholder={placeholder}
                     className="placehoder:text-[var(--w-muted)]!"
@@ -359,7 +359,7 @@ export function WSubmit({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const bg = variant === "danger" ? "var(--w-danger)" : "var(--w-brand)";
   const {
-    formState: { isLoading, isSubmitting },
+    formState: { isLoading, isSubmitting, isValid },
   } = useFormContext();
 
   const loading = isLoading || isSubmitting;
@@ -368,7 +368,7 @@ export function WSubmit({
     <motion.button
       whileHover={{ y: -1 }}
       type="submit"
-      disabled={loading}
+      disabled={loading || !isValid}
       whileTap={{ scale: 0.98 }}
       {...(props as React.ComponentProps<typeof motion.button>)}
       className={`w-full rounded-[1.4rem] px-6 py-4 text-sm font-extrabold uppercase tracking-[0.16em] text-[var(--w-brand-contrast)] shadow-xl transition disabled:opacity-50 disabled:pointer-events-none ${props.className ?? ""} text-center mx-auto`}
