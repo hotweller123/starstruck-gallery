@@ -55,6 +55,7 @@ export function AuthForms() {
 
   const formControl = useForm({
     resolver: zodResolver(partSchema),
+    mode: "onChange",
     defaultValues: {
       ...(mode == "register"
         ? {

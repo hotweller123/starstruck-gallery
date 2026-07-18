@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { KeyRound, Wallet as WalletIcon, CheckCircle2 } from "lucide-react";
-import { useWallet, formatMoney } from "@/lib/wallet";
 import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
+import { useAuthStore } from "@/store/zustand";
 
 export const Route = createFileRoute("/connect")({
   component: ConnectPage,
@@ -11,29 +11,29 @@ export const Route = createFileRoute("/connect")({
 });
 
 function ConnectPage() {
-  const { getAccountByToken } = useWallet();
-  const { connectWallet, connectedWalletId, disconnectWallet } = useStore();
+  // const { getAccountByToken } = useWallet();
+  const { user: connected } = useAuthStore();
   const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const connected = connectedWalletId
-    ? getAccountByToken(
-        // round-trip through the wallet
-        useWalletAccount(connectedWalletId)?.token ?? "",
-      )
-    : null;
+  // const connected = connectedWalletId
+  //   ? getAccountByToken(
+  //       // round-trip through the wallet
+  //       useWalletAccount(connectedWalletId)?.token ?? "",
+  //     )
+  //   : null;
 
   const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const acc = getAccountByToken(token);
-    if (!acc) {
-      setError("That token doesn't match any wallet on this device.");
-      return;
-    }
-    connectWallet(acc.id);
-    navigate({ to: "/profile" });
+    // e.preventDefault();
+    // setError(null);
+    // const acc = getAccountByToken(token);
+    // if (!acc) {
+    //   setError("That token doesn't match any wallet on this device.");
+    //   return;
+    // }
+    // connectWallet(acc.id);
+    // navigate({ to: "/profile" });
   };
 
   return (
@@ -55,9 +55,7 @@ function ConnectPage() {
               <p className="mt-6 font-display text-3xl italic">{connected.fullName}</p>
               <p className="text-sm text-detail">{connected.email}</p>
               <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">Balance</p>
-              <p className="font-display text-4xl italic">
-                {formatMoney(connected.wallet.balance)}
-              </p>
+              <p className="font-display text-4xl italic">{}</p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -73,7 +71,7 @@ function ConnectPage() {
                   Open wallet
                 </Link>
                 <button
-                  onClick={disconnectWallet}
+                  // onClick={disconnectWallet}
                   className="border border-ink/30 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail hover:border-clay hover:text-clay"
                 >
                   Disconnect
@@ -147,10 +145,6 @@ function ConnectPage() {
 }
 
 // Tiny helper to look up account by id without redoing the import dance
-function useWalletAccount(id: string) {
-  const { getAccount } = useWallet();
-  return getAccount(id);
-}
 
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (

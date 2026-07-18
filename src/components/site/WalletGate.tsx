@@ -1,8 +1,7 @@
 import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Wallet as WalletIcon, KeyRound } from "lucide-react";
-import { useStore } from "@/lib/store";
-import { useWallet, formatMoney } from "@/lib/wallet";
+import { useAuthStore } from "@/store/zustand";
 
 interface Props {
   children: ReactNode;
@@ -15,11 +14,9 @@ export function WalletGate({
   title = "Connect your Aethelred Wallet",
   description = "The exhibition is wallet-gated. Paste your wallet token on the Connect page to unlock bidding, buying, selling, and your profile.",
 }: Props) {
-  const { connectedWalletId } = useStore();
-  const { getAccount } = useWallet();
-  const account = getAccount(connectedWalletId);
+  const { user } = useAuthStore();
 
-  if (!account) {
+  if (!user) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-24">
         <div className="border border-ink/10 bg-surface/40 p-10 text-center md:p-14">
@@ -53,10 +50,7 @@ export function WalletGate({
     <>
       <div className="border-b border-ink/10 bg-surface/30">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
-          <span>
-            Wallet connected · {account.fullName} ·{" "}
-            <span className="text-ink">{formatMoney(account.wallet.balance)}</span>
-          </span>
+          <span>Wallet connected · {user.fullName} · </span>
           <Link to="/wallet" className="text-ink hover:text-clay">
             Open wallet →
           </Link>

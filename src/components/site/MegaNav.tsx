@@ -15,7 +15,6 @@ import {
   Wallet,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { useWallet } from "@/lib/wallet";
 import { categories } from "@/data/categories";
 import { artists } from "@/data/artists";
 import { renownedArtists } from "@/data/renowned-artists";

@@ -122,7 +122,7 @@ function Dashboard() {
               24h
             </p>
             <p className="mt-1 text-sm font-extrabold text-[var(--w-brand)]">
-              ▲ {formatMoney(Math.max(stats.deposited - stats.spent, 0))}
+              ▲ {formatMoney(Math.max(stats.deposited - stats.spent, 0), currentAccount?.currency)}
             </p>
           </div>
         </div>
