@@ -50,7 +50,9 @@ function ArtistPage() {
   });
 
   if (loading) {
-    return <Loader message="Loading..." className="flex flex-col gap-3 py-16 md:py-24" />;
+    return (
+      <Loader message="Loading Artist Details..." className="flex flex-col gap-3 py-24 md:py-44" />
+    );
   }
 
   return (

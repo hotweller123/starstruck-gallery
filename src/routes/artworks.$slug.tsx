@@ -104,7 +104,12 @@ function ArtworkPage() {
         <Nav />
         <div className="mx-auto  grid max-w-7xl gap-16 px-6 py-16 md:py-24 ">
           <p className="text-center text-clay font-medium italic tracking-wide">
-            <Loader variant="soft" size="xs" className="py-24" message="Loading Artwork..." />
+            <Loader
+              variant="soft"
+              size="xs"
+              className="py-24 md:py-44"
+              message="Loading Artwork..."
+            />
           </p>
         </div>
       </>
