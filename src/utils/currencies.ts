@@ -60,9 +60,5 @@ export function formatMoneyInput(input: string): string {
   const withCommas = Number(intPart).toLocaleString();
   if (parts.length === 1) return withCommas;
   const decPart = parts.slice(1).join("").slice(0, 2);
-  console.log({
-    withCommas,
-    decPart,
-  });
   return `${withCommas}.${decPart}`;
 }

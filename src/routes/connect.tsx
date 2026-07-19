@@ -18,6 +18,7 @@ export const Route = createFileRoute("/connect")({
 });
 
 const TOKEN_REGEX = /^AET-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+// "AET-0D3H-0FZE-0UD6"
 
 const tokenSchema = z.object({
   token: z
@@ -30,11 +31,11 @@ function ConnectPage() {
   const { user: connected } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { loginUser } = useAuth();
+  const { loginUser, logOut } = useAuth();
 
   const formControl = useForm({
     resolver: zodResolver(tokenSchema),
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       token: "",
     },
@@ -96,19 +97,10 @@ function ConnectPage() {
 
   const error = errors["token"]?.message;
 
-  if (loading)
-    return (
-      <>
-        {" "}
-        <Loader
-          fullScreen
-          message="Connecting..."
-          variant="dots"
-          size="sm"
-          className="gap-2 flex flex-col h-screen"
-        />
-      </>
-    );
+  // if (loading)
+  //   return (
+
+  //   );
 
   return (
     <>
@@ -117,6 +109,19 @@ function ConnectPage() {
         title="Connect to the exhibition"
         description="Paste your Aethelred Wallet token to unlock bidding, buying, selling, and your profile."
       />
+
+      {loading && (
+        <>
+          {" "}
+          <Loader
+            fullScreen
+            message="Connecting..."
+            variant="dots"
+            size="sm"
+            className="gap-2 flex flex-col h-screen"
+          />
+        </>
+      )}
 
       <section className="mx-auto grid max-w-5xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.2fr_1fr]">
         <div className="border border-ink/15 p-8 md:p-10">
@@ -145,8 +150,14 @@ function ConnectPage() {
                   Open wallet
                 </Link>
                 <button
-                  // onClick={disconnectWallet}
-                  className="border border-ink/30 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail hover:border-clay hover:text-clay"
+                  onClick={() => {
+                    logOut();
+                    toast.reserved({
+                      title: "Logout Successful",
+                      description: "Wallet Disconnected",
+                    });
+                  }}
+                  className="border border-clay/60 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-clay hover:border-clay hover:text-clay"
                 >
                   Disconnect
                 </button>

@@ -1,16 +1,15 @@
-import { useState, type FormEvent } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Upload, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
 import { useStore, type UserListing } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Fields, { FieldProps } from "@/components/site/Fields";
+import ImageUploader from "@/components/site/ImageUploader";
+import { FormProvider, useForm } from "react-hook-form";
+import { useAuthStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -39,36 +38,169 @@ const empty = {
   image: "",
 };
 
+const auctionSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  category: z.string().min(1, { message: "Select A Category" }),
+  year: z
+    .number()
+    .min(1950, { message: "Year Must Not Go Below 1950" })
+    .max(new Date().getFullYear(), { message: "Current Year Is The Year Of Upload" }),
+  medium: z.string().min(1, { message: "Medium is required" }),
+  dimensions: z.string().min(1, { message: "Dimensions is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  provenance: z.string().min(1, { message: "Provenance is requred" }),
+  condition: z.string().min(1, { message: "Condition is required" }),
+  images: z.array(z.string()).min(1, { message: "At least one image is required" }),
+  estimateLow: z.number().positive().min(10, { message: "Minimum Amount Must Be Above 10" }),
+  price: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .max(1_000_000, "Amount must be less than 1,000,000"),
+  estimateHigh: z.number().positive().max(1_000_000, { message: "Maximum Amount is a Million" }),
+  startBid: z.number().positive().min(1, { message: "Start Bid is required" }),
+  currentBid: z.number().positive().min(1, { message: "Current Bid is required" }),
+  endsAt: z.string().min(1, { message: "Bid Time Range in hours is required" }),
+});
+
 function SellPage() {
+  // ================================================================
+  // ALL HOOKS MUST BE DECLARED HERE, UNCONDITIONALLY, IN THE SAME ORDER EVERY RENDER.
+  // No hooks, no useState, no useEffect, no useForm, nothing after the early returns.
+  // ================================================================
+
   const { listings, addListing, removeListing } = useStore();
-  const [form, setForm] = useState<Omit<UserListing, "id" | "createdAt">>(empty);
+
+  const { user, loading, isAuthHydrated } = useAuthStore(
+    useShallow((s) => ({
+      user: s.user,
+      loading: s.loading,
+      isAuthHydrated: s.isAuthHydrated,
+    })),
+  );
+
   const [submitting, setSubmitting] = useState(false);
+  const [imagesIndex, setImagesIndex] = useState(1);
 
-  const handleImage = (file: File) => {
-    if (file.size > 4_000_000) {
-      alert("Please choose an image under 4 MB.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => setForm((f) => ({ ...f, image: String(reader.result) }));
-    reader.readAsDataURL(file);
-  };
+  const formControl = useForm({
+    resolver: zodResolver(auctionSchema),
+    mode: "onChange",
+    defaultValues: {
+      title: "",
+      category: "",
+      condition: "",
+      currentBid: 0,
+      description: "",
+      dimensions: "",
+      endsAt: "",
+      estimateHigh: 0,
+      images: [],
+      estimateLow: 0,
+      medium: "",
+      provenance: "",
+      price: 0,
+      startBid: 0,
+      year: 0,
+    },
+  });
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.image) {
-      alert("Please upload an image of the work.");
-      return;
-    }
-    if (!form.title || !form.artist || !form.price) {
-      alert("Title, artist and price are required.");
-      return;
-    }
-    setSubmitting(true);
-    addListing(form);
-    setForm(empty);
-    setSubmitting(false);
-  };
+  const { setValue, handleSubmit } = formControl;
+
+  useEffect(() => {
+    formControl.trigger("images");
+  }, [formControl]);
+
+  // --- Early returns are now safe ---
+  if (loading || !isAuthHydrated) {
+    return <div className="min-h-[60vh]" />;
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Consign</p>
+          <h1 className="mt-3 font-display text-4xl italic text-ink">Sign in to sell</h1>
+          <p className="mt-3 text-sm text-detail">
+            You need an account to list artwork for exhibition.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Link
+              to="/connect"
+              className="inline-block border border-ink bg-ink px-6 py-2 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/"
+              className="inline-block border border-ink px-6 py-2 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
+            >
+              Browse
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Non-hook code only below this line.
+  const fields = (
+    [
+      { fieldType: "input", label: "Title", name: "title" },
+      {
+        fieldType: "input",
+        label: "Medium",
+        name: "medium",
+        attrs: { placeholder: "e.g. Oil on linen" },
+      },
+      {
+        fieldType: "input",
+        label: "Dimensions",
+        name: "dimensions",
+        attrs: { placeholder: "e.g. 80 × 60 cm" },
+      },
+      {
+        fieldType: "input",
+        label: "Year",
+        name: "year",
+        attrs: { type: "number", placeholder: "Year" },
+      },
+      {
+        fieldType: "input",
+        label: "Price",
+        name: "price",
+        format: "money" as const,
+      },
+      { fieldType: "input", label: "Estimate Low", name: "estimateLow", format: "money" as const },
+      {
+        fieldType: "input",
+        label: "Estimate High",
+        name: "estimateHigh",
+        format: "money" as const,
+      },
+      { fieldType: "input", label: "Start Bid", name: "startBid", format: "money" as const },
+      { fieldType: "input", label: "Current Bid", name: "currentBid", format: "money" as const },
+      {
+        fieldType: "select",
+        label: "Category",
+        name: "category",
+        options: categories.map((c) => ({ label: c, value: c.toLowerCase() })),
+      },
+      {
+        fieldType: "textarea",
+        label: "Description",
+        name: "description",
+        attrs: { placeholder: "A few sentences about the work, its materials, and its making." },
+      },
+    ] as FieldProps["fields"]
+  ).map((f) => ({
+    ...f,
+    attrs: { ...f.attrs, className: inputCls },
+  })) as FieldProps["fields"];
+
+  const submit = handleSubmit(
+    (data) => console.log(data),
+    (invalidate) => console.log(invalidate),
+  );
 
   return (
     <>
@@ -79,157 +211,59 @@ function SellPage() {
       />
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.4fr_1fr]">
-        <form onSubmit={submit} className="flex flex-col gap-6">
-          {/* Image */}
-          <label className="group flex aspect-[4/3] cursor-pointer flex-col items-center justify-center border-2 border-dashed border-ink/20 bg-surface/30 transition-colors hover:border-ink/40">
-            {form.image ? (
-              <img src={form.image} alt="Preview" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center gap-3 text-center">
-                <Upload className="size-8 text-detail" strokeWidth={1.25} />
-                <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
-                  Upload image of the work
-                </p>
-                <p className="text-xs text-detail/70">JPG or PNG · up to 4 MB</p>
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleImage(f);
-              }}
-            />
-          </label>
+        <FormProvider {...formControl}>
+          <form onSubmit={submit} className="flex flex-col gap-6">
+            {/* Image Uploader */}
+            <ImageUploader slotCount={imagesIndex} onSlotCountChange={setImagesIndex} />
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Title">
-              <input
-                required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Artist">
-              <input
-                required
-                value={form.artist}
-                onChange={(e) => setForm({ ...form, artist: e.target.value })}
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Medium">
-              <input
-                value={form.medium}
-                onChange={(e) => setForm({ ...form, medium: e.target.value })}
-                placeholder="e.g. Oil on linen"
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Dimensions">
-              <input
-                value={form.dimensions}
-                onChange={(e) => setForm({ ...form, dimensions: e.target.value })}
-                placeholder="e.g. 80 × 60 cm"
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Year">
-              <input
-                type="number"
-                value={form.year}
-                onChange={(e) => setForm({ ...form, year: Number(e.target.value) })}
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Price (USD)">
-              <input
-                type="number"
-                required
-                min={0}
-                value={form.price || ""}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Category" className="md:col-span-2">
-              <Select
-                value={form.category}
-                onValueChange={(e) => setForm((f) => ({ ...f, category: e }))}
-              >
-                <SelectTrigger
-                  className={`focus:border-0 focus:border-ink transition-all shadow-none ${inputCls}`}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {categories.map((c) => (
-                      <SelectItem value={c} key={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Description" className="md:col-span-2">
-              <textarea
-                rows={4}
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="A few sentences about the work, its materials, and its making."
-                className={inputCls}
-              />
-            </Field>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50"
-          >
-            Submit for review
-          </button>
-        </form>
-
-        <aside className="self-start lg:sticky lg:top-32">
-          <h2 className="font-display text-2xl italic">Your listings</h2>
-          <p className="mt-2 text-xs text-detail">
-            Drafts you've submitted. Held locally on this device.
-          </p>
-          {listings.length === 0 ? (
-            <div className="mt-6 border border-dashed border-ink/15 p-8 text-center text-sm text-detail">
-              No listings yet.
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <Fields fields={fields} />
             </div>
-          ) : (
-            <ul className="mt-6 flex flex-col gap-4">
-              {listings.map((l) => (
-                <li key={l.id} className="flex gap-4 border border-ink/10 p-3">
-                  <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" />
-                  <div className="flex flex-1 flex-col">
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                      {l.category}
-                    </p>
-                    <p className="font-display text-lg italic">{l.title}</p>
-                    <p className="text-xs text-detail">{l.artist}</p>
-                    <p className="mt-auto text-sm">${l.price.toLocaleString()}</p>
-                  </div>
-                  <button
-                    onClick={() => removeListing(l.id)}
-                    className="self-start text-detail hover:text-clay"
-                    aria-label="Remove"
-                  >
-                    <Trash2 className="size-4" strokeWidth={1.25} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50"
+            >
+              Submit for review
+            </button>
+          </form>
+
+          <aside className="self-start lg:sticky lg:top-32">
+            <h2 className="font-display text-2xl italic">Your listings</h2>
+            <p className="mt-2 text-xs text-detail">
+              Drafts you've submitted. Held locally on this device.
+            </p>
+            {listings.length === 0 ? (
+              <div className="mt-6 border border-dashed border-ink/15 p-8 text-center text-sm text-detail">
+                No listings yet.
+              </div>
+            ) : (
+              <ul className="mt-6 flex flex-col gap-4">
+                {listings.map((l) => (
+                  <li key={l.id} className="flex gap-4 border border-ink/10 p-3">
+                    <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" />
+                    <div className="flex flex-1 flex-col">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                        {l.category}
+                      </p>
+                      <p className="font-display text-lg italic">{l.title}</p>
+                      <p className="text-xs text-detail">{l.artist}</p>
+                      <p className="mt-auto text-sm">${l.price.toLocaleString()}</p>
+                    </div>
+                    <button
+                      onClick={() => removeListing(l.id)}
+                      className="self-start text-detail hover:text-clay"
+                      aria-label="Remove"
+                    >
+                      <Trash2 className="size-4" strokeWidth={1.25} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </aside>
+        </FormProvider>
       </section>
     </>
   );

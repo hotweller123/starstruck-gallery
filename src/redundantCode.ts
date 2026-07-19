@@ -368,3 +368,85 @@
 //     ? 1
 //     : -1;
 // }
+
+// todo
+// <Field label="Title">
+// <input
+//   required
+//   value={form.title}
+//   onChange={(e) => setForm({ ...form, title: e.target.value })}
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Artist">
+// <input
+//   required
+//   value={form.artist}
+//   onChange={(e) => setForm({ ...form, artist: e.target.value })}
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Medium">
+// <input
+//   value={form.medium}
+//   onChange={(e) => setForm({ ...form, medium: e.target.value })}
+//   placeholder="e.g. Oil on linen"
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Dimensions">
+// <input
+//   value={form.dimensions}
+//   onChange={(e) => setForm({ ...form, dimensions: e.target.value })}
+//   placeholder="e.g. 80 × 60 cm"
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Year">
+// <input
+//   type="number"
+//   value={form.year}
+//   onChange={(e) => setForm({ ...form, year: Number(e.target.value) })}
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Price (USD)">
+// <input
+//   type="number"
+//   required
+//   min={0}
+//   value={form.price || ""}
+//   onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+//   className={inputCls}
+// />
+// </Field>
+// <Field label="Category" className="md:col-span-2">
+// <Select
+//   value={form.category}
+//   onValueChange={(e) => setForm((f) => ({ ...f, category: e }))}
+// >
+//   <SelectTrigger
+//     className={`focus:border-0 focus:border-ink transition-all shadow-none ${inputCls}`}
+//   >
+//     <SelectValue />
+//   </SelectTrigger>
+//   <SelectContent>
+//     <SelectGroup>
+//       {categories.map((c) => (
+//         <SelectItem value={c} key={c}>
+//           {c}
+//         </SelectItem>
+//       ))}
+//     </SelectGroup>
+//   </SelectContent>
+// </Select>
+// </Field>
+// <Field label="Description" className="md:col-span-2">
+// <textarea
+//   rows={4}
+//   value={form.description}
+//   onChange={(e) => setForm({ ...form, description: e.target.value })}
+//   placeholder="A few sentences about the work, its materials, and its making."
+//   className={inputCls}
+// />
+// </Field>

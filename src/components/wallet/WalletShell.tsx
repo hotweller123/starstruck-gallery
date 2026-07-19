@@ -169,7 +169,7 @@ function TopBar({ showAccount }: { showAccount: boolean }) {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         <Brand />
         <div className="flex items-center gap-2">
-          {showAccount && (
+          {/* {showAccount && (
             <button
               className="hidden md:inline-grid size-10 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-surface)] text-[var(--w-muted)] transition hover:text-[var(--w-fg)]"
               aria-label="Search"
@@ -185,7 +185,7 @@ function TopBar({ showAccount }: { showAccount: boolean }) {
               <Bell className="size-4" />
               <span className="absolute right-2.5 top-2.5 size-1.5 rounded-full bg-[var(--w-brand)]" />
             </button>
-          )}
+          )} */}
 
           <Link
             to="/"
