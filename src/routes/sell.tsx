@@ -59,7 +59,7 @@ const auctionSchema = z.object({
   estimateHigh: z.number().positive().max(1_000_000, { message: "Maximum Amount is a Million" }),
   startBid: z.number().positive().min(1, { message: "Start Bid is required" }),
   currentBid: z.number().positive().min(1, { message: "Current Bid is required" }),
-  endsAt: z.string().min(1, { message: "Bid Time Range in hours is required" }),
+  endsAt: z.number().min(1, { message: "Bid Time Range in hours is required" }),
 });
 
 function SellPage() {
@@ -91,7 +91,7 @@ function SellPage() {
       currentBid: 0,
       description: "",
       dimensions: "",
-      endsAt: "",
+      endsAt: 0,
       estimateHigh: 0,
       images: [],
       estimateLow: 0,
@@ -160,6 +160,18 @@ function SellPage() {
       },
       {
         fieldType: "input",
+        label: "Provenance",
+        name: "provenance",
+        attrs: { placeholder: "Authenticity of the artwork" },
+      },
+      {
+        fieldType: "input",
+        label: "Condition",
+        name: "condition",
+        attrs: { placeholder: "Condition of the artwork" },
+      },
+      {
+        fieldType: "input",
         label: "Year",
         name: "year",
         attrs: { type: "number", placeholder: "Year" },
@@ -184,6 +196,15 @@ function SellPage() {
         label: "Category",
         name: "category",
         options: categories.map((c) => ({ label: c, value: c.toLowerCase() })),
+      },
+      {
+        fieldType: "input",
+        label: "Ends At",
+        name: "endsAt",
+        attrs: {
+          type: "number",
+          placeholder: "In hours",
+        },
       },
       {
         fieldType: "textarea",
