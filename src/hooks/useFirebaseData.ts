@@ -18,7 +18,7 @@ export function useFirebaseDataHook() {
     })),
   );
 
-  const isLoading = transactions.isLoading || users.isLoading;
+  const isLoading = transactions.isLoading || users.isLoading || auctions.isLoading;
 
   if (transactions.data && users.data) {
     setState({

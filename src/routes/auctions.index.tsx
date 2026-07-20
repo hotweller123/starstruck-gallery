@@ -105,11 +105,14 @@ function AuctionsPage() {
       auctions: s.auctions,
     })),
   );
+  console.log(auctions);
 
-  const filtered = useMemo(() => {
-    const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
-    return apply(auctionLots.concat(auctions), f, sort);
-  }, [filters, sort, activeCat, auctions]);
+  // const filtered = useMemo(() => {
+  //   const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
+  //   return apply(auctionLots.concat(auctions), f, sort);
+  // }, [filters, sort, activeCat, auctions]);
+
+  const filtered = auctions;
 
   const featured = useMemo(
     () =>
