@@ -1,10 +1,12 @@
 import { Collections } from "@/hooks/useDoc";
 import { toast, useToast } from "@/lib/useToast";
+import { appwriteConfig } from "@/services/appwrite";
 import { useDataStore } from "@/store/zustand";
 import { clsx, type ClassValue } from "clsx";
 import { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
+import { Client, Storage, ID } from "appwrite";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -163,7 +165,44 @@ export function findObj<T extends { id: string }>({
   prop: keyof T;
   collection: keyof Collections;
 }): T | undefined {
-  const storeCollection = useDataStore.getState()[collection] as unknown as T[];
+  const storeCollection = useDataStore.getState()[collection as keyof Collections] as T[];
   const obj = storeCollection.find((s) => s[prop] == id) as T;
   return obj;
+}
+
+export function getUserName(email: string) {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    toast.warning({
+      title: "Error Message",
+      description: "Email is invalid",
+      position: "top-right",
+    });
+    return "invalidemail";
+  }
+
+  const index = email.indexOf("@");
+  const username = email.slice(0, index);
+
+  return username;
+}
+
+export async function photoFN(file: File) {
+  const { endpoint, project_id, str_id } = appwriteConfig;
+
+  try {
+    const client = new Client().setEndpoint(endpoint).setProject(project_id);
+
+    if (!client) throw new Error("Error File Creation");
+
+    const uniqueID = ID.unique();
+
+    const storage = new Storage(client);
+    // Create a new file
+    const createFileFN = await storage.createFile(str_id, uniqueID, file);
+    const url = storage.getFileView(str_id, uniqueID);
+    return url;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }

@@ -1,4 +1,4 @@
-import { makeToken } from "@/utils";
+import { getUserName, makeToken } from "@/utils";
 import { auth, db } from "@/services/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -38,7 +38,7 @@ export default function useAuth() {
       } = await createUserWithEmailAndPassword(auth, user.email, user.password);
 
       const currentUser = doc(db, "users", uid);
-      const acc: WalletAccount = {
+      const acc: WalletAccount & { userName: string } = {
         blocked: false,
         userID: uid,
         id: uid,
@@ -48,6 +48,7 @@ export default function useAuth() {
         category: "users",
         symbol: getCurrencySymbol(user.currency),
         email: user.email.trim(),
+        userName: getUserName(user.email.trim()),
         fullName: user.fullName.trim(),
         password: user.password,
         token: makeToken(),

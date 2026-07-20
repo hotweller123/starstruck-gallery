@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useStore, type UserListing } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
 import Fields, { FieldProps } from "@/components/site/Fields";
@@ -10,6 +10,13 @@ import { useAuthStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AuctionLot, inHours } from "@/data/auctions";
+import { CategorySlug } from "@/data/artworks";
+import { getUserName, photoFN } from "@/utils";
+import useDoc from "@/hooks/useDoc";
+import { toast } from "@/lib/useToast";
+import { EMPTY_TEXT } from "@/lib/emptyState";
+import { Loader } from "@/components/site/Loader";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -37,6 +44,8 @@ const empty = {
   description: "",
   image: "",
 };
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
 const auctionSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -50,15 +59,38 @@ const auctionSchema = z.object({
   description: z.string().min(1, { message: "Description is required" }),
   provenance: z.string().min(1, { message: "Provenance is requred" }),
   condition: z.string().min(1, { message: "Condition is required" }),
-  images: z.array(z.string()).min(1, { message: "At least one image is required" }),
-  estimateLow: z.number().positive().min(10, { message: "Minimum Amount Must Be Above 10" }),
+  images: z
+    .array(
+      z
+        .instanceof(File, { message: "Please upload a valid file." })
+        .refine((file) => file.size <= MAX_FILE_SIZE, {
+          message: "Max file size is 5MB.",
+        })
+        .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+          message: "Only .jpg, .jpeg, and .png formats are supported.",
+        }),
+    )
+    .min(1, { message: "At least one image is required" }),
+  estimateLow: z
+    .number()
+    .positive("Estimated Low Amount must be greater than 0")
+    .min(10, { message: "Minimum Amount Must Be Above 10" }),
   price: z
     .number()
     .positive("Amount must be greater than 0")
     .max(1_000_000, "Amount must be less than 1,000,000"),
-  estimateHigh: z.number().positive().max(1_000_000, { message: "Maximum Amount is a Million" }),
-  startBid: z.number().positive().min(1, { message: "Start Bid is required" }),
-  currentBid: z.number().positive().min(1, { message: "Current Bid is required" }),
+  estimateHigh: z
+    .number()
+    .positive("Estimated High Amount must be greater than 0")
+    .max(1_000_000, { message: "Maximum Amount is a Million" }),
+  startBid: z
+    .number()
+    .positive("Start Bid Amount must be greater than 0")
+    .min(1, { message: "Start Bid is required" }),
+  currentBid: z
+    .number()
+    .positive("Current Bid Amount must be greater than 0")
+    .min(1, { message: "Current Bid is required" }),
   endsAt: z.number().min(1, { message: "Bid Time Range in hours is required" }),
 });
 
@@ -78,8 +110,9 @@ function SellPage() {
     })),
   );
 
-  const [submitting, setSubmitting] = useState(false);
   const [imagesIndex, setImagesIndex] = useState(1);
+  const [loadingForm, setLoadingForm] = useState(false);
+  const { addDocToCollection } = useDoc();
 
   const formControl = useForm({
     resolver: zodResolver(auctionSchema),
@@ -103,7 +136,12 @@ function SellPage() {
     },
   });
 
-  const { setValue, handleSubmit } = formControl;
+  const {
+    setValue,
+    handleSubmit,
+    getValues,
+    formState: { isValid, isLoading, isSubmitting },
+  } = formControl;
 
   useEffect(() => {
     formControl.trigger("images");
@@ -111,7 +149,7 @@ function SellPage() {
 
   // --- Early returns are now safe ---
   if (loading || !isAuthHydrated) {
-    return <div className="min-h-[60vh]" />;
+    return <Loader message="Loading..." className="min-h-[60vh]" />;
   }
 
   if (!user) {
@@ -219,8 +257,75 @@ function SellPage() {
   })) as FieldProps["fields"];
 
   const submit = handleSubmit(
-    (data) => console.log(data),
-    (invalidate) => console.log(invalidate),
+    async (data) => {
+      setLoadingForm(true);
+      const transformedImages = await Promise.all(
+        [...getValues("images")].map(async (f) => await photoFN(f)),
+      );
+
+      try {
+        const payload: AuctionLot & { userID: string } = {
+          bidCount: 0,
+          category: getValues("category").toLowerCase() as CategorySlug,
+          categoryLabel: getValues("category") as CategorySlug,
+          condition: getValues("condition"),
+          currentBid: getValues("currentBid"),
+          description: getValues("description"),
+          dimensions: getValues("dimensions"),
+          endsAt: inHours(isNaN(getValues("endsAt")) ? 0 : Number(getValues("endsAt"))),
+          estimateHigh: getValues("estimateHigh"),
+          estimateLow: getValues("estimateLow"),
+          images: transformedImages,
+          lotNumber: "",
+          medium: getValues("medium"),
+          provenance: getValues("provenance"),
+          reserveMet: false,
+          sellerSlug: getUserName(user?.email),
+          slug: crypto.randomUUID(),
+          startBid: getValues("startBid"),
+          status: "pending",
+          title: getValues("title"),
+          year: getValues("year"),
+          userID: user?.userID,
+        };
+
+        formControl.reset();
+        setImagesIndex(1);
+
+        console.log(payload);
+
+        await addDocToCollection({
+          collections: "auctions",
+          document: payload,
+        });
+
+        setTimeout(() => {
+          toast.success({
+            title: "Success",
+            description: "Your Auction Lot Have Been Submitted For Review",
+          });
+        }, 3100);
+      } catch (error) {
+        toast.error({
+          title: "Error Message",
+          description: error.message,
+        });
+      } finally {
+        setTimeout(() => {
+          setLoadingForm(false);
+        }, 3000);
+      }
+    },
+    (invalidate) => {
+      console.log(invalidate);
+
+      Object.keys(invalidate).forEach((k) => {
+        toast.reserved({
+          title: invalidate[k as keyof typeof invalidate]?.message || EMPTY_TEXT,
+          description: "Invalid Form Fields",
+        });
+      });
+    },
   );
 
   return (
@@ -230,6 +335,16 @@ function SellPage() {
         title="Sell your artwork"
         description="Upload a work to be reviewed for the next exhibition. Provide the most accurate details you can."
       />
+
+      {loadingForm && (
+        <Loader
+          message="Submitting Auction Lot..."
+          variant="dots"
+          size="sm"
+          fullScreen
+          className="flex flex-col"
+        />
+      )}
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.4fr_1fr]">
         <FormProvider {...formControl}>
@@ -243,10 +358,14 @@ function SellPage() {
 
             <button
               type="submit"
-              disabled={submitting}
-              className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50"
+              disabled={loadingForm}
+              className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50 disabled:pointer-events-none"
             >
-              Submit for review
+              {loadingForm || isLoading || isSubmitting ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Submit For Review"
+              )}
             </button>
           </form>
 
@@ -291,7 +410,7 @@ function SellPage() {
 }
 
 const inputCls =
-  "w-full border border-ink/20 bg-canvas px-4 py-2.5 text-sm text-ink placeholder:text-detail/50 focus:border-ink focus:outline-none";
+  "w-full border border-ink/20 bg-canvas px-4 py-2.5 text-base text-ink placeholder:text-detail/50 focus:border-ink focus:outline-none";
 
 function Field({
   label,

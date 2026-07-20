@@ -1,3 +1,4 @@
+import { AuctionLot } from "@/data/auctions";
 import { db } from "@/services/firebase";
 import { WalletAccount, WalletTx } from "@/types";
 import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
@@ -5,6 +6,7 @@ import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 export interface Collections {
   users: WalletAccount;
   transactions: WalletTx;
+  auctions: AuctionLot;
 }
 
 // type CollectionKey<T extends keyof Collections> = Collections[T];

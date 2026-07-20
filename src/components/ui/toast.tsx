@@ -303,7 +303,7 @@ function addToast(props: Omit<Toast, "id">): string {
     ...props,
   };
 
-  toastStore.toasts = [...toastStore.toasts, newToast].slice(-5);
+  toastStore.toasts = [...toastStore.toasts, newToast].slice(-7);
   notify();
 
   return id;

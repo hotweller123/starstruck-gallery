@@ -25,6 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useShallow } from "zustand/shallow";
+import { useDataStore } from "@/store/zustand";
 
 export const Route = createFileRoute("/auctions/")({
   component: AuctionsPage,
@@ -98,11 +100,16 @@ function AuctionsPage() {
   const [filters, setFilters] = useState<AuctionFilters>(defaultFilters);
   const [sort, setSort] = useState<SortKey>("ending-soon");
   const [activeCat, setActiveCat] = useState<CategorySlug | "all">("all");
+  const { auctions } = useDataStore(
+    useShallow((s) => ({
+      auctions: s.auctions,
+    })),
+  );
 
   const filtered = useMemo(() => {
     const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
-    return apply(auctionLots, f, sort);
-  }, [filters, sort, activeCat]);
+    return apply(auctionLots.concat(auctions), f, sort);
+  }, [filters, sort, activeCat, auctions]);
 
   const featured = useMemo(
     () =>

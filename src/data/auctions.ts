@@ -38,7 +38,7 @@ export interface AuctionLot {
 }
 
 const now = Date.now();
-const inHours = (h: number) => new Date(now + h * 3_600_000).toISOString();
+export const inHours = (h: number) => new Date(now + h * 3_600_000).toISOString();
 
 export const auctionCategories: { slug: CategorySlug | "all"; label: string }[] = [
   { slug: "all", label: "All Lots" },

@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "@/components/site/Loader";
 import useAuth from "@/hooks/useAuth";
+import { AuctionLot } from "@/data/auctions";
 
 export const Route = createFileRoute("/connect")({
   component: ConnectPage,
@@ -51,6 +52,7 @@ function ConnectPage() {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const acc = findObj<WalletAccount>({
         collection: "users",

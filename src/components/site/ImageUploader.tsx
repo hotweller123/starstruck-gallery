@@ -1,6 +1,7 @@
 import { Upload, Plus, Minus } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "@/lib/useToast";
+import { useState } from "react";
 
 interface ImageUploaderProps {
   name?: string;
@@ -18,10 +19,12 @@ export default function ImageUploader({
   const {
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty, isValid, isLoading },
   } = useFormContext();
 
-  const images: string[] = getValues(name) || [];
+  const [convertedImages, setConvertedImages] = useState<string[]>([]);
+
+  const images: File[] = getValues(name) || [];
 
   const handleFile = (file: File, index: number) => {
     if (file.size > 4_000_000) {
@@ -32,9 +35,16 @@ export default function ImageUploader({
       return;
     }
     const url = URL.createObjectURL(file);
+    const nextConvertedImages = [...convertedImages];
+    nextConvertedImages[index] = url;
+    setConvertedImages((ci) => [...nextConvertedImages]);
+
     const next = [...images];
-    next[index] = url;
+
+    next[index] = file;
     const cleaned = next.filter(Boolean).slice(0, slotCount);
+    console.log(cleaned);
+    console.log(convertedImages);
     setValue(name, cleaned, { shouldValidate: true });
   };
 
@@ -47,6 +57,7 @@ export default function ImageUploader({
     onSlotCountChange(nextCount);
     const trimmed = images.slice(0, nextCount);
     setValue(name, trimmed, { shouldValidate: true });
+    setConvertedImages((ci) => ci.slice(0, nextCount));
   };
 
   const errorMessage =
@@ -55,13 +66,15 @@ export default function ImageUploader({
   return (
     <div className="space-y-2">
       <div className="flex gap-1 justify-end">
-        <button
-          type="button"
-          onClick={addSlot}
-          className="flex gap-1 text-canvas p-2 text-xs bg-clay font-medium hover:bg-clay/90"
-        >
-          Add Image Slot <Plus className="size-4" />
-        </button>
+        {slotCount != maxSlots && (
+          <button
+            type="button"
+            onClick={addSlot}
+            className="flex gap-1 text-canvas p-2 text-xs bg-clay font-medium hover:bg-clay/90"
+          >
+            Add Image Slot <Plus className="size-4" />
+          </button>
+        )}
         {slotCount >= 2 && (
           <button
             type="button"
@@ -83,14 +96,14 @@ export default function ImageUploader({
             >
               {hasImage ? (
                 <img
-                  src={images[i]}
+                  src={convertedImages[i]}
                   alt={`Upload ${i + 1}`}
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <div className="flex flex-col items-center gap-3 text-center">
                   <Upload className="size-8 text-detail" strokeWidth={1.25} />
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+                  <p className="text-[9px] md:text-[11px] uppercase tracking-[0.12em] text-detail">
                     Upload image of the work
                   </p>
                   <p className="text-xs text-detail/70">JPG or PNG · up to 4 MB</p>
