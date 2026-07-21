@@ -1,7 +1,8 @@
 import { AuctionLot } from "@/data/auctions";
+import { toast } from "@/lib/useToast";
 import { db } from "@/services/firebase";
 import { WalletAccount, WalletTx } from "@/types";
-import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 export interface Collections {
   users: WalletAccount;
@@ -28,7 +29,14 @@ export default function useDoc() {
       const currentDoc = doc(colref, addDocument.id);
       await updateDoc(currentDoc, {
         id: addDocument.id,
+        ...(collections == "auctions"
+          ? {
+              lotNumber: addDocument.id,
+            }
+          : {}),
       });
+
+      return { ...document, id: addDocument.id };
     } catch (error) {
       throw new Error(error.message);
     }
@@ -43,6 +51,7 @@ export default function useDoc() {
   }) => {
     const colref = collection(db, collections);
     const currentDoc = doc(colref, document.id);
+
     try {
       await updateDoc(currentDoc, document);
     } catch (error) {
@@ -50,8 +59,34 @@ export default function useDoc() {
     }
   };
 
+  const deleteDocument = async ({
+    collectionName,
+    id,
+    message,
+  }: {
+    collectionName: keyof Collections;
+    id: string;
+    message?: string;
+  }) => {
+    const colref = collection(db, collectionName);
+    const currentDoc = doc(colref, id);
+
+    await deleteDoc(currentDoc)
+      .then(() =>
+        toast.reserved({
+          title: message || "Deleted Successfullly",
+        }),
+      )
+      .catch((err) =>
+        toast.error({
+          title: err.message,
+        }),
+      );
+  };
+
   return {
     addDocToCollection,
     updateDocument,
+    deleteDocument,
   };
 }

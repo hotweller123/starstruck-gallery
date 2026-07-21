@@ -64,7 +64,7 @@ function Dashboard() {
       else if (txSign(t.type) < 0) spent += t.amount;
     }
     return { deposited, withdrawn, spent };
-  }, []);
+  }, [txs]);
 
   const copy = () => {
     navigator.clipboard.writeText(currentAccount.token).then(() => {
@@ -100,7 +100,7 @@ function Dashboard() {
               whileTap={{ scale: 0.98 }}
               className="mt-3 flex items-center gap-3 text-left"
             >
-              <span className="text-5xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-7xl">
+              <span className="text-3xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-4xl">
                 {showBal
                   ? formatMoney(currentAccount.wallet.balance, currentAccount?.currency, {
                       withSymbol: true,

@@ -43,7 +43,7 @@ export function AuthForms() {
         strongPasswordRegex,
         "Password must contain uppercase, lowercase, number and special character",
       ),
-    currency: z.string().min(1, { message: "Currency is required" }),
+    // currency: z.string().min(1, { message: "Currency is required" }),
   });
 
   const loginSchema = z.object({
@@ -62,7 +62,7 @@ export function AuthForms() {
             fullName: "",
             email: "",
             password: "",
-            currency: "",
+            // currency: "",
           }
         : {
             email: "",
@@ -89,7 +89,7 @@ export function AuthForms() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed Operation";
       console.log(message);
-      await toast({
+      toast({
         title: "Error Message",
         description: message,
         position: "bottom-left",
@@ -178,14 +178,14 @@ export function AuthForms() {
                     </button>
                   }
                 />
-                {mode === "register" && (
+                {/* {mode === "register" && (
                   <SelectField
                     label="Currencies"
                     fieldName="currency"
                     icon={<List className="size-4" />}
                     placeholder="Select A Currency"
                   />
-                )}
+                )} */}
               </div>
 
               <motion.button

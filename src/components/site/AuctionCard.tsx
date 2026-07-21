@@ -28,9 +28,9 @@ export function AuctionCard({ lot, priority }: Props) {
           aspect="aspect-[4/5]"
         />
         {/* lot number badge */}
-        <div className="pointer-events-none absolute left-4 top-4 z-10 border border-canvas/50 bg-canvas/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.24em] text-ink backdrop-blur">
-          Lot {lot.lotNumber}
-        </div>
+        {/* <div className="pointer-events-none absolute left-4 top-4 z-10 border border-canvas/50 bg-canvas/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.24em] text-ink backdrop-blur">
+          Lot {lot.lotNumber.slice(0, 3)}
+        </div> */}
         {/* reserve status */}
         <div className="pointer-events-none absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 border border-canvas/50 bg-canvas/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.24em] backdrop-blur">
           <span
@@ -67,10 +67,8 @@ export function AuctionCard({ lot, priority }: Props) {
 
         <div className="mt-6 grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10">
           <div className="bg-canvas p-4">
-            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Current bid</p>
-            <p className="mt-1 font-display text-2xl italic text-ink">
-              {formatBid(lot.currentBid)}
-            </p>
+            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Price</p>
+            <p className="mt-1 font-display text-2xl italic text-ink">{formatBid(lot.price)}</p>
             <p className="mt-0.5 text-[10px] text-detail">
               {lot.bidCount} {lot.bidCount === 1 ? "bid" : "bids"}
             </p>

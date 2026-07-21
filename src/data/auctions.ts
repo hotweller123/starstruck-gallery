@@ -12,6 +12,7 @@ import art11 from "@/assets/art-11.jpg";
 import art12 from "@/assets/art-12.jpg";
 import type { CategorySlug } from "./artworks";
 import { artists, type Artist } from "./artists";
+import { useDataStore } from "@/store/zustand";
 
 export interface AuctionLot {
   slug: string; //...generate something unique as an id for the slug
@@ -26,6 +27,7 @@ export interface AuctionLot {
   description: string;
   provenance: string;
   condition: string;
+  price: number;
   images: string[];
   estimateLow: number;
   estimateHigh: number;
@@ -340,7 +342,10 @@ export const auctionLots: AuctionLot[] = [
     reserveMet: true,
     endsAt: inHours(54),
   },
-];
+].map((al) => ({
+  ...al,
+  price: 650000,
+}));
 
 export const formatBid = (n: number) =>
   new Intl.NumberFormat("en-US", {
@@ -349,7 +354,8 @@ export const formatBid = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 
-export const getAuctionBySlug = (slug: string) => auctionLots.find((l) => l.slug === slug);
+export const getAuctionBySlug = (slug: string) =>
+  useDataStore.getState().auctions.find((l) => l.slug === slug);
 
 export const getLotsBySeller = (sellerSlug: string) =>
   auctionLots.filter((l) => l.sellerSlug === sellerSlug);

@@ -126,7 +126,7 @@ function SendPage() {
     if (recipient?.token == u?.token) {
       toast.info({
         title: "Info",
-        description: `Can't Enter Your Personal Token`,
+        description: `Can't Use Your Personal Token`,
       });
       return;
     }

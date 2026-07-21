@@ -74,15 +74,12 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
 
   const defaultCategory =
     options?.initialCategory ||
-    MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length)];
+    MET_ARTWORK_SEARCH_TERMS[0]; // stable default for SSR hydration
 
-  // Load previously saved state from localStorage (original key restored)
-  const [persisted] = React.useState(() => loadChicagoFromLocalStorage());
 
   // Main artworks query (category-based)
   const artworksQuery = useQuery({
     ...chicagoQueries.artworksByCategory(defaultCategory, 20),
-    initialData: persisted.artworks.length > 0 ? persisted.artworks : undefined,
   });
 
   // Lazy artist query
@@ -90,7 +87,6 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
   const artistQuery = useQuery({
     ...chicagoQueries.artist(artistName || ""),
     enabled: !!artistName,
-    initialData: persisted.artist ?? undefined,
   });
 
   // Lazy search by artist
@@ -100,10 +96,10 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
     enabled: !!searchArtist,
   });
 
-  // Persist to localStorage when data changes (restored original behavior)
+  // Persist to localStorage when data changes (client-side only)
   React.useEffect(() => {
     const currentArtworks = searchArtist ? (searchQuery.data ?? []) : (artworksQuery.data ?? []);
-    const currentArtist = artistQuery.data ?? persisted.artist;
+    const currentArtist = artistQuery.data ?? null;
 
     if (currentArtworks.length > 0 || currentArtist) {
       saveChicagoToLocalStorage({
@@ -111,7 +107,7 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
         artist: currentArtist,
       });
     }
-  }, [artworksQuery.data, artistQuery.data, searchQuery.data, searchArtist, persisted.artist]);
+  }, [artworksQuery.data, artistQuery.data, searchQuery.data, searchArtist]);
 
   const fetchArtistByName = (name: string) => setArtistName(name);
   const searchByArtist = (name: string) => setSearchArtist(name);

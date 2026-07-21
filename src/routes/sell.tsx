@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/site/PageHeader";
 import Fields, { FieldProps } from "@/components/site/Fields";
 import ImageUploader from "@/components/site/ImageUploader";
 import { FormProvider, useForm } from "react-hook-form";
-import { useAuthStore } from "@/store/zustand";
+import { useAuthStore, useDataStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,8 @@ import useDoc from "@/hooks/useDoc";
 import { toast } from "@/lib/useToast";
 import { EMPTY_TEXT } from "@/lib/emptyState";
 import { Loader } from "@/components/site/Loader";
+import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
+import { formatMoney } from "@/lib/wallet";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -87,10 +89,10 @@ const auctionSchema = z.object({
     .number()
     .positive("Start Bid Amount must be greater than 0")
     .min(1, { message: "Start Bid is required" }),
-  currentBid: z
-    .number()
-    .positive("Current Bid Amount must be greater than 0")
-    .min(1, { message: "Current Bid is required" }),
+  // currentBid: z
+  //   .number()
+  //   .positive("Current Bid Amount must be greater than 0")
+  //   .min(1, { message: "Current Bid is required" }),
   endsAt: z.number().min(1, { message: "Bid Time Range in hours is required" }),
 });
 
@@ -101,6 +103,11 @@ function SellPage() {
   // ================================================================
 
   const { listings, addListing, removeListing } = useStore();
+  const { auctions } = useDataStore(
+    useShallow((s) => ({
+      auctions: s.auctions,
+    })),
+  );
 
   const { user, loading, isAuthHydrated } = useAuthStore(
     useShallow((s) => ({
@@ -112,7 +119,7 @@ function SellPage() {
 
   const [imagesIndex, setImagesIndex] = useState(1);
   const [loadingForm, setLoadingForm] = useState(false);
-  const { addDocToCollection } = useDoc();
+  const { addDocToCollection, deleteDocument } = useDoc();
 
   const formControl = useForm({
     resolver: zodResolver(auctionSchema),
@@ -121,7 +128,7 @@ function SellPage() {
       title: "",
       category: "",
       condition: "",
-      currentBid: 0,
+      // currentBid: 0,
       description: "",
       dimensions: "",
       endsAt: 0,
@@ -228,7 +235,7 @@ function SellPage() {
         format: "money" as const,
       },
       { fieldType: "input", label: "Start Bid", name: "startBid", format: "money" as const },
-      { fieldType: "input", label: "Current Bid", name: "currentBid", format: "money" as const },
+      // { fieldType: "input", label: "Current Bid", name: "currentBid", format: "money" as const },
       {
         fieldType: "select",
         label: "Category",
@@ -286,13 +293,16 @@ function SellPage() {
           status: "pending",
           title: getValues("title"),
           year: getValues("year"),
+
+          // added props
           userID: user?.userID,
+          price: getValues("price"),
         };
 
         formControl.reset();
         setImagesIndex(1);
 
-        console.log(payload);
+        // console.log(payload);
 
         await addDocToCollection({
           collections: "auctions",
@@ -323,6 +333,7 @@ function SellPage() {
         toast.reserved({
           title: invalidate[k as keyof typeof invalidate]?.message || EMPTY_TEXT,
           description: "Invalid Form Fields",
+          position: "top-left",
         });
       });
     },
@@ -338,9 +349,9 @@ function SellPage() {
 
       {loadingForm && (
         <Loader
-          message="Submitting Auction Lot..."
+          message="Please Hold As We Process This Request..."
           variant="dots"
-          size="sm"
+          size="xs"
           fullScreen
           className="flex flex-col"
         />
@@ -356,43 +367,69 @@ function SellPage() {
               <Fields fields={fields} />
             </div>
 
-            <button
-              type="submit"
-              disabled={loadingForm}
-              className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50 disabled:pointer-events-none"
-            >
-              {loadingForm || isLoading || isSubmitting ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Submit For Review"
-              )}
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={loadingForm}
+                className="self-start border border-ink bg-ink px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {loadingForm || isLoading || isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Submit For Review"
+                )}
+              </button>
+              <button
+                disabled={loadingForm}
+                className="self-start border border-ink bg-canvas px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ink hover:text-clay hover:bg-clay/5 hover:border-clay/80 disabled:opacity-50 disabled:pointer-events-none"
+                onClick={() => formControl.reset()}
+                type="reset"
+              >
+                Reset
+              </button>
+            </div>
           </form>
 
           <aside className="self-start lg:sticky lg:top-32">
             <h2 className="font-display text-2xl italic">Your listings</h2>
-            <p className="mt-2 text-xs text-detail">
-              Drafts you've submitted. Held locally on this device.
-            </p>
-            {listings.length === 0 ? (
+            <p className="mt-2 text-xs text-detail">Drafts you've submitted so far.</p>
+            {auctions.length === 0 ? (
               <div className="mt-6 border border-dashed border-ink/15 p-8 text-center text-sm text-detail">
                 No listings yet.
               </div>
             ) : (
               <ul className="mt-6 flex flex-col gap-4">
-                {listings.map((l) => (
-                  <li key={l.id} className="flex gap-4 border border-ink/10 p-3">
-                    <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" />
+                {auctions.map((a) => (
+                  <li key={a.id!} className="flex gap-4 border border-ink/10 p-3">
+                    {/* <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" /> */}
+                    <div className="flex-1 ">
+                      <AuctionImageSwiper
+                        images={a.images}
+                        alt="Auctions Drafts"
+                        aspect="aspect-[5/5]"
+                      />
+                    </div>
+
                     <div className="flex flex-1 flex-col">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                        {l.category}
+                        {a.category}
                       </p>
-                      <p className="font-display text-lg italic">{l.title}</p>
-                      <p className="text-xs text-detail">{l.artist}</p>
-                      <p className="mt-auto text-sm">${l.price.toLocaleString()}</p>
+                      <p className="font-display text-lg italic">{a.title}</p>
+                      <p className="text-xs text-detail">{a.sellerSlug}</p>
+                      <p className="mt-auto text-sm">{formatMoney(a.price)}</p>
                     </div>
                     <button
-                      onClick={() => removeListing(l.id)}
+                      onClick={async () => {
+                        setLoadingForm(true);
+                        setTimeout(() => {
+                          setLoadingForm(false);
+                        }, 2000);
+                        await deleteDocument({
+                          collectionName: "auctions",
+                          id: a.id!,
+                          message: `${a.title} Has Been Deleted Successfully From Your Draft`,
+                        });
+                      }}
                       className="self-start text-detail hover:text-clay"
                       aria-label="Remove"
                     >

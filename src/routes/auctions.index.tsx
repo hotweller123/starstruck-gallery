@@ -116,10 +116,8 @@ function AuctionsPage() {
 
   const featured = useMemo(
     () =>
-      [...auctionLots].sort(
-        (a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime(),
-      )[0],
-    [],
+      [...auctions].sort((a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime())[0],
+    [auctions],
   );
 
   return (
@@ -145,9 +143,9 @@ function AuctionsPage() {
             </div>
             <div className="flex flex-col justify-between gap-8 bg-canvas p-8 md:p-12">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-clay">
+                {/* <p className="text-[10px] uppercase tracking-[0.3em] text-clay">
                   Closing next · Lot {featured.lotNumber}
-                </p>
+                </p> */}
                 <h2 className="mt-4 font-display text-4xl italic leading-tight md:text-5xl">
                   {featured.title}
                 </h2>
@@ -163,12 +161,8 @@ function AuctionsPage() {
                 <Countdown endsAt={featured.endsAt} size="lg" />
                 <div className="flex items-end justify-between border-t border-ink/10 pt-6">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                      Current bid
-                    </p>
-                    <p className="mt-1 font-display text-3xl italic">
-                      {formatBid(featured.currentBid)}
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Price</p>
+                    <p className="mt-1 font-display text-3xl italic">{formatBid(featured.price)}</p>
                     <p className="text-xs text-detail">
                       {featured.bidCount} bids · est. {formatBid(featured.estimateLow)}–
                       {formatBid(featured.estimateHigh)}
@@ -245,7 +239,7 @@ function AuctionsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-32">
         {filtered.length === 0 ? (
-          <p className="py-24 text-center text-sm text-detail">No lots match these filters.</p>
+          <div className="py-24 text-center text-sm text-detail">No lots match these filters.</div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((l, i) => (

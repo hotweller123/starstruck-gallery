@@ -110,13 +110,11 @@ interface UseMetArtworksReturn {
  * This is the cleanest way to use TanStack Query with this API shape.
  */
 export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
-  const [currentCategory, setCurrentCategory] = React.useState(initialQuery || getRandomCategory());
-
-  // Load previously saved artworks from localStorage on first render
-  const [initialDataFromStorage] = React.useState(() => {
-    const saved = loadFromLocalStorage();
-    return saved ? { artworks: saved.artworks, total: saved.total } : undefined;
-  });
+  // Use a stable default for SSR hydration safety.
+  // Randomization happens only on client via fetchRandomCategory or search.
+  const [currentCategory, setCurrentCategory] = React.useState(
+    initialQuery || MET_ARTWORK_SEARCH_TERMS[0],
+  );
 
   const artworksQuery = useQuery({
     queryKey: ["met", "full-search", currentCategory],
@@ -132,14 +130,12 @@ export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
 
       const artworks = await metApi.getArtworks(searchRes.objectIDs, 40);
 
-      // Save fresh results to localStorage (original behavior restored)
+      // Save fresh results to localStorage (client-side only, for faster subsequent loads)
       saveToLocalStorage({
         artworks,
         total: searchRes.total || artworks.length,
         timestamp: Date.now(),
       });
-
-      console.log(artworks);
 
       return {
         artworks,
@@ -147,7 +143,7 @@ export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
       };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-    initialData: initialDataFromStorage,
+    // No initialData from localStorage — that causes SSR hydration mismatches
   });
 
   const search = (queryStr: string) => {

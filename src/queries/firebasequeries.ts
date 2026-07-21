@@ -35,11 +35,6 @@ const firebaseQuery = {
       queryKey: [collection, ...options.map((o) => JSON.stringify(o))],
       queryFn: () => fetchCollection<T>({ collectionName: collection, options }),
       enabled: !!collection,
-      initialData: () => {
-        const data = getLocalData();
-        const collectionData = data[collection as CollectionKey] ?? [];
-        return collectionData.length > 0 ? collectionData : undefined;
-      },
       staleTime: 1000 * 60 * 5, // 5 minutes
     }),
 
