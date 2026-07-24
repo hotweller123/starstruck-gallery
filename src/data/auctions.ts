@@ -16,6 +16,7 @@ import { useDataStore } from "@/store/zustand";
 
 export interface AuctionLot {
   slug: string; //...generate something unique as an id for the slug
+  id: string;
   lotNumber: string; //...should be generate as a special number?
   title: string;
   sellerSlug: string; //username...gotten from the gmail address....it's unique anyway
@@ -37,6 +38,7 @@ export interface AuctionLot {
   reserveMet: boolean;
   status: "active" | "pending" | "suspended";
   endsAt: string; // ISO
+  userID: string;
 }
 
 const now = Date.now();
@@ -358,7 +360,7 @@ export const getAuctionBySlug = (slug: string) =>
   useDataStore.getState().auctions.find((l) => l.slug === slug);
 
 export const getLotsBySeller = (sellerSlug: string) =>
-  auctionLots.filter((l) => l.sellerSlug === sellerSlug);
+  useDataStore.getState().auctions.filter((l) => l.sellerSlug === sellerSlug);
 
 export const getSeller = (slug: string): Artist | undefined => artists.find((a) => a.slug === slug);
 

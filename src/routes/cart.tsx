@@ -5,6 +5,7 @@ import { formatPrice, getArtworkBySlug } from "@/data/artworks";
 import { PageHeader } from "@/components/site/PageHeader";
 import { SmartImage } from "@/components/site/SmartImage";
 import { useArtworkContext } from "@/lib/useMetArtworksStore";
+import { useToast } from "@/lib/useToast";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/cart")({
 function CartPage() {
   const { artworks } = useArtworkContext();
   const { cart, setQuantity, removeFromCart, clearCart } = useStore();
+
+  const { toast } = useToast();
 
   const rows = cart
     .map((c) => ({ item: c, artwork: getArtworkBySlug(c.slug, artworks) }))
@@ -135,7 +138,12 @@ function CartPage() {
               <button
                 onClick={() => {
                   clearCart();
-                  alert("Thank you — a member of the gallery will be in touch shortly.");
+                  toast({
+                    title: "Info",
+                    description: "Our Team Will Contact You Shortly",
+                    variant: "collection",
+                    position: "top",
+                  });
                 }}
                 className="mt-6 w-full border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
               >

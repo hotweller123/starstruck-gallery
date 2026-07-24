@@ -2,12 +2,13 @@ import { AuctionLot } from "@/data/auctions";
 import { toast } from "@/lib/useToast";
 import { db } from "@/services/firebase";
 import { WalletAccount, WalletTx } from "@/types";
-import { addDoc, collection, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 
 export interface Collections {
   users: WalletAccount;
   transactions: WalletTx;
   auctions: AuctionLot;
+  bids: Partial<AuctionLot & WalletAccount>;
 }
 
 // type CollectionKey<T extends keyof Collections> = Collections[T];
@@ -59,6 +60,23 @@ export default function useDoc() {
     }
   };
 
+  const setDocument = async <T extends keyof Collections>({
+    collections,
+    document,
+  }: {
+    collections: T;
+    document: Partial<Collections[T]> & { id: string };
+  }) => {
+    const colref = collection(db, collections);
+    const currentDoc = doc(colref, document.id);
+
+    try {
+      await setDoc(currentDoc, { ...document, id: document.id });
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
   const deleteDocument = async ({
     collectionName,
     id,
@@ -88,5 +106,6 @@ export default function useDoc() {
     addDocToCollection,
     updateDocument,
     deleteDocument,
+    setDocument,
   };
 }

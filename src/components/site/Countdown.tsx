@@ -7,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-function diff(endsAt: string) {
+export function diff(endsAt: string) {
   const ms = Math.max(0, new Date(endsAt).getTime() - Date.now());
   const total = Math.floor(ms / 1000);
   const days = Math.floor(total / 86400);

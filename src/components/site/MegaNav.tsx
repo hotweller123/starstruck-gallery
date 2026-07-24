@@ -13,6 +13,8 @@ import {
   ShoppingBag,
   User,
   Wallet,
+  Wallet2,
+  Gavel,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { categories } from "@/data/categories";
@@ -557,11 +559,13 @@ function WalletNavIcon() {
       <Link
         to="/wallet"
         aria-label="Open wallet"
-        className="ml-1 hidden items-center gap-2 border border-ink/20 px-3 py-1.5 text-[11px] font-medium tracking-[0.18em] text-ink hover:border-ink md:inline-flex"
+        className="ml-1 hidden items-center gap-2 divide-2 border border-ink/20 px-3 py-1.5 text-[11px] font-medium tracking-[0.18em] text-ink hover:border-ink md:inline-flex"
         activeProps={{ className: "border-clay text-clay" }}
       >
         <Wallet className="size-[15px]" strokeWidth={ICON_STROKE} />$
         {user?.wallet?.balance.toLocaleString()}
+        <Gavel className="size-[15px]" strokeWidth={ICON_STROKE} />$
+        {user?.wallet?.bidBalance.toLocaleString()}
       </Link>
     );
   }

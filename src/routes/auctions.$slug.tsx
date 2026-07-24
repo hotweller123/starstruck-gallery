@@ -1,5 +1,5 @@
-import { ReactHTMLElement, useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ReactHTMLElement, useMemo, useState } from "react";
+import { createFileRoute, Link, notFound, useNavigate, useParams } from "@tanstack/react-router";
 import { Gavel, Heart, ShieldCheck, Mail, MapPin } from "lucide-react";
 import {
   auctionLots,
@@ -9,34 +9,73 @@ import {
   getSeller,
 } from "@/data/auctions";
 import { SmartImage } from "@/components/site/SmartImage";
-import { Countdown } from "@/components/site/Countdown";
+import { Countdown, diff } from "@/components/site/Countdown";
 import { AuctionCard } from "@/components/site/AuctionCard";
 import { useStore } from "@/lib/store";
-import { cn } from "@/utils/gen";
+import { cn, handleWalletBalance } from "@/utils/gen";
+import { useAuthStore, useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { useToast } from "@/lib/useToast";
+import useDoc from "@/hooks/useDoc";
+import { Loader } from "@/components/site/Loader";
+import z from "zod";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Fields from "@/components/site/Fields";
+import { Bid } from "@/types";
 
 export const Route = createFileRoute("/auctions/$slug")({
-  loader: ({ params }) => {
-    const lot = getAuctionBySlug(params.slug);
-    if (!lot) throw notFound();
-    return { lot };
-  },
+  // loader: ({ params }) => {
+  //   const lot = getAuctionBySlug(params.slug);
+  //   if (!lot) throw notFound();
+  //   return { lot };
+  // },
   component: AuctionLotPage,
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData
-          ? `Lot ${loaderData.lot.lotNumber} · ${loaderData.lot.title} — Aethelred Auction`
-          : "Auction lot — Aethelred",
-      },
-      { name: "description", content: loaderData?.lot.description ?? "" },
-    ],
-  }),
+  // head: ({ loaderData }) => ({
+  //   meta: [
+  //     {
+  //       title: loaderData
+  //         ? `Lot ${loaderData.lot.lotNumber} · ${loaderData.lot.title} — Aethelred Auction`
+  //         : "Auction lot — Aethelred",
+  //     },
+  //     { name: "description", content: loaderData?.lot.description ?? "" },
+  //   ],
+  // }),
 });
 
 function AuctionLotPage() {
-  const { lot } = Route.useLoaderData();
+  const { auctions } = useDataStore(
+    useShallow((s) => ({
+      auctions: s.auctions,
+    })),
+  );
+  const { slug } = useParams({ from: "/auctions/$slug" });
+  const lot = useMemo(() => getAuctionBySlug(slug), [slug]);
+
+  if (!lot) {
+    throw notFound();
+  }
+
   const seller = getSeller(lot.sellerSlug);
+  const { user } = useAuthStore();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { setDocument, updateDocument } = useDoc();
   const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter((l) => l.slug !== lot.slug);
+
+  const amountSchema = z.object({
+    bidAmount: z
+      .number()
+      .min(1, { message: `Minumum Amount To Enter is ${formatBid(lot.estimateLow)}` }),
+  });
+
+  const formControl = useForm({
+    mode: "onChange",
+    resolver: zodResolver(amountSchema),
+    defaultValues: {
+      bidAmount: 0,
+    },
+  });
 
   // Side rail: this lot's own images + first image of each other seller lot
   const railImages = [
@@ -53,37 +92,99 @@ function AuctionLotPage() {
   ];
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const [loading, setLoading] = useState(false);
   const active = railImages[activeIdx] ?? railImages[0];
 
   // Related: same category, exclude this lot
-  const related = auctionLots
+  const related = auctions
     .filter((l) => l.category === lot.category && l.slug !== lot.slug)
     .slice(0, 3);
 
-  const minBid = lot.currentBid + 100;
+  // const minBid = lot.currentBid + 100;
   const { placeBid, toggleFavorite, isFavorite } = useStore();
-  const [bidAmount, setBidAmount] = useState(0);
   const fav = isFavorite(lot.slug);
 
-  const submitBid = () => {
-    if (bidAmount < minBid) {
-      alert(`Minimum next bid is ${formatBid(minBid)}.`);
-      return;
+  const submitBid = formControl.handleSubmit(async () => {
+    if (!user) return;
+
+    const { bidAmount: formBidAmount } = formControl.getValues();
+
+    try {
+      setLoading(true);
+      if (user.wallet.balance < lot.estimateLow) {
+        setTimeout(() => {
+          toast({
+            title: "Info",
+            description:
+              "Unable To Place Bid On This Lot (Estimate Low), Please Top Up Your Wallet Balance",
+            variant: "info",
+            action: {
+              label: "Go To Wallet",
+              onClick: () => {
+                navigate({ to: "/wallet" });
+              },
+            },
+            duration: 6000,
+            position: "top",
+          });
+        }, 3100);
+        return;
+      }
+
+      const payload: Omit<Bid, "id"> = {
+        auctionID: lot.id,
+        bidAmount: formBidAmount,
+        placedAt: new Date().toISOString(),
+        slug: lot.slug,
+        userID: user?.userID,
+      };
+
+      await setDocument({
+        collections: "bids",
+        document: {
+          ...payload,
+          id: lot.id,
+        },
+      });
+
+      await handleWalletBalance({
+        balance: user.wallet.balance,
+        bidAmount: formBidAmount,
+        bidBalance: user.wallet.bidBalance,
+        userID: user?.userID,
+      });
+
+      await updateDocument({
+        collections: "auctions",
+        document: {
+          id: lot.id,
+          bidCount: lot.bidCount + 1,
+        },
+      });
+
+      setTimeout(() => {
+        toast({
+          title: "Bid Placed Successfully",
+          description: "You Will Be Notified If You Won The Bid Eventually",
+          duration: 50000,
+          variant: "reserved",
+          position: "bottom",
+        });
+      }, 3100);
+    } catch (error: any) {
+      toast({
+        title: "Error Message",
+        description: error?.message ?? "Failed to place bid",
+        variant: "error",
+      });
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
     }
-    placeBid(lot.slug, bidAmount);
-    alert(`Bid of ${formatBid(bidAmount)} placed on Lot ${lot.lotNumber}.`);
-  };
+  });
 
-  const getNum = (num: number) => {
-    return num.toLocaleString();
-  };
-
-  const setNum = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const checkNum = value.split(",").join("");
-    const convertNum = parseInt(checkNum);
-    setBidAmount(convertNum || 0);
-  };
+  const checkIfUserCanBid = lot?.userID !== user?.userID;
 
   return (
     <article>
@@ -96,12 +197,22 @@ function AuctionLotPage() {
         </Link>
       </div>
 
+      {loading && (
+        <Loader
+          message="Processing Your Request, Please Hold..."
+          className="flex flex-col"
+          variant="dots"
+          size="xs"
+          fullScreen
+        />
+      )}
+
       <section className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:py-16 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
         {/* Left: thumbnails + big image */}
         <div className="flex gap-4 md:gap-6">
           {/* Vertical thumbnail rail */}
           <div className="flex w-16 shrink-0 flex-col gap-3 md:w-20">
-            {railImages.map((img, i) => {
+            {railImages.slice(0, 5).map((img, i) => {
               const isActive = i === activeIdx;
               const isOtherLot = img.lotSlug !== lot.slug;
               return (
@@ -159,7 +270,7 @@ function AuctionLotPage() {
         <aside className="flex flex-col gap-8 lg:sticky lg:top-32 lg:self-start">
           <div>
             <p className="text-[11px] uppercase tracking-[0.3em] text-clay">
-              Lot {lot.lotNumber} · {lot.categoryLabel}
+              Lot {lot.lotNumber.slice(0, 5)} · {lot.categoryLabel}
             </p>
             <h1 className="mt-3 font-display text-5xl italic leading-tight md:text-6xl">
               {lot.title}
@@ -187,7 +298,7 @@ function AuctionLotPage() {
                 </p>
                 <p className="mt-1 text-xs text-detail">
                   {lot.bidCount} bids · estimate {formatBid(lot.estimateLow)}–
-                  {formatBid(lot.estimateHigh)}
+                  {formatBid(lot.estimateHigh)} · Price {formatBid(lot.price)}
                 </p>
               </div>
               <span
@@ -215,46 +326,67 @@ function AuctionLotPage() {
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <div className="flex flex-1 items-center border border-ink/20 bg-canvas">
-                <span className="px-3 text-sm text-detail">$</span>
-                <input
-                  type="text"
-                  value={getNum(bidAmount ?? 0)}
-                  onChange={(e) => setNum(e)}
-                  min={minBid}
-                  step={100}
-                  className="w-full bg-transparent py-3 pr-3 text-base text-ink focus:outline-none"
-                  aria-label="Your bid"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={submitBid}
-                className="inline-flex items-center justify-center gap-2 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
-              >
-                <Gavel className="size-3.5" strokeWidth={1.5} />
-                Place bid
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleFavorite(lot.slug)}
-                aria-label={fav ? "Remove from favourites" : "Add to favourites"}
-                className={cn(
-                  "inline-flex size-12 items-center justify-center border transition-colors",
-                  fav
-                    ? "border-clay bg-clay/10 text-clay"
-                    : "border-ink/20 text-ink hover:border-ink",
-                )}
-              >
-                <Heart className="size-4" strokeWidth={1.5} fill={fav ? "currentColor" : "none"} />
-              </button>
-            </div>
-            <p className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-detail">
+            {checkIfUserCanBid ? (
+              <>
+                <FormProvider {...formControl}>
+                  <div className="">
+                    <Fields
+                      fields={[
+                        {
+                          fieldType: "input",
+                          name: "bidAmount",
+                          label: "Your bid",
+                          format: "money",
+                          labelClass: "text-right ",
+                          attrs: {
+                            className:
+                              "w-full !border border-ink/20 bg-canvas py-3 px-3 text-base text-ink focus:outline-none",
+                          },
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={submitBid}
+                      className="inline-flex items-center justify-center gap-2 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+                    >
+                      <Gavel className="size-3.5" strokeWidth={1.5} />
+                      Place bid
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleFavorite(lot.slug)}
+                      aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+                      className={cn(
+                        "inline-flex size-12 items-center justify-center border transition-colors",
+                        fav
+                          ? "border-clay bg-clay/10 text-clay"
+                          : "border-ink/20 text-ink hover:border-ink",
+                      )}
+                    >
+                      <Heart
+                        className="size-4"
+                        strokeWidth={1.5}
+                        fill={fav ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </div>
+                </FormProvider>
+              </>
+            ) : (
+              <>
+                <p className="text-ink/75 font-display italic text-xl mt-4">
+                  You Can't Place Bid As You Are The Author Of This Work
+                </p>
+              </>
+            )}
+            {/* <p className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-detail">
               <ShieldCheck className="size-3.5" strokeWidth={1.5} />
               Min next bid {formatBid(minBid)} · Buyer's premium 12% · Auctioned lots cannot be
               added to cart
-            </p>
+            </p> */}
           </div>
 
           {/* Specifications */}

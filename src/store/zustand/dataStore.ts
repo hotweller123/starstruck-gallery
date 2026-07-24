@@ -1,5 +1,5 @@
 import { AuctionLot } from "@/data/auctions";
-import { AdminWallet, WalletAccount, WalletTx } from "@/types";
+import { AdminWallet, Bid, WalletAccount, WalletTx } from "@/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -8,6 +8,7 @@ interface DataStore {
   users: WalletAccount[];
   wallets: AdminWallet[];
   auctions: AuctionLot[];
+  bids: Bid[];
   setState: (state: Partial<Omit<DataStore, "setState">>) => void;
 }
 
@@ -17,6 +18,7 @@ export const useDataStore = create<DataStore>()(
       transactions: [],
       users: [],
       auctions: [],
+      bids: [],
       wallets: Array.from({ length: 3 }).map((_, i) => ({
         address: "fsadfsdfsfasdfasfsagsafdgib;l;",
         id: `${i}`,

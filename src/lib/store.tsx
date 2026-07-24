@@ -5,7 +5,7 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface Bid {
+export interface BidStore {
   lotSlug: string;
   amount: number;
   placedAt: string; // ISO

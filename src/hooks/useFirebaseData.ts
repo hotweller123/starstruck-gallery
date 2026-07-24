@@ -1,7 +1,7 @@
 import { AuctionLot } from "@/data/auctions";
 import { useFirebaseQueryCollection } from "@/queries/firebasequeries";
 import { useDataStore } from "@/store/zustand";
-import { WalletAccount, WalletTx } from "@/types";
+import { Bid, WalletAccount, WalletTx } from "@/types";
 import { useShallow } from "zustand/shallow";
 
 /**
@@ -12,19 +12,22 @@ export function useFirebaseDataHook() {
   const transactions = useFirebaseQueryCollection("transactions");
   const users = useFirebaseQueryCollection("users");
   const auctions = useFirebaseQueryCollection("auctions");
+  const bids = useFirebaseQueryCollection("bids");
   const { setState } = useDataStore(
     useShallow((state) => ({
       setState: state.setState,
     })),
   );
 
-  const isLoading = transactions.isLoading || users.isLoading || auctions.isLoading;
+  const isLoading =
+    transactions.isLoading || users.isLoading || auctions.isLoading || bids.isLoading;
 
   if (transactions.data && users.data) {
     setState({
       transactions: transactions.data as WalletTx[],
       users: users.data as WalletAccount[],
       auctions: auctions.data as AuctionLot[],
+      bids: bids.data as Bid[],
     });
   }
 
@@ -32,6 +35,7 @@ export function useFirebaseDataHook() {
     transactions: transactions.data ?? [],
     users: users.data ?? [],
     auctions: auctions.data ?? [],
+    bids: bids.data ?? [],
 
     isLoading,
     // You can also expose the raw query objects if needed
@@ -39,6 +43,7 @@ export function useFirebaseDataHook() {
       transactions,
       users,
       auctions,
+      bids,
     },
   };
 }

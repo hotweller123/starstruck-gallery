@@ -38,7 +38,7 @@ export default function useAuth() {
       } = await createUserWithEmailAndPassword(auth, user.email, user.password);
 
       const currentUser = doc(db, "users", uid);
-      const acc: WalletAccount & { userName: string } = {
+      const acc: WalletAccount = {
         blocked: false,
         userID: uid,
         id: uid,

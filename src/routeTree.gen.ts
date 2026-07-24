@@ -32,6 +32,7 @@ import { Route as WalletSecurityRouteImport } from './routes/wallet.security'
 import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
 import { Route as WalletActivityRouteImport } from './routes/wallet.activity'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as AuctionsMineRouteImport } from './routes/auctions.mine'
 import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
 import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
 import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
@@ -156,6 +157,11 @@ const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   path: '/categories/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuctionsMineRoute = AuctionsMineRouteImport.update({
+  id: '/auctions/mine',
+  path: '/auctions/mine',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuctionsSlugRoute = AuctionsSlugRouteImport.update({
   id: '/auctions/$slug',
   path: '/auctions/$slug',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
+  '/auctions/mine': typeof AuctionsMineRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/wallet/activity': typeof WalletActivityRoute
   '/wallet/deposit': typeof WalletDepositRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
+  '/auctions/mine': typeof AuctionsMineRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/wallet/activity': typeof WalletActivityRoute
   '/wallet/deposit': typeof WalletDepositRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/artists/$slug': typeof ArtistsSlugRoute
   '/artworks/$slug': typeof ArtworksSlugRoute
   '/auctions/$slug': typeof AuctionsSlugRoute
+  '/auctions/mine': typeof AuctionsMineRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/wallet/activity': typeof WalletActivityRoute
   '/wallet/deposit': typeof WalletDepositRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
+    | '/auctions/mine'
     | '/categories/$slug'
     | '/wallet/activity'
     | '/wallet/deposit'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
+    | '/auctions/mine'
     | '/categories/$slug'
     | '/wallet/activity'
     | '/wallet/deposit'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/artists/$slug'
     | '/artworks/$slug'
     | '/auctions/$slug'
+    | '/auctions/mine'
     | '/categories/$slug'
     | '/wallet/activity'
     | '/wallet/deposit'
@@ -414,6 +426,7 @@ export interface RootRouteChildren {
   ArtistsSlugRoute: typeof ArtistsSlugRoute
   ArtworksSlugRoute: typeof ArtworksSlugRoute
   AuctionsSlugRoute: typeof AuctionsSlugRoute
+  AuctionsMineRoute: typeof AuctionsMineRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   ArtistsIndexRoute: typeof ArtistsIndexRoute
   AuctionsIndexRoute: typeof AuctionsIndexRoute
@@ -583,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auctions/mine': {
+      id: '/auctions/mine'
+      path: '/auctions/mine'
+      fullPath: '/auctions/mine'
+      preLoaderRoute: typeof AuctionsMineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auctions/$slug': {
       id: '/auctions/$slug'
       path: '/auctions/$slug'
@@ -698,6 +718,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistsSlugRoute: ArtistsSlugRoute,
   ArtworksSlugRoute: ArtworksSlugRoute,
   AuctionsSlugRoute: AuctionsSlugRoute,
+  AuctionsMineRoute: AuctionsMineRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   ArtistsIndexRoute: ArtistsIndexRoute,
   AuctionsIndexRoute: AuctionsIndexRoute,

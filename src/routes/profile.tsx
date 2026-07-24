@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart, ShoppingBag, Gavel, Upload, Mail, MapPin } from "lucide-react";
+import { Heart, ShoppingBag, Gavel, Upload, Mail, MapPin, ImageDown } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
+import { useAuthStore, useDataStore } from "@/store/zustand";
+import { fmtDateTime } from "@/data/admin-mock";
+import { useShallow } from "zustand/shallow";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
   head: () => ({ meta: [{ title: "Profile — Aethelred" }] }),
 });
 
-const user = {
+const localUser = {
   name: "Eloise Marchand",
   handle: "@eloise.m",
   location: "Lisbon, Portugal",
@@ -18,7 +21,14 @@ const user = {
 };
 
 function ProfilePage() {
-  const { favorites, cart, bids, listings } = useStore();
+  const { user } = useAuthStore();
+  const { auctions, bids } = useDataStore(
+    useShallow((s) => ({
+      auctions: s.auctions,
+      bids: s.bids,
+    })),
+  );
+  const { favorites, cart, listings } = useStore();
 
   const stats = [
     { label: "Favourites", value: favorites.length, to: "/favourites", icon: Heart },
@@ -30,6 +40,7 @@ function ProfilePage() {
     },
     { label: "Active bids", value: bids.length, to: "/bids", icon: Gavel },
     { label: "Listings", value: listings.length, to: "/sell", icon: Upload },
+    { label: "Active Auctions", value: auctions.length, to: "/auctions/mine", icon: ImageDown },
   ] as const;
 
   return (
@@ -39,24 +50,33 @@ function ProfilePage() {
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-24 lg:grid-cols-[1fr_1.4fr]">
         <aside className="border border-ink/10 p-8">
           <div className="flex size-24 items-center justify-center rounded-full bg-clay/15 font-display text-4xl italic text-clay">
-            {user.name.charAt(0)}
+            {user?.fullName
+              .split(" ")
+              .map((f) => f[0])
+              .slice(0, 2) || localUser.name.charAt(0)}
           </div>
-          <h2 className="mt-6 font-display text-3xl italic">{user.name}</h2>
-          <p className="text-[11px] uppercase tracking-[0.22em] text-detail">{user.handle}</p>
-          <p className="mt-6 text-sm leading-relaxed text-ink/80">{user.bio}</p>
+          <h2 className="mt-6 font-display text-3xl italic">{user?.fullName || localUser.name}</h2>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+            {user?.userName || localUser.handle}
+          </p>
+          {!user && <p className="mt-6 text-sm leading-relaxed text-ink/80">{localUser.bio}</p>}
           <ul className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 text-sm text-ink/80">
             <li className="flex items-center gap-3">
               <Mail className="size-4 text-detail" strokeWidth={1.25} />
-              {user.email}
+              {user?.email || localUser.email}
             </li>
-            <li className="flex items-center gap-3">
-              <MapPin className="size-4 text-detail" strokeWidth={1.25} />
-              {user.location}
-            </li>
+            {!user && (
+              <li className="flex items-center gap-3">
+                <MapPin className="size-4 text-detail" strokeWidth={1.25} />
+                {localUser.location}
+              </li>
+            )}
           </ul>
-          <p className="mt-8 text-[10px] uppercase tracking-[0.22em] text-detail">
-            Member since {user.joined}
-          </p>
+          {user && (
+            <p className="mt-8 text-[10px] uppercase tracking-[0.22em] text-detail">
+              Member since {fmtDateTime(user.joinedDate) || localUser.joined}
+            </p>
+          )}
         </aside>
 
         <div className="flex flex-col gap-10">
@@ -81,13 +101,19 @@ function ProfilePage() {
                 to="/sell"
                 className="border border-ink bg-ink px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
               >
-                Sell an artwork
+                Auction an artwork(s)
               </Link>
               <Link
                 to="/bids"
                 className="border border-ink px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
               >
                 My bids
+              </Link>
+              <Link
+                to="/auctions/mine"
+                className="border border-ink px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
+              >
+                My auctions
               </Link>
               <Link
                 to="/favourites"

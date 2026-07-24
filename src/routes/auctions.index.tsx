@@ -58,8 +58,8 @@ const defaultFilters = (): AuctionFilters => ({
   seller: [],
   reserveMet: false,
   endingSoon: false,
-  priceMin: auctionPriceMin,
-  priceMax: auctionPriceMax,
+  priceMin: 10000,
+  priceMax: 1_000_000,
 });
 
 function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
@@ -71,7 +71,7 @@ function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
       const ms = new Date(l.endsAt).getTime() - Date.now();
       if (ms <= 0 || ms > 24 * 3_600_000) return false;
     }
-    if (l.currentBid < f.priceMin || l.currentBid > f.priceMax) return false;
+    if (l.price < f.priceMin || l.price > f.priceMax) return false;
     return true;
   });
 
@@ -105,14 +105,17 @@ function AuctionsPage() {
       auctions: s.auctions,
     })),
   );
-  console.log(auctions);
 
-  // const filtered = useMemo(() => {
-  //   const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
-  //   return apply(auctionLots.concat(auctions), f, sort);
-  // }, [filters, sort, activeCat, auctions]);
+  const filtered = useMemo(() => {
+    const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
+    return apply(auctions, f, sort);
+  }, [filters, sort, activeCat, auctions]);
 
-  const filtered = auctions;
+  // const filtered = auctions;
+  console.log({
+    auctions,
+    filtered,
+  });
 
   const featured = useMemo(
     () =>

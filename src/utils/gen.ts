@@ -7,6 +7,8 @@ import { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "re
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 import { Client, Storage, ID } from "appwrite";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/services/firebase";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -202,6 +204,44 @@ export async function photoFN(file: File) {
     const createFileFN = await storage.createFile(str_id, uniqueID, file);
     const url = storage.getFileView(str_id, uniqueID);
     return url;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function handleWalletBalance({
+  balance,
+  bidBalance,
+  bidAmount,
+  userID,
+}: {
+  balance: number;
+  bidBalance: number;
+  bidAmount: number;
+  userID: string;
+}) {
+  // if(balance > 0) add this condition?
+  try {
+    let modBalance;
+    if (bidBalance == 0) {
+      modBalance = balance - bidAmount;
+    } else if (bidBalance > 0 && bidAmount > bidBalance) {
+      const amount = bidAmount - bidBalance;
+      modBalance = balance - amount;
+    } else if (bidBalance > 0 && bidAmount < bidBalance) {
+      const amount = bidBalance - bidAmount;
+      modBalance = balance + amount;
+    } else {
+      modBalance = 0;
+    }
+
+    const currentUserDoc = doc(db, "users", userID);
+    await updateDoc(currentUserDoc, {
+      wallet: {
+        balance: modBalance,
+        bidBalance: bidAmount,
+      },
+    });
   } catch (error) {
     throw new Error(error.message);
   }

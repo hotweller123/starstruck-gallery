@@ -5,6 +5,8 @@ import { formatBid, getAuctionBySlug } from "@/data/auctions";
 import { PageHeader } from "@/components/site/PageHeader";
 import { SmartImage } from "@/components/site/SmartImage";
 import { Countdown } from "@/components/site/Countdown";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
 
 export const Route = createFileRoute("/bids")({
   component: BidsPage,
@@ -12,10 +14,15 @@ export const Route = createFileRoute("/bids")({
 });
 
 function BidsPage() {
-  const { bids, removeFromBid } = useStore();
+  // const { bids, removeFromBid } = useStore();
+  const { bids } = useDataStore(
+    useShallow((s) => ({
+      bids: s.bids,
+    })),
+  );
 
   const rows = bids
-    .map((b) => ({ bid: b, lot: getAuctionBySlug(b.lotSlug) }))
+    .map((b) => ({ bid: b, lot: getAuctionBySlug(b.slug) }))
     .filter((r): r is { bid: typeof r.bid; lot: NonNullable<typeof r.lot> } => !!r.lot);
 
   return (
@@ -40,9 +47,9 @@ function BidsPage() {
         ) : (
           <ul className="flex flex-col divide-y divide-ink/10 border-y border-ink/10">
             {rows.map(({ bid, lot }) => {
-              const leading = bid.amount >= lot.currentBid;
+              const leading = bid.bidAmount! >= lot.price;
               return (
-                <li key={`${bid.lotSlug}-${bid.placedAt}`}>
+                <li key={`${bid.slug}-${bid.placedAt}`}>
                   <div className="flex gap-6 py-6">
                     <Link
                       to="/auctions/$slug"
@@ -59,7 +66,7 @@ function BidsPage() {
                     </Link>
                     <div className="flex flex-1 flex-col gap-2">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                        Lot {lot.lotNumber} · {lot.categoryLabel}
+                        Lot {lot.lotNumber.slice(0, 6)} · {lot.categoryLabel}
                       </p>
                       <Link
                         to="/auctions/$slug"
@@ -72,10 +79,10 @@ function BidsPage() {
                         <span className="text-detail">
                           Your bid:{" "}
                           <span className="font-display text-lg italic text-ink not-italic">
-                            {formatBid(bid.amount)}
+                            {formatBid(bid.bidAmount)}
                           </span>
                         </span>
-                        <span className="text-detail">Current: {formatBid(lot.currentBid)}</span>
+                        <span className="text-detail">Current Price: {formatBid(lot.price)}</span>
                         <span
                           className={
                             leading
@@ -90,7 +97,7 @@ function BidsPage() {
                     <div className="flex flex-col items-end justify-between text-right">
                       <button
                         className="text-detail/80 hover:text-ink/80 transition-colors text-right float-right"
-                        onClick={() => removeFromBid(bid.lotSlug)}
+                        // onClick={() => removeFromBid(bid.lotSlug)}
                       >
                         <Trash2 strokeWidth={1.2} size={18} />
                       </button>

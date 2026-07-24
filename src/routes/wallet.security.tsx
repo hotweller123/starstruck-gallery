@@ -52,8 +52,10 @@ function SecurityPage() {
     toast.default({
       title: "Success",
       description:
-        "You Have Successfully Changed The Token Of Your Account, And Will Logout In Ten Seconds",
+        "You Have Successfully Changed The Token Of Your Account, And Will Logout In Five Seconds",
     });
+
+    setTimeout(() => logOut(), 5000);
   };
 
   return (
@@ -111,20 +113,20 @@ function SecurityPage() {
 
       {/* Toggles */}
       <div className="grid gap-3 md:grid-cols-2">
-        <Toggle
+        {/* <Toggle
           icon={Smartphone}
           title="Two-factor auth"
           desc="Require a code on every sign in."
           value={twofa}
           onChange={setTwofa}
-        />
-        <Toggle
+        /> */}
+        {/* <Toggle
           icon={Fingerprint}
           title="Biometric unlock"
           desc="Use Face ID / Touch ID."
           value={bio}
           onChange={setBio}
-        />
+        /> */}
         <Toggle
           icon={Bell}
           title="Transaction alerts"

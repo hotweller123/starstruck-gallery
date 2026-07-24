@@ -23,6 +23,7 @@ export interface WalletAccount {
   userID: string;
   email: string;
   fullName: string;
+  userName: string;
   password: string;
   currency: string;
   symbol: string;

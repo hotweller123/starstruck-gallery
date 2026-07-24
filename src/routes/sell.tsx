@@ -76,7 +76,8 @@ const auctionSchema = z.object({
   estimateLow: z
     .number()
     .positive("Estimated Low Amount must be greater than 0")
-    .min(10, { message: "Minimum Amount Must Be Above 10" }),
+    .min(10, { message: "Minimum Amount Must Be Above 10" })
+    .max(1_000_000, "Amount must be less than 1,000,000"),
   price: z
     .number()
     .positive("Amount must be greater than 0")
@@ -84,11 +85,13 @@ const auctionSchema = z.object({
   estimateHigh: z
     .number()
     .positive("Estimated High Amount must be greater than 0")
+    .min(10, { message: "Minimum Amount Must Be Above 10" })
     .max(1_000_000, { message: "Maximum Amount is a Million" }),
   startBid: z
     .number()
     .positive("Start Bid Amount must be greater than 0")
-    .min(1, { message: "Start Bid is required" }),
+    .min(1, { message: "Start Bid is required" })
+    .max(1_000_000, { message: "Maximum Amount is a Million" }),
   // currentBid: z
   //   .number()
   //   .positive("Current Bid Amount must be greater than 0")
@@ -271,12 +274,12 @@ function SellPage() {
       );
 
       try {
-        const payload: AuctionLot & { userID: string } = {
+        const payload: Omit<AuctionLot, "id"> = {
           bidCount: 0,
           category: getValues("category").toLowerCase() as CategorySlug,
           categoryLabel: getValues("category") as CategorySlug,
           condition: getValues("condition"),
-          currentBid: getValues("currentBid"),
+          currentBid: 0,
           description: getValues("description"),
           dimensions: getValues("dimensions"),
           endsAt: inHours(isNaN(getValues("endsAt")) ? 0 : Number(getValues("endsAt"))),
@@ -382,7 +385,10 @@ function SellPage() {
               <button
                 disabled={loadingForm}
                 className="self-start border border-ink bg-canvas px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ink hover:text-clay hover:bg-clay/5 hover:border-clay/80 disabled:opacity-50 disabled:pointer-events-none"
-                onClick={() => formControl.reset()}
+                onClick={() => {
+                  formControl.reset();
+                  setImagesIndex(1);
+                }}
                 type="reset"
               >
                 Reset
