@@ -70,7 +70,7 @@ function HomePage() {
           variant="soft"
           className="flex flex-col gap-3 overscroll-contain! z-20"
           fullScreen
-          message="Loading Museum"
+          message="Loading Gallery.."
         />
       </>
     );

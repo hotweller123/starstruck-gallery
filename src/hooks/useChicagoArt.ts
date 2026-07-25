@@ -74,8 +74,7 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
 
   const defaultCategory =
     options?.initialCategory ||
-    MET_ARTWORK_SEARCH_TERMS[0]; // stable default for SSR hydration
-
+    MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * categories.length)]; // stable default for SSR hydration
 
   // Main artworks query (category-based)
   const artworksQuery = useQuery({

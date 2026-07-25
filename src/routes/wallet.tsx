@@ -25,9 +25,11 @@ import { formatMoney } from "@/utils";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 import { txSign } from "@/lib/wallet";
+import { requireAuth } from "@/lib/routeGuards";
 
 export const Route = createFileRoute("/wallet")({
   component: WalletDashboard,
+  beforeLoad: requireAuth,
   head: () => ({ meta: [{ title: "EmberPay — Aethelred Wallet" }] }),
 });
 
