@@ -67,8 +67,8 @@ export function AuctionCard({ lot, priority }: Props) {
 
         <div className="mt-6 grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10">
           <div className="bg-canvas p-4">
-            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Price</p>
-            <p className="mt-1 font-display text-2xl italic text-ink">{formatBid(lot.price)}</p>
+            <p className="text-[9px] uppercase tracking-[0.22em] text-detail">Start Bid</p>
+            <p className="mt-1 font-display text-2xl italic text-ink">{formatBid(lot.startBid)}</p>
             <p className="mt-0.5 text-[10px] text-detail">
               {lot.bidCount} {lot.bidCount === 1 ? "bid" : "bids"}
             </p>

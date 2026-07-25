@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { fmtDateTime } from "@/data/admin-mock";
 import { useShallow } from "zustand/shallow";
+import { checkForUserID } from "@/utils";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
@@ -40,7 +41,12 @@ function ProfilePage() {
     },
     { label: "Active bids", value: bids.length, to: "/bids", icon: Gavel },
     { label: "Listings", value: listings.length, to: "/sell", icon: Upload },
-    { label: "Active Auctions", value: auctions.length, to: "/auctions/mine", icon: ImageDown },
+    {
+      label: "Active Auctions",
+      value: checkForUserID(auctions, user?.userID).length || 0,
+      to: "/auctions/mine",
+      icon: ImageDown,
+    },
   ] as const;
 
   return (

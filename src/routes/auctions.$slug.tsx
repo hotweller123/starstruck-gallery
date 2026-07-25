@@ -22,7 +22,9 @@ import z from "zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Fields from "@/components/site/Fields";
-import { Bid } from "@/types";
+import { Bid, WalletAccount } from "@/types";
+import { db } from "@/services/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export const Route = createFileRoute("/auctions/$slug")({
   // loader: ({ params }) => {
@@ -64,9 +66,9 @@ function AuctionLotPage() {
   const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter((l) => l.slug !== lot.slug);
 
   const amountSchema = z.object({
-    bidAmount: z
-      .number()
-      .min(1, { message: `Minumum Amount To Enter is ${formatBid(lot.estimateLow)}` }),
+    bidAmount: z.number().min(1, {
+      message: `Minumum Amount To Enter is ${formatBid(lot.currentBid || lot.startBid)}`,
+    }),
   });
 
   const formControl = useForm({
@@ -105,26 +107,39 @@ function AuctionLotPage() {
   const fav = isFavorite(lot.slug);
 
   const submitBid = formControl.handleSubmit(async () => {
-    if (!user) return;
+    if (!user || user.wallet.balance == 0) return;
 
     const { bidAmount: formBidAmount } = formControl.getValues();
 
+    if (
+      user.wallet.balance < (lot.currentBid || lot.startBid) ||
+      formBidAmount > user.wallet.balance
+    ) {
+      toast({
+        title: "Info",
+        description: "Insufficient Balance, Please Top Up Your Wallet Balance",
+        variant: "info",
+        action: {
+          label: "Go To Wallet",
+          onClick: () => {
+            navigate({ to: "/wallet" });
+          },
+        },
+        duration: 6000,
+        position: "top",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-      if (user.wallet.balance < lot.estimateLow) {
+      if (formBidAmount < (lot.currentBid || lot.startBid)) {
         setTimeout(() => {
           toast({
             title: "Info",
-            description:
-              "Unable To Place Bid On This Lot (Estimate Low), Please Top Up Your Wallet Balance",
+            description: "Bid Lower Than The Minimum Bidding Amount, Please Top Up Your Bid Amount",
             variant: "info",
-            action: {
-              label: "Go To Wallet",
-              onClick: () => {
-                navigate({ to: "/wallet" });
-              },
-            },
-            duration: 6000,
+            duration: 10000,
             position: "top",
           });
         }, 3100);
@@ -138,6 +153,8 @@ function AuctionLotPage() {
         slug: lot.slug,
         userID: user?.userID,
       };
+
+      // add email and fullname to refer previous bidder....add notification to alert previous bidder that they have been outbidded
 
       await setDocument({
         collections: "bids",
@@ -154,11 +171,28 @@ function AuctionLotPage() {
         userID: user?.userID,
       });
 
+      const previousBidUser = doc(db, "users", lot.userID);
+      const previousBidUserDoc = await getDoc(previousBidUser);
+      if (previousBidUserDoc.exists()) {
+        const data = previousBidUserDoc.data() as WalletAccount;
+        await updateDocument({
+          collections: "users",
+          document: {
+            id: lot.userID,
+            wallet: {
+              balance: data.wallet.balance + lot.currentBid,
+              bidBalance: data.wallet.bidBalance - lot.currentBid,
+            },
+          },
+        });
+      }
+
       await updateDocument({
         collections: "auctions",
         document: {
           id: lot.id,
           bidCount: lot.bidCount + 1,
+          currentBid: formBidAmount,
         },
       });
 
@@ -178,6 +212,7 @@ function AuctionLotPage() {
         variant: "error",
       });
     } finally {
+      formControl.reset();
       setTimeout(() => {
         setLoading(false);
       }, 3000);
@@ -207,7 +242,7 @@ function AuctionLotPage() {
         />
       )}
 
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:py-16 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:py-16 lg:grid-cols-[1.5fr_1fr] lg:gap-16 relative">
         {/* Left: thumbnails + big image */}
         <div className="flex gap-4 md:gap-6">
           {/* Vertical thumbnail rail */}
@@ -297,8 +332,8 @@ function AuctionLotPage() {
                   {formatBid(lot.currentBid)}
                 </p>
                 <p className="mt-1 text-xs text-detail">
-                  {lot.bidCount} bids · estimate {formatBid(lot.estimateLow)}–
-                  {formatBid(lot.estimateHigh)} · Price {formatBid(lot.price)}
+                  {lot.bidCount} Bid(s) · Estimate {formatBid(lot.estimateLow)}–
+                  {formatBid(lot.estimateHigh)} · Start Bid At {formatBid(lot.startBid)}
                 </p>
               </div>
               <span

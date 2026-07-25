@@ -15,6 +15,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { cn } from "@/utils/gen";
+import useDoc from "@/hooks/useDoc";
 
 export const Route = createFileRoute("/auctions/mine")({
   component: MyAuctionsPage,
@@ -62,6 +63,8 @@ function MyAuctionsPage() {
       </div>
     );
   }
+
+  const { deleteDocument } = useDoc();
 
   if (!user) {
     return (
@@ -221,7 +224,7 @@ function MyAuctionsPage() {
               <div className="shrink-0 border-b border-ink/10 bg-canvas px-5 py-4 flex items-start justify-between sticky top-0 z-10">
                 <div className="min-w-0 pr-8">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                    Lot {selected.lotNumber || "—"} · {selected.categoryLabel}
+                    Lot {selected.lotNumber.slice(0, 5) || "—"} · {selected.categoryLabel}
                   </p>
                   <h2 className="font-display text-[22px] md:text-3xl italic leading-tight mt-0.5 break-words">
                     {selected.title}
@@ -250,7 +253,7 @@ function MyAuctionsPage() {
                         <DetailRow label="ID" value={selected.id || "—"} />
                         <DetailRow label="Seller" value={selected.sellerSlug} />
                         <DetailRow label="User ID" value={selected.userID || "—"} />
-                        <DetailRow label="Status" value={selected.status} />
+                        {/* <DetailRow label="Status" value={selected.status} /> */}
                       </DetailSection>
 
                       <DetailSection title="Artwork">
@@ -269,7 +272,7 @@ function MyAuctionsPage() {
                     {/* Right */}
                     <div className="space-y-4">
                       <DetailSection title="Pricing">
-                        <DetailRow label="Price" value={formatBid(selected.price)} />
+                        {/* <DetailRow label="Price" value={formatBid(selected.price)} /> */}
                         <DetailRow
                           label="Estimate"
                           value={`${formatBid(selected.estimateLow)} – ${formatBid(selected.estimateHigh)}`}
@@ -323,7 +326,7 @@ function MyAuctionsPage() {
               </div>
 
               {/* Footer */}
-              <div className="shrink-0 border-t border-ink/10 bg-surface/70 px-5 py-3 flex items-center justify-between gap-3">
+              <div className="shrink-0 border-t border-ink/10 bg-surface/70 px-5 py-3 flex items-center justify-between gap-3 ">
                 <Link
                   to="/auctions/$slug"
                   params={{ slug: selected.slug }}
@@ -333,7 +336,7 @@ function MyAuctionsPage() {
                 </Link>
 
                 <DialogClose asChild>
-                  <button className="border border-ink bg-ink px-5 py-2 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay">
+                  <button className="border border-ink bg-ink px-5 py-2  uppercase tracking-[0.22em] text-canvas !text-sm hover:bg-clay hover:border-clay">
                     Close
                   </button>
                 </DialogClose>

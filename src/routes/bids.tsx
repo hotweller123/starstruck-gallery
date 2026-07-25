@@ -47,7 +47,7 @@ function BidsPage() {
         ) : (
           <ul className="flex flex-col divide-y divide-ink/10 border-y border-ink/10">
             {rows.map(({ bid, lot }) => {
-              const leading = bid.bidAmount! >= lot.price;
+              const leading = bid.bidAmount! >= lot.currentBid;
               return (
                 <li key={`${bid.slug}-${bid.placedAt}`}>
                   <div className="flex gap-6 py-6">
@@ -82,7 +82,9 @@ function BidsPage() {
                             {formatBid(bid.bidAmount)}
                           </span>
                         </span>
-                        <span className="text-detail">Current Price: {formatBid(lot.price)}</span>
+                        <span className="text-detail">
+                          Current Price: {formatBid(lot.currentBid)}
+                        </span>
                         <span
                           className={
                             leading

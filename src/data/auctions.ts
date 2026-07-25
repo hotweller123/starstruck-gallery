@@ -28,7 +28,7 @@ export interface AuctionLot {
   description: string;
   provenance: string;
   condition: string;
-  price: number;
+  // price: number; using startbid instead as the first price
   images: string[];
   estimateLow: number;
   estimateHigh: number;
@@ -56,7 +56,7 @@ export const auctionCategories: { slug: CategorySlug | "all"; label: string }[] 
   { slug: "minimalism", label: "Minimalism" },
 ];
 
-export const auctionLots: AuctionLot[] = [
+export const auctionLots: Omit<AuctionLot, "id" | "userID">[] = [
   {
     slug: "lot-001-linen-meridian",
     lotNumber: "001",
@@ -344,10 +344,7 @@ export const auctionLots: AuctionLot[] = [
     reserveMet: true,
     endsAt: inHours(54),
   },
-].map((al) => ({
-  ...al,
-  price: 650000,
-}));
+];
 
 export const formatBid = (n: number) =>
   new Intl.NumberFormat("en-US", {

@@ -222,27 +222,20 @@ export async function handleWalletBalance({
 }) {
   // if(balance > 0) add this condition?
   try {
-    let modBalance;
-    if (bidBalance == 0) {
-      modBalance = balance - bidAmount;
-    } else if (bidBalance > 0 && bidAmount > bidBalance) {
-      const amount = bidAmount - bidBalance;
-      modBalance = balance - amount;
-    } else if (bidBalance > 0 && bidAmount < bidBalance) {
-      const amount = bidBalance - bidAmount;
-      modBalance = balance + amount;
-    } else {
-      modBalance = 0;
-    }
+    const modBalance = balance - bidAmount;
 
     const currentUserDoc = doc(db, "users", userID);
     await updateDoc(currentUserDoc, {
       wallet: {
         balance: modBalance,
-        bidBalance: bidAmount,
+        bidBalance: bidAmount + bidBalance,
       },
     });
   } catch (error) {
     throw new Error(error.message);
   }
 }
+
+export const checkForUserID = <T extends { userID: string }>(arr: T[], id: string) => {
+  return arr.filter((a) => a.userID == id);
+};

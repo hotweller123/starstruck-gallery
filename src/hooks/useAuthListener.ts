@@ -5,6 +5,7 @@ import { auth, db } from "@/services/firebase";
 import { useAuthStore } from "@/store/zustand";
 import type { WalletAccount } from "@/types";
 import { useShallow } from "zustand/shallow";
+import { useFirebaseQueryDocument } from "@/queries";
 
 /**
  * Best-practice Firebase auth listener for wallet.
@@ -16,10 +17,11 @@ import { useShallow } from "zustand/shallow";
  * - Handles the initial "still checking" state correctly
  */
 export function useAuthListener() {
-  const { setUser, setLoading } = useAuthStore(
+  const { setUser, setLoading, setState } = useAuthStore(
     useShallow((s) => ({
       setUser: s.setUser,
       setLoading: s.setLoading,
+      setState: s.setState,
     })),
   );
 

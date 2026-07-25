@@ -1,7 +1,8 @@
 import { AuctionLot } from "@/data/auctions";
 import { useFirebaseQueryCollection } from "@/queries/firebasequeries";
-import { useDataStore } from "@/store/zustand";
+import { useAuthStore, useDataStore } from "@/store/zustand";
 import { Bid, WalletAccount, WalletTx } from "@/types";
+import { query, where } from "firebase/firestore";
 import { useShallow } from "zustand/shallow";
 
 /**
@@ -9,10 +10,18 @@ import { useShallow } from "zustand/shallow";
  * Safe to use anywhere as long as you're inside <QueryClientProvider>.
  */
 export function useFirebaseDataHook() {
-  const transactions = useFirebaseQueryCollection("transactions");
+  const { user } = useAuthStore();
+
+  const transactions = useFirebaseQueryCollection(
+    "transactions",
+    user ? [where("userID", "==", user?.userID)] : [],
+  );
   const users = useFirebaseQueryCollection("users");
   const auctions = useFirebaseQueryCollection("auctions");
-  const bids = useFirebaseQueryCollection("bids");
+  const bids = useFirebaseQueryCollection(
+    "bids",
+    user ? [where("userID", "==", user?.userID)] : [],
+  );
   const { setState } = useDataStore(
     useShallow((state) => ({
       setState: state.setState,

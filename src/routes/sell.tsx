@@ -78,10 +78,10 @@ const auctionSchema = z.object({
     .positive("Estimated Low Amount must be greater than 0")
     .min(10, { message: "Minimum Amount Must Be Above 10" })
     .max(1_000_000, "Amount must be less than 1,000,000"),
-  price: z
-    .number()
-    .positive("Amount must be greater than 0")
-    .max(1_000_000, "Amount must be less than 1,000,000"),
+  // price: z
+  //   .number()
+  //   .positive("Amount must be greater than 0")
+  //   .max(1_000_000, "Amount must be less than 1,000,000"),
   estimateHigh: z
     .number()
     .positive("Estimated High Amount must be greater than 0")
@@ -96,7 +96,10 @@ const auctionSchema = z.object({
   //   .number()
   //   .positive("Current Bid Amount must be greater than 0")
   //   .min(1, { message: "Current Bid is required" }),
-  endsAt: z.number().min(1, { message: "Bid Time Range in hours is required" }),
+  endsAt: z
+    .number()
+    .min(24, { message: "Minimum Time For Auction is 24 hours" })
+    .max(96, { message: "Maximum Time Limit is 96 hours" }),
 });
 
 function SellPage() {
@@ -140,7 +143,7 @@ function SellPage() {
       estimateLow: 0,
       medium: "",
       provenance: "",
-      price: 0,
+      // price: 0,
       startBid: 0,
       year: 0,
     },
@@ -224,12 +227,12 @@ function SellPage() {
         name: "year",
         attrs: { type: "number", placeholder: "Year" },
       },
-      {
-        fieldType: "input",
-        label: "Price",
-        name: "price",
-        format: "money" as const,
-      },
+      // {
+      //   fieldType: "input",
+      //   label: "Price",
+      //   name: "price",
+      //   format: "money" as const,
+      // },
       { fieldType: "input", label: "Estimate Low", name: "estimateLow", format: "money" as const },
       {
         fieldType: "input",
@@ -247,7 +250,7 @@ function SellPage() {
       },
       {
         fieldType: "input",
-        label: "Ends At",
+        label: "Ends At (in hours)",
         name: "endsAt",
         attrs: {
           type: "number",
@@ -299,7 +302,7 @@ function SellPage() {
 
           // added props
           userID: user?.userID,
-          price: getValues("price"),
+          // price: getValues("price") ...using start bid as the primary price of the artwork...that's how bidding work
         };
 
         formControl.reset();
@@ -422,7 +425,7 @@ function SellPage() {
                       </p>
                       <p className="font-display text-lg italic">{a.title}</p>
                       <p className="text-xs text-detail">{a.sellerSlug}</p>
-                      <p className="mt-auto text-sm">{formatMoney(a.price)}</p>
+                      <p className="mt-auto text-sm">{formatMoney(a.startBid)}</p>
                     </div>
                     <button
                       onClick={async () => {

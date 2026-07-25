@@ -175,9 +175,7 @@ function RootComponent() {
             <ToastProvider>
               {/* FirebaseProvider must wrap everything that uses useFirebaseQueryCollection */}
               {isAdmin ? (
-                <div className="admin-theme min-h-screen">
-                  <Outlet />
-                </div>
+                <div className="admin-theme min-h-screen">{/* <Outlet /> */}</div>
               ) : isWallet ? (
                 <div className="wallet-theme flex min-h-screen flex-col">
                   {showWalletLoader ? (

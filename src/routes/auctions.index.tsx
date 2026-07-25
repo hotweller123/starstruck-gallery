@@ -164,8 +164,10 @@ function AuctionsPage() {
                 <Countdown endsAt={featured.endsAt} size="lg" />
                 <div className="flex items-end justify-between border-t border-ink/10 pt-6">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Price</p>
-                    <p className="mt-1 font-display text-3xl italic">{formatBid(featured.price)}</p>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Start Bid</p>
+                    <p className="mt-1 font-display text-3xl italic">
+                      {formatBid(featured.startBid)}
+                    </p>
                     <p className="text-xs text-detail">
                       {featured.bidCount} bids · est. {formatBid(featured.estimateLow)}–
                       {formatBid(featured.estimateHigh)}

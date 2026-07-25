@@ -644,25 +644,25 @@ function AuctionsPanel({
         operations={
           selected
             ? [
-                // {
-                //   id: "open",
-                //   label: "Open bidding",
-                //   icon: PlayCircle,
-                //   tone: "success",
-                //   onRun: () => {
-                //     patch(selected.slug, { status: "active" } as Partial<AuctionLot>);
-                //     setSelected({ ...selected, status: "active" });
-                //   },
-                // },
-                // {
-                //   id: "pause",
-                //   label: "Pause lot",
-                //   icon: Pause,
-                //   onRun: () => {
-                //     patch(selected.slug, { status: "pending" } as Partial<AuctionLot>);
-                //     setSelected({ ...selected, status: "pending" });
-                //   },
-                // },
+                {
+                  id: "open",
+                  label: "Open bidding",
+                  icon: PlayCircle,
+                  tone: "success",
+                  onRun: () => {
+                    patch(selected.slug, { status: "active" } as Partial<AuctionLot>);
+                    setSelected({ ...selected, status: "active" });
+                  },
+                },
+                {
+                  id: "pause",
+                  label: "Pause lot",
+                  icon: Pause,
+                  onRun: () => {
+                    patch(selected.slug, { status: "pending" } as Partial<AuctionLot>);
+                    setSelected({ ...selected, status: "pending" });
+                  },
+                },
                 {
                   id: "close",
                   label: "Close & award winner",

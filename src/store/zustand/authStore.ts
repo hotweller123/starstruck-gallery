@@ -6,6 +6,7 @@ interface AuthStore {
   user: WalletAccount | null;
   loggedIn: boolean;
   loading: boolean;
+  userID: string | null;
   /** True while we are still determining auth state (onAuth + Firestore fetch) */
   isAuthHydrated: boolean;
   setState: (state: Partial<AuthStore>) => void;
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthStore>()(
       loggedIn: false,
       loading: true, // start true until listener resolves
       isAuthHydrated: false,
+      userID: null,
       setState: (state) => {
         set((stateValues) => ({
           ...stateValues,
