@@ -82,7 +82,7 @@ export function AuthForms() {
       // navigate({ to: "/wallet" });
       await toast({
         title: mode == "register" ? "Registration Successful" : "Welcome Back",
-        position: "top-left",
+        position: "top",
         variant: "collection",
         duration: 4000,
       });
@@ -92,7 +92,7 @@ export function AuthForms() {
       toast({
         title: "Error Message",
         description: message,
-        position: "top-left",
+        position: "top",
         variant: "error",
         duration: 4000,
       });

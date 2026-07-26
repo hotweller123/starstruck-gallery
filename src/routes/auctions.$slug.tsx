@@ -154,7 +154,33 @@ function AuctionLotPage() {
         userID: user?.userID,
       };
 
-      // add email and fullname to refer previous bidder....add notification to alert previous bidder that they have been outbidded
+      // todo add email and fullname to refer previous bidder....add notification to alert previous bidder that they have been outbidded
+
+      const previousBid = doc(db, "bids", lot.id);
+      const getPreviousBid = await getDoc(previousBid);
+      const previousUserBid = doc(db, "users", (getPreviousBid.data() as WalletAccount).userID);
+      const getPreviousBidUser = await getDoc(previousUserBid);
+
+      if (getPreviousBid.exists() && getPreviousBidUser.exists()) {
+        const bidData = getPreviousBid.data() as Bid;
+        const userData = getPreviousBidUser.data() as WalletAccount;
+        const newBal = await (userData.wallet.balance + bidData.bidAmount);
+        const newBidBal = await Math.max(0, userData.wallet.bidBalance - bidData.bidAmount);
+
+        await updateDocument({
+          collections: "users",
+          document: {
+            id: userData.userID,
+            wallet: {
+              balance: newBal,
+              bidBalance: newBidBal,
+            },
+          },
+        });
+
+        console.log(newBal);
+        console.log(newBidBal);
+      }
 
       await setDocument({
         collections: "bids",
@@ -164,6 +190,7 @@ function AuctionLotPage() {
         },
       });
 
+      console.log({ currentUserBal: user.wallet.balance });
       await handleWalletBalance({
         balance: user.wallet.balance,
         bidAmount: formBidAmount,
@@ -171,21 +198,12 @@ function AuctionLotPage() {
         userID: user?.userID,
       });
 
-      const previousBidUser = doc(db, "users", lot.userID);
-      const previousBidUserDoc = await getDoc(previousBidUser);
-      if (previousBidUserDoc.exists()) {
-        const data = previousBidUserDoc.data() as WalletAccount;
-        await updateDocument({
-          collections: "users",
-          document: {
-            id: lot.userID,
-            wallet: {
-              balance: data.wallet.balance + lot.currentBid,
-              bidBalance: data.wallet.bidBalance - lot.currentBid,
-            },
-          },
-        });
-      }
+      console.log({
+        totalBalanceAfter: {
+          userTotalBalance: user.wallet.balance,
+          userTotalBidBalance: user.wallet.bidBalance,
+        },
+      });
 
       await updateDocument({
         collections: "auctions",
@@ -235,7 +253,7 @@ function AuctionLotPage() {
       {loading && (
         <Loader
           message="Processing Your Request, Please Hold..."
-          className="flex flex-col"
+          className="flex flex-col !text-[11px] md:text-sm"
           variant="dots"
           size="xs"
           fullScreen

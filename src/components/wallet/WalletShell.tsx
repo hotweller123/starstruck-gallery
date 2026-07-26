@@ -107,7 +107,7 @@ function AccountChip() {
         {open && (
           <>
             <button
-              className="fixed inset-0 z-10 cursor-default"
+              className="fixed inset-0 !z-50 cursor-default"
               onClick={() => setOpen(false)}
               aria-hidden
             />
@@ -143,6 +143,7 @@ function AccountChip() {
               </div>
               <Link
                 className="flex w-full items-center gap-2 border-t border-[var(--w-border)] px-4 py-3 text-sm font-medium text-[var(--w-fg)] transition hover:bg-[var(--w-bg-2)]"
+                onClick={() => setOpen(false)}
                 to="/wallet/security"
               >
                 <LockKeyhole className="size-4" />

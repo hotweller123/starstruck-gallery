@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/services/firebase";
 import { useAuthStore } from "@/store/zustand";
 import type { WalletAccount } from "@/types";
@@ -44,10 +44,14 @@ export function useAuthListener() {
         if (userSnap.exists()) {
           const userData = { id: userSnap.id, ...userSnap.data() } as WalletAccount;
 
+          onSnapshot(userRef, (docRef) => {
+            const data = docRef.data() as WalletAccount;
+
+            setUser(data);
+          });
+
           // Optional: keep some fields fresh from Auth if you want
           // userData.email = firebaseUser.email ?? userData.email;
-
-          setUser(userData);
         } else {
           // User exists in Auth but no Firestore profile yet (edge case)
           console.warn("[auth] No Firestore user doc for uid:", firebaseUser.uid);
