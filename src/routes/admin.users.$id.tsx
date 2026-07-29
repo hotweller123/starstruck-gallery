@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { motion } from "motion/react";
+import { useState, useMemo, MouseEvent } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Area,
   AreaChart,
@@ -38,6 +38,7 @@ import {
   Hammer,
   Check,
   X,
+  Pause,
 } from "lucide-react";
 import { BentoCard, DataTable, StatusChip } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
@@ -54,11 +55,14 @@ import {
 import { useDataStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 import { Bid, WalletAccount, WalletTx } from "@/types";
-import { AuctionLot, inHours } from "@/data/auctions";
+import { AuctionLot, getAuctionBySlug, inHours } from "@/data/auctions";
 import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
 import { useToast } from "@/lib/useToast";
 import useDoc from "@/hooks/useDoc";
 import { ToastPosition } from "@/components/ui/toast";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/services/firebase";
+import { WalletLoader } from "@/components/wallet";
 
 export const Route = createFileRoute("/admin/users/$id")({
   component: UserDetail,
@@ -147,7 +151,7 @@ function UserDetail() {
   ];
 
   const { toast } = useToast();
-  const { updateDocument } = useDoc();
+  const { updateDocument, addDocToCollection, deleteDocument } = useDoc();
 
   const errorToast = (error: any, position?: ToastPosition, description?: string, action?: any) => {
     toast({
@@ -177,6 +181,25 @@ function UserDetail() {
     });
   };
 
+  const [imagesHover, setImagesHover] = useState<string[]>([]);
+  const [uniqueImageID, setUniqueImageID] = useState<string | null>(null);
+
+  const openImages = (
+    e: MouseEvent<HTMLDivElement>,
+    { id, images }: { id: string; images: string[] },
+  ) => {
+    if (images.length) setImagesHover(images);
+    if (id) {
+      setUniqueImageID(id);
+    }
+  };
+
+  const scheduleClose = () => {
+    setUniqueImageID(null);
+  };
+
+  const [loading, setLoading] = useState(false);
+
   return (
     <div className="mx-auto max-w-[1440px]">
       <Link
@@ -185,6 +208,8 @@ function UserDetail() {
       >
         <ArrowLeft className="size-3.5" /> Back to users
       </Link>
+
+      {loading && <WalletLoader compact isLoading={loading} partial />}
 
       {/* Identity card */}
       <motion.div
@@ -257,6 +282,8 @@ function UserDetail() {
             return;
           }
 
+          setLoading(true);
+
           try {
             await updateDocument({
               collections: "users",
@@ -271,6 +298,7 @@ function UserDetail() {
             errorToast(error);
           } finally {
             close();
+            setLoading(false);
           }
         }}
         operations={[
@@ -285,6 +313,7 @@ function UserDetail() {
                 return;
               }
 
+              setLoading(true);
               try {
                 await updateDocument({
                   collections: "users",
@@ -297,6 +326,7 @@ function UserDetail() {
                 errorToast(error);
               } finally {
                 close();
+                setLoading(true);
               }
             },
           },
@@ -311,6 +341,7 @@ function UserDetail() {
                 return;
               }
 
+              setLoading(true);
               try {
                 await updateDocument({
                   collections: "users",
@@ -323,6 +354,7 @@ function UserDetail() {
                 errorToast(error);
               } finally {
                 close();
+                setLoading(false);
               }
             },
           },
@@ -333,93 +365,9 @@ function UserDetail() {
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <WalletStat label="Balance" value={fmtMoney(currentUser.wallet.balance)} accent />
         <WalletStat label="Bid Balance" value={fmtMoney(currentUser.wallet.bidBalance)} />
-        {/* <WalletStat label="In escrow" value={fmtMoney(wallet.inEscrow)} />
-        <WalletStat label="Lifetime fees" value={fmtMoney(wallet.feesPaid)} /> */}
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
-        {/* Balance chart */}
-        {/* <BentoCard
-          className="lg:col-span-8"
-          eyebrow="Last 14 days"
-          title="Wallet balance trend"
-          delay={0.1}
-          action={
-            <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-muted)] hover:text-[var(--a-fg)]">
-              <Download className="size-3" /> Export
-            </button>
-          }
-        >
-          <div className="h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={series} margin={{ left: -18, right: 8, top: 8, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="u-bal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--a-accent)" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="var(--a-accent)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="var(--a-border)" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  stroke="var(--a-faint)"
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="var(--a-faint)"
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  width={48}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--a-bg-2)",
-                    border: "1px solid var(--a-border-hi)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                  labelStyle={{ color: "var(--a-muted)" }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="balance"
-                  stroke="var(--a-accent)"
-                  strokeWidth={2}
-                  fill="url(#u-bal)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </BentoCard> */}
-
-        {/* Security & account */}
-        {/* <BentoCard
-          className="lg:col-span-4"
-          eyebrow="Security"
-          title="Account integrity"
-          delay={0.14}
-        >
-          <ul className="space-y-3 text-xs">
-            <SecRow icon={ShieldCheck} label="KYC" value={wallet.kycLevel} good />
-            <SecRow
-              icon={KeyRound}
-              label="2FA"
-              value={wallet.twoFactor ? "Enabled" : "Disabled"}
-              good={wallet.twoFactor}
-            />
-            <SecRow icon={Smartphone} label="Active devices" value={`${wallet.devices} trusted`} />
-            <SecRow icon={WalletIcon} label="Lifetime inflow" value={fmtMoney(wallet.lifetimeIn)} />
-            <SecRow
-              icon={RefreshCw}
-              label="Lifetime outflow"
-              value={fmtMoney(wallet.lifetimeOut)}
-            />
-          </ul>
-        </BentoCard> */}
-
         {/* Bids */}
         <BentoCard
           className="lg:col-span-7"
@@ -433,46 +381,90 @@ function UserDetail() {
           }
         >
           <DataTable
-            rows={auctions}
+            rows={auctions.filter((a) => a.userID == currentUser.userID)}
             onRowClick={(r) => setTarget({ kind: "auction", row: r })}
             columns={[
               {
                 key: "title",
-                header: "Title",
+                header: "Lot",
                 render: (r) => (
-                  <div className="flex items-center gap-2">
-                    <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
-                      <Gavel className="size-3" />
-                    </span>
-                    <span className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</span>
+                  <div className="flex items-center gap-3 relative">
+                    <div
+                      className="absolute -top-[105%] w-auto h-auto ml-1 p-2 flex gap-2 "
+                      onMouseEnter={(e) => {
+                        e.stopPropagation();
+                        openImages(e, { id: r.id, images: r.images });
+                      }}
+                      onMouseLeave={() => {
+                        scheduleClose();
+                      }}
+                    >
+                      <AnimatePresence mode="wait">
+                        {r.id === uniqueImageID &&
+                          imagesHover.length > 0 &&
+                          imagesHover.map((i, num) => (
+                            <motion.div
+                              initial={{ opacity: 0, x: 10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 10 }}
+                              // transition={{ duration: 0.3, ease: "easeInOut" }}
+                            >
+                              <img
+                                key={i}
+                                src={i}
+                                className="size-16 transition object-cover aspect-auto rounded transition"
+                              />
+                            </motion.div>
+                          ))}
+                      </AnimatePresence>
+                    </div>
+                    {r.images?.[0] && (
+                      <img
+                        onMouseEnter={(e) => {
+                          e.stopPropagation();
+                          openImages(e, { id: r.id, images: r.images });
+                        }}
+                        onMouseLeave={() => {
+                          scheduleClose();
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openImages(e, { id: r.id, images: r.images });
+                        }}
+                        src={r.images[0]}
+                        alt={r.title}
+                        className="size-12 border rounded object-cover"
+                      />
+                    )}
+                    <div>
+                      <p className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
+                      <p className="a-mono text-[10px] text-[var(--a-muted)]">{r.sellerSlug}</p>
+                    </div>
                   </div>
                 ),
               },
               {
-                key: "startBid",
-                header: "Start Bid",
+                key: "estimate",
+                header: "Estimate",
                 render: (r) => (
-                  <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                    {fmtMoney(r.startBid)}
+                  <span className="a-mono text-xs text-[var(--a-fg-2)]">
+                    {fmtMoney(r.estimateLow)} – {fmtMoney(r.estimateHigh)}
                   </span>
                 ),
               },
               {
-                key: "currentBid",
-                header: "Current Bid",
+                key: "bid",
+                header: "Current bid",
                 render: (r) => (
-                  <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                    {fmtMoney(r.currentBid)}
+                  <span className="a-mono text-xs font-bold text-[var(--a-accent)]">
+                    {fmtMoney(r.currentBid ?? 0)}
                   </span>
                 ),
               },
-              { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
               {
-                key: "at",
-                header: "Time Of Upload",
-                render: (r) => (
-                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.endsAt)}</span>
-                ),
+                key: "status",
+                header: "Status",
+                render: (r) => <StatusChip value={r.status ?? "active"} />,
               },
             ]}
           />
@@ -489,7 +481,7 @@ function UserDetail() {
           }
         >
           <DataTable
-            rows={bids}
+            rows={bids.filter((b) => b.userID == currentUser.userID)}
             onRowClick={(r) => setTarget({ kind: "bid", row: r })}
             columns={[
               {
@@ -525,52 +517,6 @@ function UserDetail() {
           />
         </BentoCard>
 
-        {/* Orders */}
-        {/* <BentoCard
-          className="lg:col-span-5"
-          eyebrow="Exhibition · Purchases"
-          title="Orders"
-          delay={0.22}
-          action={
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-accent-2)]">
-              <Package className="size-3" /> {orders.length} total
-            </span>
-          }
-        >
-          <ul className="space-y-2.5">
-            {orders.map((o) => (
-              <li key={o.id}>
-                <button
-                  onClick={() => setTarget({ kind: "order", row: o })}
-                  className="flex w-full items-center gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-2.5 text-left transition hover:border-[var(--a-border-hi)] hover:bg-[var(--a-surface)]"
-                >
-                  <img
-                    src={o.image}
-                    alt={o.artworkTitle}
-                    className="size-12 rounded object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-[var(--a-fg)]">
-                      {o.artworkTitle}
-                    </p>
-                    <p className="a-mono text-[10px] text-[var(--a-muted)]">
-                      {o.id} · {fmtDateTime(o.at)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                      {fmtMoney(o.amount)}
-                    </p>
-                    <div className="mt-1">
-                      <StatusChip value={o.status} />
-                    </div>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </BentoCard> */}
-
         {/* Wallet transactions */}
         <BentoCard
           className="lg:col-span-8"
@@ -587,7 +533,7 @@ function UserDetail() {
           }
         >
           <DataTable
-            rows={txs}
+            rows={txs.filter((t) => t.userID == currentUser.userID)}
             onRowClick={(r) => setTarget({ kind: "tx", row: r })}
             columns={[
               {
@@ -631,96 +577,6 @@ function UserDetail() {
             ]}
           />
         </BentoCard>
-
-        {/* Favourites */}
-        {/* <BentoCard
-          className="lg:col-span-4"
-          eyebrow="Exhibition · Watchlist"
-          title="Favourited works"
-          delay={0.3}
-          action={
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-accent-2)]">
-              <Heart className="size-3" /> {favourites.length}
-            </span>
-          }
-        >
-          <ul className="grid grid-cols-2 gap-2">
-            {favRows.slice(0, 6).map((f) => (
-              <li key={f.slug}>
-                <button
-                  onClick={() => setTarget({ kind: "fav", row: f })}
-                  className="block w-full overflow-hidden rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] text-left transition hover:border-[var(--a-border-hi)]"
-                >
-                  <img src={f.image} alt={f.title} className="aspect-square w-full object-cover" />
-                  <div className="p-2">
-                    <p className="truncate text-[10px] font-semibold text-[var(--a-fg)]">
-                      {f.title}
-                    </p>
-                    <p className="a-mono text-[10px] text-[var(--a-accent)]">{fmtMoney(f.price)}</p>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </BentoCard> */}
-
-        {/* Admin notes */}
-        {/* <BentoCard
-          className="lg:col-span-12"
-          eyebrow="Internal"
-          title="Admin notes"
-          delay={0.34}
-          action={
-            <button
-              onClick={() => {
-                const id = `n_${Date.now().toString(36)}`;
-
-                const userNotes: UserNote = {
-                  id,
-                  at: new Date().toISOString(),
-                  author: "",
-                  body: "",
-                };
-
-                setTarget({ kind: "note", row: userNotes });
-              }}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
-            >
-              <FileText className="size-3" /> Add note
-            </button>
-          }
-        >
-          <ul className="space-y-2.5">
-            {notes.map((n) => (
-              <li key={n.id}>
-                <button
-                  onClick={() => setTarget({ kind: "note", row: n })}
-                  className="flex w-full items-start gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-3 text-left transition hover:border-[var(--a-border-hi)]"
-                >
-                  <span className="grid size-8 place-items-center rounded bg-[var(--a-accent-2-soft)] text-[10px] font-bold text-[var(--a-accent-2)]">
-                    {n.author
-                      .split(" ")
-                      .map((p) => p[0])
-                      .join("")
-                      .slice(0, 2)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-semibold text-[var(--a-fg)]">{n.author}</p>
-                      <p className="text-[10px] text-[var(--a-faint)]">{fmtDateTime(n.at)}</p>
-                    </div>
-                    <p className="mt-0.5 text-xs text-[var(--a-fg-2)]">
-                      {n.body || "(empty — click to edit)"}
-                    </p>
-                  </div>
-                  <span className="grid size-7 place-items-center rounded text-[var(--a-muted)] hover:bg-[var(--a-surface-2)] hover:text-[var(--a-fg)]">
-                    <MoreHorizontal className="size-3.5" />
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </BentoCard> */}
       </div>
 
       {/* -------- Record sheets -------- */}
@@ -734,118 +590,163 @@ function UserDetail() {
           subtitle={`Lot ${target.row.lotTitle}`}
           record={target.row}
           fields={bidFields}
-          onSave={async (patch) => {
-            return;
-
-            close();
-          }}
+          // onSave={async (patch) => {
+          //   return;
+          // }}
           operations={[
-            // {
-            //   id: "mark-leading",
-            //   label: "Mark leading",
-            //   icon: Crown,
-            //   tone: "primary",
-            //   onRun: () => {
-            //     return;
-            //     setBids((prev) =>
-            //       prev.map((b) => (b.id === target.row.id ? { ...b, status: "leading" } : b)),
-            //     );
-            //     close();
-            //   },
-            // },
             {
-              id: "mark-won",
-              label: "Mark won",
-              icon: CheckCircle2,
-              tone: "success",
-              onRun: () => {
-                return;
-                setBids((prev) =>
-                  prev.map((b) => (b.id === target.row.id ? { ...b, status: "won" } : b)),
-                );
-                close();
+              id: "delete",
+              label: "Delete Bid",
+              tone: "danger",
+              icon: Pause,
+              onRun: async () => {
+                if (!target.row) {
+                  toast({
+                    title: "Error",
+                    description: "Error In Selections",
+                    variant: "warning",
+                    position: "bottom",
+                  });
+                  return;
+                }
+
+                setLoading(true);
+
+                try {
+                  await updateDocument({
+                    collections: "users",
+                    document: {
+                      id: target.row.userID,
+                      wallet: {
+                        balance: currentUser.wallet.balance + target.row.bidAmount,
+                        bidBalance: Math.max(
+                          0,
+                          currentUser.wallet.bidBalance - target.row.bidAmount,
+                        ),
+                      },
+                    },
+                  });
+
+                  await deleteDocument({
+                    collectionName: "bids",
+                    id: target.row.id,
+                    message:
+                      "Bid Successfully Deleted, And Funds Has Been Returned To User Who Bidded",
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: error.message || error.code,
+                    variant: "error",
+                    position: "bottom",
+                  });
+                } finally {
+                  setTarget(null);
+                  setLoading(false);
+                }
               },
             },
-            // {
-            //   id: "withdraw",
-            //   label: "Withdraw bid",
-            //   icon: XCircle,
-            //   tone: "danger",
-            //   confirm: "Withdraw this bid?",
-            //   onRun: () => {
-            //     return;
-            //     setBids((prev) => prev.filter((b) => b.id !== target.row.id));
-            //     close();
-            //   },
-            // },
+            {
+              id: "close",
+              label: "Close & award winner",
+              icon: Hammer,
+              tone: "primary",
+              onRun: async () => {
+                const Lot = await getAuctionBySlug(target.row.slug);
+                if (!target.row || !Lot) {
+                  toast({
+                    title: "Error",
+                    description: "Error In Selections",
+                    variant: "warning",
+                    position: "bottom",
+                  });
+
+                  return;
+                }
+
+                setLoading(true);
+                try {
+                  //for current Bidder..deduct from bidding balance
+                  await updateDocument({
+                    collections: "users",
+                    document: {
+                      id: target.row.userID,
+                      wallet: {
+                        balance: currentUser.wallet.balance,
+                        bidBalance: Math.max(
+                          0,
+                          currentUser.wallet.bidBalance - target.row.bidAmount,
+                        ),
+                      },
+                    },
+                  });
+
+                  //for original owner...add to the wallet balance
+                  await updateDocument({
+                    collections: "users",
+                    document: {
+                      id: Lot.userID,
+                      wallet: {
+                        balance: currentUser.wallet.balance + target.row.bidAmount,
+                        bidBalance: currentUser.wallet.bidBalance,
+                      },
+                    },
+                  });
+
+                  await addDocToCollection({
+                    collections: "listings",
+                    document: {
+                      title: Lot?.title,
+                      userName: currentUser.userName,
+                      userID: target.row.userID,
+                      bidAmount: target.row.bidAmount,
+                      year: Lot?.year,
+                      category: Lot?.category,
+                      description: Lot?.description,
+                      images: Lot?.images,
+                      createdAt: new Date().toISOString(),
+                      dimensions: Lot?.dimensions,
+                      status: Lot?.status,
+                      medium: Lot?.medium,
+                      slug: crypto.randomUUID(),
+                      provenance: Lot?.provenance,
+                      condition: Lot?.condition,
+                      totalBidCounts: Lot?.bidCount,
+                      placedAt: target.row.placedAt,
+                    },
+                  });
+
+                  await updateDocument({
+                    collections: "auctions",
+                    document: {
+                      id: target.row.id,
+                      endsAt: inHours(12),
+                      status: "outbidded",
+                    },
+                  });
+
+                  await deleteDocument({
+                    collectionName: "bids",
+                    id: target.row.id,
+                    message:
+                      "Bid Has Ended, Thus Added To The User Listing List And Deleted From Auctions In 12 hours From Now",
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: error.message || error.code,
+                    variant: "error",
+                    position: "bottom",
+                  });
+                } finally {
+                  setTarget(null);
+                  setLoading(false);
+                }
+              },
+            },
           ]}
         />
       )}
-
-      {/* {target?.kind === "order" && (
-        <RecordSheet<UserOrder>
-          open
-          onOpenChange={(o) => !o && close()}
-          eyebrow="Order"
-          title={target.row.artworkTitle}
-          subtitle={`Order ${target.row.id}`}
-          record={target.row}
-          fields={orderFields}
-          extra={
-            <div>
-              <p className="a-eyebrow mb-2">Artwork</p>
-              <img
-                src={target.row.image}
-                alt={target.row.artworkTitle}
-                className="w-full rounded-md border border-[var(--a-border)] object-cover"
-              />
-            </div>
-          }
-          onSave={(patch) => {
-            setOrders((prev) => prev.map((o) => (o.id === target.row.id ? { ...o, ...patch } : o)));
-            close();
-          }}
-          operations={[
-            {
-              id: "ship",
-              label: "Mark shipped",
-              icon: Truck,
-              tone: "primary",
-              onRun: () => {
-                setOrders((prev) =>
-                  prev.map((o) => (o.id === target.row.id ? { ...o, status: "shipped" } : o)),
-                );
-                close();
-              },
-            },
-            {
-              id: "deliver",
-              label: "Mark delivered",
-              icon: CheckCircle2,
-              tone: "success",
-              onRun: () => {
-                setOrders((prev) =>
-                  prev.map((o) => (o.id === target.row.id ? { ...o, status: "delivered" } : o)),
-                );
-                close();
-              },
-            },
-            {
-              id: "refund",
-              label: "Refund",
-              icon: RotateCcw,
-              tone: "danger",
-              confirm: "Refund this order?",
-              onRun: () => {
-                setOrders((prev) =>
-                  prev.map((o) => (o.id === target.row.id ? { ...o, status: "refunded" } : o)),
-                );
-                close();
-              },
-            },
-          ]}
-        />
-      )} */}
 
       {target?.kind === "tx" && (
         <RecordSheet<WalletTx>
@@ -856,10 +757,33 @@ function UserDetail() {
           subtitle={`Tx ${target.row.id}`}
           record={target.row}
           fields={txFields}
-          onSave={(patch) => {
-            return;
-            setTxs((prev) => prev.map((t) => (t.id === target.row.id ? { ...t, ...patch } : t)));
-            close();
+          onSave={async (p) => {
+            if (!target.row) {
+              toast({
+                title: "Error",
+                description: "Error in Selection",
+                variant: "warning",
+              });
+              return;
+            }
+
+            setLoading(true);
+
+            try {
+              await updateDocument({
+                collections: "transactions",
+                document: {
+                  ...target.row,
+                  ...p,
+                },
+              });
+
+              modToast();
+            } catch (error) {
+              errorToast(error);
+            } finally {
+              setTarget(null);
+            }
           }}
           operations={[
             {
@@ -867,38 +791,55 @@ function UserDetail() {
               label: "Approve",
               icon: CheckCircle2,
               tone: "success",
-              onRun: () => {
-                return;
-                setTxs((prev) =>
-                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "completed" } : t)),
-                );
-                close();
+              onRun: async () => {
+                if (!target.row) {
+                  warnToast();
+                  return;
+                }
+                try {
+                  await updateDocument({
+                    collections: "transactions",
+                    document: {
+                      status: "Approved",
+                      id: target.row.id,
+                    },
+                  });
+                  modToast();
+                } catch (error) {
+                  errorToast(error);
+                } finally {
+                  setTarget(null);
+                  setLoading(false);
+                }
               },
             },
             {
-              id: "review",
-              label: "Put On Hold",
-              icon: RefreshCw,
-              onRun: () => {
-                return;
-                setTxs((prev) =>
-                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "review" } : t)),
-                );
-                close();
-              },
-            },
-            {
-              id: "fail",
+              id: "decline",
               label: "Decline",
               icon: XCircle,
               tone: "danger",
-              confirm: "Mark this transaction as failed?",
-              onRun: () => {
-                return;
-                setTxs((prev) =>
-                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "failed" } : t)),
-                );
-                close();
+              onRun: async () => {
+                if (!target.row) {
+                  warnToast();
+                  return;
+                }
+                setLoading(true);
+
+                try {
+                  await updateDocument({
+                    collections: "transactions",
+                    document: {
+                      status: "Failed",
+                      id: target.row.id,
+                    },
+                  });
+                  modToast();
+                } catch (error) {
+                  errorToast(error);
+                } finally {
+                  setTarget(null);
+                  setLoading(false);
+                }
               },
             },
           ]}
@@ -913,130 +854,53 @@ function UserDetail() {
           subtitle={` ${target.row.category}`}
           record={target.row}
           fields={auctionFields}
-          onSave={(patch) => {
-            return;
-            setTxs((prev) => prev.map((t) => (t.id === target.row.id ? { ...t, ...patch } : t)));
-            close();
+          onSave={async (p) => {
+            if (!target.row) {
+              warnToast();
+              return;
+            }
+
+            setLoading(true);
+            try {
+              await updateDocument({
+                collections: "auctions",
+                document: {
+                  ...target.row,
+                  id: target.row.id,
+                  ...p,
+                },
+              });
+
+              toast({
+                title: "Success",
+                description: "Lot Modified Successfully",
+                position: "top",
+                variant: "info",
+                duration: 50000,
+              });
+            } catch (error) {
+              toast({
+                title: "Error",
+                description: error.code || error.message,
+                position: "top",
+                variant: "error",
+                duration: 50000,
+              });
+            } finally {
+              setTarget(null);
+              setLoading(false);
+            }
+            // patch(selected.slug, p);
+            // setSelected({ ...selected, ...p } as LotRow);
           }}
           extra={
             target.row.images.length && (
               <AuctionImageSwiper images={target.row.images} alt={currentUser.fullName} />
             )
           }
-          operations={[
-            {
-              id: "active",
-              label: "Approve",
-              icon: CheckCircle2,
-              tone: "success",
-              onRun: () => {
-                return;
-                setTxs((prev) =>
-                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "completed" } : t)),
-                );
-                close();
-              },
-            },
-            {
-              id: "suspend",
-              label: "Suspend",
-              tone: "danger",
-              icon: RefreshCw,
-              onRun: () => {
-                return;
-                setTxs((prev) =>
-                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "review" } : t)),
-                );
-                close();
-              },
-            },
-            // {
-            //   id: "fail",
-            //   label: "Decline",
-            //   icon: XCircle,
-            //   tone: "danger",
-            //   confirm: "Mark this transaction as failed?",
-            //   onRun: () => {
-            //     return;
-            //     setTxs((prev) =>
-            //       prev.map((t) => (t.id === target.row.id ? { ...t, status: "failed" } : t)),
-            //     );
-            //     close();
-            //   },
-            // },
-          ]}
+          // operations={}
         />
       )}
-
-      {/* {target?.kind === "fav" && (
-        <RecordSheet
-          open
-          onOpenChange={(o) => !o && close()}
-          eyebrow="Watchlist"
-          title={target.row.title}
-          subtitle={target.row.artist}
-          record={target.row}
-          fields={favFields}
-          extra={
-            <div>
-              <p className="a-eyebrow mb-2">Preview</p>
-              <img
-                src={target.row.image}
-                alt={target.row.title}
-                className="w-full rounded-md border border-[var(--a-border)] object-cover"
-              />
-            </div>
-          }
-          onSave={(patch) => {
-            setFavourites((prev) =>
-              prev.map((f) => (f.slug === target.row.slug ? { ...f, ...patch } : f)),
-            );
-            close();
-          }}
-          operations={[
-            {
-              id: "remove",
-              label: "Remove from watchlist",
-              icon: Trash2,
-              tone: "danger",
-              confirm: "Remove this artwork from the user's watchlist?",
-              onRun: () => {
-                setFavourites((prev) => prev.filter((f) => f.slug !== target.row.slug));
-                close();
-              },
-            },
-          ]}
-        />
-      )} */}
-
-      {/* {target?.kind === "note" && (
-        <RecordSheet<UserNote>
-          open
-          onOpenChange={(o) => !o && close()}
-          eyebrow="Admin note"
-          title={target.row.author}
-          subtitle={fmtDateTime(target.row.at)}
-          record={target.row}
-          fields={noteFields}
-          onSave={(patch) => {
-            setNotes((prev) => prev.map((n) => (n.id === target.row.id ? { ...n, ...patch } : n)));
-            close();
-          }}
-          operations={[
-            {
-              id: "delete",
-              label: "Delete note",
-              icon: Trash2,
-              tone: "danger",
-              confirm: "Delete this note?",
-              onRun: () => {
-                setNotes((prev) => prev.filter((n) => n.id !== target.row.id));
-                close();
-              },
-            },
-          ]}
-        />
-      )} */}
     </div>
   );
 }

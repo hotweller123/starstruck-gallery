@@ -88,9 +88,11 @@ function WalletOps() {
           ? t.type === "deposit"
           : tab === "withdrawals"
             ? t.type === "withdraw"
-            : tab === "transfer_in" || tab === "transfer_out"
-              ? t.type === "transfer_in" || t.type === "transfer_out"
-              : true,
+            : tab === "transfer_in"
+              ? t.type === "transfer_in"
+              : tab == "transfer_out"
+                ? t.type == "transfer_out"
+                : true,
       )
       .filter((t) => (status === "all" ? true : t.status === status))
       .filter(
@@ -397,7 +399,6 @@ function WalletOps() {
             });
             return;
           }
-
           try {
             await updateDocument({
               collections: "transactions",

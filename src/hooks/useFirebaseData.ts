@@ -20,7 +20,7 @@ export function useFirebaseDataHook() {
   const auctions = useFirebaseQueryCollection("auctions");
   const bids = useFirebaseQueryCollection(
     "bids",
-    // user ? [where("userID", "==", user?.userID)] : [],
+    user?.role == "user" ? [where("userID", "==", user?.userID)] : [],
   );
   const { setState } = useDataStore(
     useShallow((state) => ({

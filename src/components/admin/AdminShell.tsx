@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Palette,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuthStore } from "@/store/zustand";
+import useAuth from "@/hooks/useAuth";
 
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -96,6 +97,8 @@ function SidebarInner({
   onToggle?: () => void;
   onClose?: () => void;
 }) {
+  const navigate = useNavigate();
+  const { logOut } = useAuth();
   return (
     <div className="flex h-full flex-col relative">
       {onToggle && (
@@ -168,7 +171,13 @@ function SidebarInner({
       <div className="border-t border-[var(--a-border)] p-3">
         {!collapsed ? (
           <div className="">
-            <button className="p-1.5 justify-between gap-1.5 flex items-center border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] text-sm hover:bg-[var(--a-neg)]/20 border w-full">
+            <button
+              className="p-1.5 justify-between gap-1.5 flex items-center border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] text-sm hover:bg-[var(--a-neg)]/20 border w-full"
+              onClick={() => {
+                logOut();
+                navigate({ to: "/wallet" });
+              }}
+            >
               Sign Out
               <LogOut className="size-4" />
             </button>

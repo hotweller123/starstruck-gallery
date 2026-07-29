@@ -674,8 +674,6 @@ function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
           } finally {
             setSelected(null);
           }
-          // patch(selected.slug, p);
-          // setSelected({ ...selected, ...p } as LotRow);
         }}
         extra={
           selected?.images?.length && (
@@ -862,16 +860,6 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
         operations={
           selected
             ? [
-                // {
-                //   id: "open",
-                //   label: "Open bidding",
-                //   icon: PlayCircle,
-                //   tone: "success",
-                //   onRun: () => {
-                //     // patch(selected.slug, { status: "active" } as Partial<Bid>);
-                //     // setSelected({ ...selected, status: "active" });
-                //   },
-                // },
                 {
                   id: "delete",
                   label: "Delete Bid",
@@ -921,9 +909,6 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                     } finally {
                       setSelected(null);
                     }
-
-                    // patch(selected.slug, { status: "pending" } as Partial<Bid>);
-                    // setSelected({ ...selected, status: "pending" });
                   },
                 },
                 {
