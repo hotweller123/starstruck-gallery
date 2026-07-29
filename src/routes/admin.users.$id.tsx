@@ -269,6 +269,8 @@ function UserDetail() {
             modToast();
           } catch (error) {
             errorToast(error);
+          } finally {
+            close();
           }
         }}
         operations={[
@@ -293,6 +295,8 @@ function UserDetail() {
                 });
               } catch (error) {
                 errorToast(error);
+              } finally {
+                close();
               }
             },
           },
@@ -317,6 +321,8 @@ function UserDetail() {
                 });
               } catch (error) {
                 errorToast(error);
+              } finally {
+                close();
               }
             },
           },
