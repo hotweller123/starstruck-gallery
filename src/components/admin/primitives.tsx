@@ -81,7 +81,7 @@ export function KpiTile({
           }`}
         >
           {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-          {Math.abs(delta).toFixed(1)}%
+          {/* {Math.abs(delta).toFixed(1)}% */}
         </span>
       </div>
       <p className="font-display mt-3 text-3xl font-extrabold tracking-tight text-[var(--a-fg)]">
@@ -114,12 +114,16 @@ function Sparkline({ positive }: { positive: boolean }) {
 /* ---------------- StatusChip ---------------- */
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
+  Approved: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   completed: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   pending: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
+  Pending: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
   review: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   suspended: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
   failed: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
+  Failed: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
   leading: "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
+  "On Hold": "bg-[var(--a-warn)]/18 text-[var(--a-warn)]",
   won: "bg-[var(--a-pos)]/15 text-[var(--a-pos)]",
   outbid: "bg-[var(--a-info)]/18 text-[var(--a-info)]",
   lost: "bg-[var(--a-neg)]/15 text-[var(--a-neg)]",
@@ -275,7 +279,7 @@ export function TabBar({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="mb-5 inline-flex rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-1">
+    <div className="mb-5 inline-flex flex-wrap rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-1">
       {tabs.map((t) => {
         const isActive = t.id === active;
         return (

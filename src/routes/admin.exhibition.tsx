@@ -26,29 +26,48 @@ import { DataTable, SectionHeader, StatusChip, TabBar } from "@/components/admin
 import { RecordSheet, type FieldDef, type OperationDef } from "@/components/admin/RecordSheet";
 import { artworks as seedArtworks, type Artwork } from "@/data/artworks";
 import { artists as seedArtists, type Artist } from "@/data/artists";
-import { auctionLots as seedLots, type AuctionLot } from "@/data/auctions";
+import {
+  getAuctionBySlug,
+  inHours,
+  auctionLots as seedLots,
+  type AuctionLot,
+} from "@/data/auctions";
 import { categories as seedCategories, type Category } from "@/data/categories";
-import { fmtMoney } from "@/data/admin-mock";
+import { fmtDateTime, fmtMoney } from "@/data/admin-mock";
 import { AnimatePresence, motion } from "motion/react";
 import { se } from "date-fns/locale";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { useToast } from "@/lib/useToast";
+import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
+import { Bid, WalletAccount } from "@/types";
+import useDoc from "@/hooks/useDoc";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/services/firebase";
 
 export const Route = createFileRoute("/admin/exhibition")({
   component: ExhibitionAdmin,
 });
 
-type Tab = "artworks" | "artists" | "auctions" | "categories";
+type Tab = "artworks" | "artists" | "auctions" | "categories" | "bids";
 
 function ExhibitionAdmin() {
-  const [tab, setTab] = useState<Tab>("artworks");
+  const [tab, setTab] = useState<Tab>("auctions");
   const [q, setQ] = useState("");
+  const { auctions, bids } = useDataStore(
+    useShallow((s) => ({
+      auctions: s.auctions,
+      bids: s.bids,
+    })),
+  );
 
-  const [artworks, setArtworks] = useState<Artwork[]>(seedArtworks);
-  const [artists, setArtists] = useState<Artist[]>(seedArtists);
-  const [lots, setLots] = useState<AuctionLot[]>(seedLots);
-  const [categories, setCategories] = useState<Category[]>(seedCategories);
+  // const [artworks, setArtworks] = useState<Artwork[]>(seedArtworks);
+  // const [artists, setArtists] = useState<Artist[]>(seedArtists);
+  // const [lots, setLots] = useState<AuctionLot[]>(auctions);
+  // const [categories, setCategories] = useState<Category[]>(seedCategories);
 
-  const totalValue = artworks.reduce((s, a) => s + a.price, 0);
-  const avgPrice = artworks.length ? Math.round(totalValue / artworks.length) : 0;
+  // const totalValue = artworks.reduce((s, a) => s + a.price, 0);
+  // const avgPrice = artworks.length ? Math.round(totalValue / artworks.length) : 0;
 
   return (
     <div className="mx-auto max-w-[1440px]">
@@ -58,20 +77,21 @@ function ExhibitionAdmin() {
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Kpi icon={Palette} label="Artworks" value={artworks.length.toString()} />
-        <Kpi icon={UsersIcon} label="Artists" value={artists.length.toString()} />
-        <Kpi icon={Gavel} label="Live lots" value={lots.length.toString()} accent />
-        <Kpi icon={Layers} label="Categories" value={categories.length.toString()} />
-        <Kpi icon={TrendingUp} label="Avg. price" value={fmtMoney(avgPrice)} />
+        {/* <Kpi icon={Palette} label="Artworks" value={artworks.length.toString()} />
+        <Kpi icon={UsersIcon} label="Artists" value={artists.length.toString()} /> */}
+        <Kpi icon={Gavel} label="Live lots" value={auctions.length.toString()} accent />
+        <Kpi icon={Hammer} label="Live bids" value={bids.length.toString()} accent />
+        {/* <Kpi icon={Layers} label="Categories" value={categories.length.toString()} />
+        <Kpi icon={TrendingUp} label="Avg. price" value={fmtMoney(avgPrice)} /> */}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabBar
           tabs={[
-            { id: "artworks", label: "Artworks", count: artworks.length },
-            { id: "artists", label: "Artists", count: artists.length },
-            { id: "auctions", label: "Auctions", count: lots.length },
-            { id: "categories", label: "Categories", count: categories.length },
+            // { id: "artworks", label: "Artworks", count: artworks.length },
+            { id: "auctions", label: "All Auctions", count: auctions.length },
+            { id: "bids", label: "All Bids", count: bids.length },
+            // { id: "categories", label: "Categories", count: categories.length },
           ]}
           active={tab}
           onChange={(id) => setTab(id as Tab)}
@@ -87,14 +107,15 @@ function ExhibitionAdmin() {
         </div>
       </div>
 
-      {tab === "artworks" && <ArtworksPanel q={q} rows={artworks} setRows={setArtworks} />}
-      {tab === "artists" && (
+      {/* {tab === "artworks" && <ArtworksPanel q={q} rows={artworks} setRows={setArtworks} />} */}
+      {/* {tab === "artists" && (
         <ArtistsPanel q={q} rows={artists} setRows={setArtists} artworks={artworks} />
-      )}
-      {tab === "auctions" && <AuctionsPanel q={q} rows={lots} setRows={setLots} />}
-      {tab === "categories" && (
+      )} */}
+      {tab === "auctions" && <AuctionsPanel q={q} rows={auctions} />}
+      {tab === "bids" && <BidsPanel q={q} rows={bids} />}
+      {/* {tab === "categories" && (
         <CategoriesPanel q={q} rows={categories} setRows={setCategories} artworks={artworks} />
-      )}
+      )} */}
     </div>
   );
 }
@@ -448,30 +469,25 @@ function ArtistsPanel({
 
 type LotRow = AuctionLot & { id: string };
 
-function AuctionsPanel({
-  q,
-  rows,
-  setRows,
-}: {
-  q: string;
-  rows: AuctionLot[];
-  setRows: (next: AuctionLot[]) => void;
-}) {
+function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
   const [selected, setSelected] = useState<LotRow | null>(null);
   const data: LotRow[] = rows
     .filter((l) => !q || l.title.toLowerCase().includes(q.toLowerCase()) || l.lotNumber.includes(q))
     .map((l) => ({
       ...l,
-      id: l.slug,
     }));
 
+  const { updateDocument } = useDoc();
+
   function patch(slug: string, p: Partial<AuctionLot>) {
-    setRows(rows.map((l) => (l.slug === slug ? { ...l, ...p } : l)));
+    // setRows(rows.map((l) => (l.slug === slug ? { ...l, ...p } : l)));
   }
+
+  const { toast } = useToast();
 
   const fields: FieldDef<LotRow>[] = [
     { key: "title", label: "Lot title", span: 2 },
-    { key: "lotNumber", label: "Lot #" },
+    // { key: "lotNumber", label: "Lot #" },
     { key: "categoryLabel", label: "Category" },
     { key: "medium", label: "Medium" },
     { key: "dimensions", label: "Dimensions" },
@@ -481,7 +497,7 @@ function AuctionsPanel({
     { key: "currentBid", label: "Current bid", kind: "money" },
     { key: "startBid", label: "Start bid", kind: "money" },
     { key: "condition", label: "Condition" },
-    { key: "provenance", label: "Provenance", kind: "textarea", span: 2 },
+    { key: "provenance", label: "Provenance", kind: "textarea" },
     { key: "description", label: "Description", kind: "textarea", span: 2 },
     {
       key: "status",
@@ -587,7 +603,7 @@ function AuctionsPanel({
                 )}
                 <div>
                   <p className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
-                  <p className="a-mono text-[10px] text-[var(--a-muted)]">Lot {r.lotNumber}</p>
+                  <p className="a-mono text-[10px] text-[var(--a-muted)]">{r.sellerSlug}</p>
                 </div>
               </div>
             ),
@@ -620,47 +636,294 @@ function AuctionsPanel({
       <RecordSheet<LotRow>
         open={!!selected}
         onOpenChange={(o) => !o && setSelected(null)}
-        eyebrow={`Lot ${selected?.lotNumber ?? ""}`}
+        eyebrow={`${selected?.sellerSlug ?? ""}`}
         title={selected?.title ?? ""}
         subtitle={
           selected ? `${selected.categoryLabel} · ${fmtMoney(selected.currentBid ?? 0)}` : undefined
         }
         record={selected}
         fields={fields}
-        onSave={(p) => {
+        onSave={async (p) => {
           if (!selected) return;
-          patch(selected.slug, p);
-          setSelected({ ...selected, ...p } as LotRow);
+          try {
+            await updateDocument({
+              collections: "auctions",
+              document: {
+                ...selected,
+                id: selected.id,
+                ...p,
+              },
+            });
+            console.log(selected);
+
+            toast({
+              title: "Success",
+              description: "Lot Modified Successfully",
+              position: "top",
+              variant: "info",
+              duration: 50000,
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.code || error.message,
+              position: "top",
+              variant: "error",
+              duration: 50000,
+            });
+          } finally {
+            setSelected(null);
+          }
+          // patch(selected.slug, p);
+          // setSelected({ ...selected, ...p } as LotRow);
         }}
         extra={
-          selected?.images?.[0] && (
-            <img
-              src={selected.images[0]}
-              alt={selected.title}
-              className="aspect-square w-full rounded object-cover"
-            />
+          selected?.images?.length && (
+            <AuctionImageSwiper alt={selected.title} images={selected.images} />
           )
         }
         operations={
           selected
             ? [
+                // {
+                //   id: "open",
+                //   label: "Open bidding",
+                //   icon: PlayCircle,
+                //   tone: "success",
+                //   onRun: () => {
+                //     patch(selected.slug, { status: "active" } as Partial<AuctionLot>);
+                //     setSelected({ ...selected, status: "active" });
+                //   },
+                // },
+                // {
+                //   id: "pause",
+                //   label: "Pause lot",
+                //   icon: Pause,
+                //   onRun: () => {
+                //     patch(selected.slug, { status: "pending" } as Partial<AuctionLot>);
+                //     setSelected({ ...selected, status: "pending" });
+                //   },
+                // },
+                // {
+                //   id: "close",
+                //   label: "Close & award winner",
+                //   icon: Hammer,
+                //   tone: "primary",
+                //   onRun: () => {
+                //     toast({
+                //       title: "Bid Has Ended",
+                //       variant: "default",
+                //       position: "top-right",
+                //       duration: 5000,
+                //     });
+                //   },
+                // },
+                // {
+                //   id: "withdraw",
+                //   label: "Withdraw lot",
+                //   icon: Archive,
+                //   tone: "danger",
+                //   confirm: "Withdraw this lot from auction?",
+                //   onRun: () => {
+                //     setRows(rows.filter((l) => l.slug !== selected.slug));
+                //     setSelected(null);
+                //   },
+                // },
+                // {
+                //   id: "flag",
+                //   label: "Flag for review",
+                //   icon: Flag,
+                //   onRun: () => alert("Flagged (mock)."),
+                // },
+              ]
+            : undefined
+        }
+      />
+    </>
+  );
+}
+
+/* ------------------------------ BIDS ------------------------------ */
+
+type BidRow = Bid & { id: string };
+
+function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
+  const [selected, setSelected] = useState<BidRow | null>(null);
+  const data: BidRow[] = rows
+    .filter(
+      (l) => !q || l.lotTitle.toLowerCase().includes(q.toLowerCase()) || l.fullName.includes(q),
+    )
+    .map((l) => ({
+      ...l,
+    }));
+
+  const { toast } = useToast();
+
+  const fields: FieldDef<BidRow>[] = [
+    { key: "lotTitle", label: "Lot title", span: 2 },
+    // { key: "lotNumber", label: "Lot #" },
+    { key: "fullName", label: "FullName", editable: false },
+    { key: "email", label: "Email", editable: false },
+    { key: "bidAmount", label: "Bid Amount", editable: false, kind: "money" },
+    { key: "lastBid", label: "Last Bid Price", editable: false, kind: "money" },
+    // {
+    //   key: "status",
+    //   label: "Status",
+    //   render(value, row) {
+    //     return (
+    //       <>
+    //         <span className="capitalize">{value as string}</span>
+    //       </>
+    //     );
+    //   },
+    //   editable: false,
+    // },
+  ];
+
+  const { updateDocument, addDocToCollection, deleteDocument } = useDoc();
+
+  return (
+    <>
+      <DataTable
+        rows={data}
+        onRowClick={(r) => setSelected(r)}
+        columns={[
+          {
+            key: "lot",
+            header: "Lot",
+            render: (r) => (
+              <div className="flex items-center gap-2">
+                <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
+                  <Hammer className="size-3" />
+                </span>
+                <span className="text-xs font-semibold text-[var(--a-fg)]">{r.lotTitle}</span>
+              </div>
+            ),
+          },
+          {
+            key: "amount",
+            header: "Bid",
+            render: (r) => (
+              <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                {fmtMoney(r.bidAmount)}
+              </span>
+            ),
+          },
+          { key: "status", header: "Status", render: (r) => <StatusChip value={"Leading"} /> },
+          {
+            key: "at",
+            header: "When",
+            render: (r) => (
+              <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.placedAt)}</span>
+            ),
+          },
+        ]}
+      />
+      <RecordSheet<BidRow>
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+        eyebrow={`${selected?.fullName ?? ""}`}
+        title={selected?.lotTitle ?? ""}
+        subtitle={
+          selected
+            ? `Current Bid Amount ${fmtMoney(selected.bidAmount)} · Last Bid Amount ${fmtMoney(selected.lastBid ?? 0)}`
+            : undefined
+        }
+        record={selected}
+        fields={fields}
+        onSave={async (p) => {
+          if (!selected) return;
+          try {
+            await updateDocument({
+              collections: "bids",
+              document: {
+                ...selected,
+                id: selected.id,
+                ...p,
+              },
+            });
+            toast({
+              title: "Success",
+              description: "Bid Modified",
+              variant: "info",
+              duration: 50000,
+              position: "top",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.message || error.code,
+              variant: "error",
+              duration: 50000,
+              position: "top",
+            });
+          }
+        }}
+        operations={
+          selected
+            ? [
+                // {
+                //   id: "open",
+                //   label: "Open bidding",
+                //   icon: PlayCircle,
+                //   tone: "success",
+                //   onRun: () => {
+                //     // patch(selected.slug, { status: "active" } as Partial<Bid>);
+                //     // setSelected({ ...selected, status: "active" });
+                //   },
+                // },
                 {
-                  id: "open",
-                  label: "Open bidding",
-                  icon: PlayCircle,
-                  tone: "success",
-                  onRun: () => {
-                    patch(selected.slug, { status: "active" } as Partial<AuctionLot>);
-                    setSelected({ ...selected, status: "active" });
-                  },
-                },
-                {
-                  id: "pause",
-                  label: "Pause lot",
+                  id: "delete",
+                  label: "Delete Bid",
+                  tone: "danger",
                   icon: Pause,
-                  onRun: () => {
-                    patch(selected.slug, { status: "pending" } as Partial<AuctionLot>);
-                    setSelected({ ...selected, status: "pending" });
+                  onRun: async () => {
+                    if (!selected) {
+                      toast({
+                        title: "Error",
+                        description: "Error In Selections",
+                        variant: "warning",
+                        position: "bottom",
+                      });
+                      return;
+                    }
+
+                    try {
+                      const bidder = await getDoc(doc(db, "users", selected.userID));
+
+                      if (bidder.exists()) {
+                        const data = bidder.data() as WalletAccount;
+                        await updateDocument({
+                          collections: "users",
+                          document: {
+                            id: selected.userID,
+                            wallet: {
+                              balance: data.wallet.balance + selected.bidAmount,
+                              bidBalance: Math.max(0, data.wallet.bidBalance - selected.bidAmount),
+                            },
+                          },
+                        });
+                      }
+
+                      await deleteDocument({
+                        collectionName: "bids",
+                        id: selected.id,
+                        message:
+                          "Bid Successfully Deleted, And Funds Has Been Returned To User Who Bidded",
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: error.message || error.code,
+                        variant: "error",
+                        position: "bottom",
+                      });
+                    } finally {
+                      setSelected(null);
+                    }
+
+                    // patch(selected.slug, { status: "pending" } as Partial<Bid>);
+                    // setSelected({ ...selected, status: "pending" });
                   },
                 },
                 {
@@ -668,26 +931,117 @@ function AuctionsPanel({
                   label: "Close & award winner",
                   icon: Hammer,
                   tone: "primary",
-                  confirm: "Close this lot and award current high bidder?",
-                  onRun: () => alert("Lot closed (mock)."),
-                },
-                {
-                  id: "withdraw",
-                  label: "Withdraw lot",
-                  icon: Archive,
-                  tone: "danger",
-                  confirm: "Withdraw this lot from auction?",
-                  onRun: () => {
-                    setRows(rows.filter((l) => l.slug !== selected.slug));
-                    setSelected(null);
+                  onRun: async () => {
+                    const Lot = await getAuctionBySlug(selected.slug);
+                    if (!selected || !Lot) {
+                      toast({
+                        title: "Error",
+                        description: "Error In Selections",
+                        variant: "warning",
+                        position: "bottom",
+                      });
+
+                      return;
+                    }
+
+                    try {
+                      const biddingUser = await getDoc(doc(db, "users", selected.userID));
+
+                      if (biddingUser.exists()) {
+                        const data = biddingUser.data() as WalletAccount;
+
+                        //for current Bidder..deduct from bidding balance
+                        await updateDocument({
+                          collections: "users",
+                          document: {
+                            id: selected.userID,
+                            wallet: {
+                              balance: data.wallet.balance,
+                              bidBalance: Math.max(0, data.wallet.bidBalance - selected.bidAmount),
+                            },
+                          },
+                        });
+
+                        //for original owner...add to the wallet balance
+                        await updateDocument({
+                          collections: "users",
+                          document: {
+                            id: Lot.userID,
+                            wallet: {
+                              balance: data.wallet.balance + selected.bidAmount,
+                              bidBalance: data.wallet.bidBalance,
+                            },
+                          },
+                        });
+
+                        await addDocToCollection({
+                          collections: "listings",
+                          document: {
+                            title: Lot?.title,
+                            userName: data.userName,
+                            userID: selected.userID,
+                            bidAmount: selected.bidAmount,
+                            year: Lot?.year,
+                            category: Lot?.category,
+                            description: Lot?.description,
+                            images: Lot?.images,
+                            createdAt: new Date().toISOString(),
+                            dimensions: Lot?.dimensions,
+                            status: Lot?.status,
+                            medium: Lot?.medium,
+                            slug: crypto.randomUUID(),
+                            provenance: Lot?.provenance,
+                            condition: Lot?.condition,
+                            totalBidCounts: Lot?.bidCount,
+                            placedAt: selected.placedAt,
+                          },
+                        });
+
+                        await updateDocument({
+                          collections: "auctions",
+                          document: {
+                            id: selected.id,
+                            endsAt: inHours(12),
+                            status: "outbidded",
+                          },
+                        });
+
+                        await deleteDocument({
+                          collectionName: "bids",
+                          id: selected.id,
+                          message:
+                            "Bid Has Ended, Thus Added To The User Listing List And Deleted From Auctions In 12 hours From Now",
+                        });
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: error.message || error.code,
+                        variant: "error",
+                        position: "bottom",
+                      });
+                    } finally {
+                      setSelected(null);
+                    }
                   },
                 },
-                {
-                  id: "flag",
-                  label: "Flag for review",
-                  icon: Flag,
-                  onRun: () => alert("Flagged (mock)."),
-                },
+                // {
+                //   id: "withdraw",
+                //   label: "Withdraw lot",
+                //   icon: Archive,
+                //   tone: "danger",
+                //   confirm: "Withdraw this lot from auction?",
+                //   onRun: () => {
+                //     setRows(rows.filter((l) => l.slug !== selected.slug));
+                //     setSelected(null);
+                //   },
+                // },
+                // {
+                //   id: "flag",
+                //   label: "Flag for review",
+                //   icon: Flag,
+                //   onRun: () => alert("Flagged (mock)."),
+                // },
               ]
             : undefined
         }

@@ -24,93 +24,145 @@ import {
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
 import {
   adminTxs as seedTxs,
-  adminUsers as seedAccounts,
+  adminUsers as seedAdminUsers,
   fmtDateTime,
   fmtMoney,
   type AdminTx,
-  type AdminUser,
 } from "@/data/admin-mock";
+import { WalletAccount, WalletTx } from "@/types";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { useToast } from "@/lib/useToast";
+import useDoc from "@/hooks/useDoc";
+import { ToastPosition } from "@/components/ui/toast";
 
 export const Route = createFileRoute("/admin/wallet")({
   component: WalletOps,
 });
 
-type Tab = "transactions" | "accounts" | "deposits" | "withdrawals";
+type Tab =
+  | "transactions"
+  | "accounts"
+  | "deposits"
+  | "withdrawals"
+  | "transfer_in"
+  | "transfer_out";
 
 function WalletOps() {
+  // Note: accounts tab uses local mapped state derived from admin-mock for now.
+  // Real implementation should source from Firestore via zustand / queries.
+
+  const { users, transactions } = useDataStore(
+    useShallow((s) => ({
+      users: s.users,
+      transactions: s.transactions,
+    })),
+  );
+
   const [tab, setTab] = useState<Tab>("transactions");
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
 
-  const [txs, setTxs] = useState<AdminTx[]>(seedTxs);
-  const [accounts, setAccounts] = useState<AdminUser[]>(seedAccounts);
-
-  const [selectedTx, setSelectedTx] = useState<AdminTx | null>(null);
-  const [selectedAcc, setSelectedAcc] = useState<AdminUser | null>(null);
+  const [selectedTx, setSelectedTx] = useState<WalletTx | null>(null);
+  const [selectedAcc, setSelectedAcc] = useState<WalletAccount | null>(null);
 
   const totals = useMemo(() => {
-    const dep = txs.filter((t) => t.type === "deposit").reduce((s, t) => s + t.amount, 0);
-    const wd = txs.filter((t) => t.type === "withdraw").reduce((s, t) => s + t.amount, 0);
-    const vol = txs.reduce((s, t) => s + t.amount, 0);
-    const pending = txs.filter((t) => t.status === "pending").length;
+    const dep = transactions
+      .filter((t) => t.type === "deposit" && t.status === "Approved")
+      .reduce((s, t) => s + t.amount, 0);
+    const wd = transactions
+      .filter((t) => t.type === "withdraw" && t.status == "Approved")
+      .reduce((s, t) => s + t.amount, 0);
+    const vol = transactions
+      .filter((t) => t.status == "Approved")
+      .reduce((s, t) => s + t.amount, 0);
+    const pending = transactions.filter((t) => t.status === "Pending").length;
     return { dep, wd, vol, pending };
-  }, [txs]);
+  }, [transactions]);
 
   const txRows = useMemo(() => {
     const ql = q.toLowerCase();
-    return txs
+    return transactions
       .filter((t) =>
         tab === "deposits"
           ? t.type === "deposit"
           : tab === "withdrawals"
             ? t.type === "withdraw"
-            : true,
+            : tab === "transfer_in" || tab === "transfer_out"
+              ? t.type === "transfer_in" || t.type === "transfer_out"
+              : true,
       )
       .filter((t) => (status === "all" ? true : t.status === status))
       .filter(
-        (t) => !q || t.user.toLowerCase().includes(ql) || t.id.includes(ql) || t.email.includes(ql),
+        (t) =>
+          !q || t.fullName.toLowerCase().includes(ql) || t.id.includes(ql) || t.email.includes(ql),
       );
-  }, [tab, q, status, txs]);
+  }, [tab, q, status, transactions]);
 
   const accRows = useMemo(
     () =>
-      accounts.filter(
+      users.filter(
         (u) =>
-          !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.includes(q.toLowerCase()),
+          !q ||
+          u.fullName.toLowerCase().includes(q.toLowerCase()) ||
+          u.email.includes(q.toLowerCase()),
       ),
-    [accounts, q],
+    [users, q],
   );
 
-  function patchTx(id: string, p: Partial<AdminTx>) {
-    setTxs((prev) => prev.map((t) => (t.id === id ? { ...t, ...p } : t)));
-    setSelectedTx((cur) => (cur && cur.id === id ? { ...cur, ...p } : cur));
-  }
-  function patchAcc(id: string, p: Partial<AdminUser>) {
-    setAccounts((prev) => prev.map((u) => (u.id === id ? { ...u, ...p } : u)));
-    setSelectedAcc((cur) => (cur && cur.id === id ? { ...cur, ...p } : cur));
-  }
+  const { toast } = useToast();
+  const { updateDocument } = useDoc();
 
-  const txFields: FieldDef<AdminTx>[] = [
-    { key: "id", label: "Transaction ID", editable: false },
-    { key: "user", label: "User", editable: false },
+  const errorToast = (error: any, position?: ToastPosition, description?: string, action?: any) => {
+    toast({
+      title: "Error",
+      description: description || error.message,
+      action: action ?? undefined,
+      variant: "error",
+      position,
+    });
+  };
+
+  const modToast = () => {
+    toast({
+      title: "Success",
+      description: "Changes Made",
+      variant: "info",
+      duration: 40000,
+    });
+  };
+
+  const warnToast = () => {
+    toast({
+      title: "Error",
+      description: "Error In Selection",
+      variant: "warning",
+      duration: 40000,
+    });
+  };
+
+  const txFields: FieldDef<WalletTx>[] = [
+    // { key: "id", label: "Transaction ID", editable: false },
+    { key: "fullName", label: "FullName", editable: false },
     { key: "email", label: "Email", editable: false },
     {
       key: "type",
       label: "Type",
       kind: "select",
+      editable: false,
       options: ["deposit", "withdraw", "transfer", "purchase", "sale"].map((v) => ({
         value: v,
         label: v,
       })),
     },
     { key: "amount", label: "Amount", kind: "money" },
-    { key: "method", label: "Method" },
-    {
-      key: "status",
-      label: "Status",
-      kind: "select",
-      options: ["completed", "pending", "failed", "review"].map((v) => ({ value: v, label: v })),
-    },
+    { key: "channel", label: "Method", editable: false },
+    // {
+    //   key: "status",
+    //   label: "Status",
+    //   kind: "select",
+    //   options: ["completed", "pending", "failed", "review"].map((v) => ({ value: v, label: v })),
+    // },
     {
       key: "createdAt",
       label: "Created",
@@ -119,27 +171,27 @@ function WalletOps() {
     },
   ];
 
-  const accFields: FieldDef<AdminUser>[] = [
-    { key: "name", label: "Name", span: 2 },
-    { key: "email", label: "Email" },
+  const accFields: FieldDef<WalletAccount>[] = [
+    { key: "fullName", label: "Name", span: 2, editable: false },
+    { key: "email", label: "Email", editable: false },
     {
-      key: "role",
-      label: "Role",
-      kind: "select",
-      options: ["user", "moderator", "admin"].map((v) => ({ value: v, label: v })),
+      key: "token",
+      label: "Token",
+      editable: false,
     },
+    { key: "userName", label: "User Name/Seller Slug" },
+
     {
       key: "status",
       label: "Status",
       kind: "select",
       options: ["active", "pending", "suspended"].map((v) => ({ value: v, label: v })),
     },
-    { key: "balance", label: "Wallet balance", kind: "money" },
-    { key: "id", label: "Account ID", editable: false },
-    { key: "joined", label: "Joined", editable: false, render: (v) => fmtDateTime(v as string) },
+    { key: "wallet.balance", label: "Wallet balance", kind: "money" },
+    { key: "wallet.bidBalance", label: "Wallet Bid Balance", kind: "money" },
     {
-      key: "lastSeen",
-      label: "Last seen",
+      key: "joinedDate",
+      label: "Joined",
       editable: false,
       render: (v) => fmtDateTime(v as string),
     },
@@ -158,14 +210,14 @@ function WalletOps() {
       />
 
       <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <BentoCard eyebrow="Inflow · 30d" title={fmtMoney(totals.dep)} delay={0}>
-          <p className="text-xs text-[var(--a-muted)]">Total deposits.</p>
+        <BentoCard eyebrow="Inflow" title={fmtMoney(totals.dep)} delay={0}>
+          <p className="text-xs text-[var(--a-muted)]">Total Approved deposits.</p>
         </BentoCard>
-        <BentoCard eyebrow="Outflow · 30d" title={fmtMoney(totals.wd)} delay={0.05}>
-          <p className="text-xs text-[var(--a-muted)]">Withdrawals processed.</p>
+        <BentoCard eyebrow="Outflow" title={fmtMoney(totals.wd)} delay={0.05}>
+          <p className="text-xs text-[var(--a-muted)]">All Approved Withdrawals.</p>
         </BentoCard>
-        <BentoCard eyebrow="Volume · 30d" title={fmtMoney(totals.vol)} delay={0.1}>
-          <p className="text-xs text-[var(--a-muted)]">All transactions combined.</p>
+        <BentoCard eyebrow="Volume" title={fmtMoney(totals.vol)} delay={0.1}>
+          <p className="text-xs text-[var(--a-muted)]">All Approved transactions combined.</p>
         </BentoCard>
         <BentoCard eyebrow="Queue" title={`${totals.pending}`} delay={0.15}>
           <p className="text-xs text-[var(--a-muted)]">Pending review.</p>
@@ -175,10 +227,12 @@ function WalletOps() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabBar
           tabs={[
-            { id: "transactions", label: "Transactions", count: txs.length },
-            { id: "accounts", label: "Accounts", count: accounts.length },
+            { id: "transactions", label: "Transactions", count: transactions.length },
+            // { id: "accounts", label: "Accounts", count: users.length },
             { id: "deposits", label: "Deposits" },
             { id: "withdrawals", label: "Withdrawals" },
+            { id: "transfer_in", label: "Transfers (Received)" },
+            { id: "transfer_out", label: "Transfers (Sent)" },
           ]}
           active={tab}
           onChange={(id) => setTab(id as Tab)}
@@ -186,7 +240,7 @@ function WalletOps() {
         <div className="flex items-center gap-2 flex-wrap">
           {tab !== "accounts" && (
             <div className="flex rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-0.5">
-              {["all", "completed", "pending", "review", "failed"].map((s) => (
+              {["all", "Approved", "Pending", "On Hold", "Failed"].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatus(s)}
@@ -219,33 +273,33 @@ function WalletOps() {
           onRowClick={(r) => setSelectedAcc(r)}
           columns={[
             {
-              key: "name",
+              key: "fullName",
               header: "Account",
               render: (r) => (
                 <div className="flex items-center gap-2.5">
                   <span
                     className="grid size-8 place-items-center rounded-md text-[11px] font-bold text-[var(--a-accent-ink)]"
-                    style={{ background: r.avatar }}
+                    style={{ background: "orange" }}
                   >
-                    {r.name
+                    {r.fullName
                       .split(" ")
                       .map((p) => p[0])
                       .join("")
                       .slice(0, 2)}
                   </span>
                   <div>
-                    <p className="text-xs font-semibold text-[var(--a-fg)]">{r.name}</p>
+                    <p className="text-xs font-semibold text-[var(--a-fg)]">{r.fullName}</p>
                     <p className="text-[10px] text-[var(--a-muted)]">{r.email}</p>
                   </div>
                 </div>
               ),
             },
             {
-              key: "balance",
+              key: "wallet.balance",
               header: "Balance",
               render: (r) => (
                 <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                  {fmtMoney(r.balance)}
+                  {fmtMoney(r.wallet.balance)}
                 </span>
               ),
             },
@@ -258,10 +312,10 @@ function WalletOps() {
             },
             { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
             {
-              key: "joined",
+              key: "joinedDate",
               header: "Joined",
               render: (r) => (
-                <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.joined)}</span>
+                <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.joinedDate)}</span>
               ),
             },
           ]}
@@ -272,17 +326,19 @@ function WalletOps() {
           onRowClick={(r) => setSelectedTx(r)}
           columns={[
             {
-              key: "id",
-              header: "Tx ID",
-              render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.id}</span>,
+              key: "fullName",
+              header: "fullname",
+              render: (r) => (
+                <span className="a-mono text-xs text-[var(--a-muted)]">{r.fullName}</span>
+              ),
             },
             {
-              key: "user",
-              header: "User",
+              key: "email",
+              header: "email",
               render: (r) => (
                 <div>
-                  <p className="text-xs font-semibold text-[var(--a-fg)]">{r.user}</p>
-                  <p className="text-[10px] text-[var(--a-muted)]">{r.email}</p>
+                  {/* <p className="text-xs font-semibold text-[var(--a-fg)]">{r.user}</p> */}
+                  <p className="text-[12px] text-[var(--a-muted)]">{r.email}</p>
                 </div>
               ),
             },
@@ -298,7 +354,9 @@ function WalletOps() {
             {
               key: "method",
               header: "Method",
-              render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.method}</span>,
+              render: (r) => (
+                <span className="text-xs text-[var(--a-fg-2)] capitalize">{r.channel}</span>
+              ),
             },
             {
               key: "amount",
@@ -322,15 +380,40 @@ function WalletOps() {
       )}
 
       {/* Transaction sheet */}
-      <RecordSheet<AdminTx>
+      <RecordSheet<WalletTx>
         open={!!selectedTx}
         onOpenChange={(o) => !o && setSelectedTx(null)}
         eyebrow={selectedTx?.type.toUpperCase()}
-        title={selectedTx ? `${fmtMoney(selectedTx.amount)} · ${selectedTx.user}` : ""}
+        title={selectedTx ? `${fmtMoney(selectedTx.amount)} · ${selectedTx.fullName}` : ""}
         subtitle={selectedTx?.id}
         record={selectedTx}
         fields={txFields}
-        onSave={(p) => selectedTx && patchTx(selectedTx.id, p)}
+        onSave={async (p) => {
+          if (!selectedTx) {
+            toast({
+              title: "Error",
+              description: "Error in Selection",
+              variant: "warning",
+            });
+            return;
+          }
+
+          try {
+            await updateDocument({
+              collections: "transactions",
+              document: {
+                ...selectedTx,
+                ...p,
+              },
+            });
+
+            modToast();
+          } catch (error) {
+            errorToast(error);
+          } finally {
+            setSelectedTx(null);
+          }
+        }}
         extra={
           selectedTx && (
             <div>
@@ -338,16 +421,20 @@ function WalletOps() {
               <ul className="space-y-2 text-xs text-[var(--a-fg-2)]">
                 <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Channel</span>
-                  <span className="a-mono">{selectedTx.method}</span>
+                  <span className="a-mono capitalize">{selectedTx.channel}</span>
                 </li>
                 <li className="flex justify-between">
+                  <span className="text-[var(--a-muted)]">Type</span>
+                  <span className="a-mono capitalize">{selectedTx.type}</span>
+                </li>
+                {/* <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Fee est.</span>
                   <span className="a-mono">{fmtMoney(Math.round(selectedTx.amount * 0.012))}</span>
-                </li>
-                <li className="flex justify-between">
+                </li> */}
+                {/* <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Net</span>
                   <span className="a-mono">{fmtMoney(Math.round(selectedTx.amount * 0.988))}</span>
-                </li>
+                </li> */}
                 <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Date</span>
                   <span className="a-mono">{fmtDateTime(selectedTx.createdAt)}</span>
@@ -364,79 +451,147 @@ function WalletOps() {
                   label: "Approve",
                   icon: CheckCircle2,
                   tone: "success",
-                  onRun: () => patchTx(selectedTx.id, { status: "completed" }),
+                  onRun: async () => {
+                    if (!selectedTx) {
+                      warnToast();
+                      return;
+                    }
+                    try {
+                      await updateDocument({
+                        collections: "transactions",
+                        document: {
+                          status: "Approved",
+                          id: selectedTx.id,
+                        },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedTx(null);
+                    }
+                  },
                 },
                 {
-                  id: "reject",
-                  label: "Reject",
+                  id: "decline",
+                  label: "Decline",
                   icon: XCircle,
                   tone: "danger",
-                  confirm: "Reject this transaction?",
-                  onRun: () => patchTx(selectedTx.id, { status: "failed" }),
+                  onRun: async () => {
+                    if (!selectedTx) {
+                      warnToast();
+                      return;
+                    }
+                    try {
+                      await updateDocument({
+                        collections: "transactions",
+                        document: {
+                          status: "Failed",
+                          id: selectedTx.id,
+                        },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedTx(null);
+                    }
+                  },
                 },
-                {
-                  id: "hold",
-                  label: "Send to review",
-                  icon: Flag,
-                  onRun: () => patchTx(selectedTx.id, { status: "review" }),
-                },
-                ...(selectedTx.type === "withdraw"
-                  ? [
-                      {
-                        id: "release",
-                        label: "Release payout",
-                        icon: ArrowUpRight,
-                        tone: "primary" as const,
-                        onRun: () => patchTx(selectedTx.id, { status: "completed" }),
-                      },
-                    ]
-                  : []),
-                ...(selectedTx.status === "completed"
-                  ? [
-                      {
-                        id: "refund",
-                        label: "Issue refund",
-                        icon: RotateCcw,
-                        tone: "danger" as const,
-                        confirm: "Refund this transaction?",
-                        onRun: () => alert(`Refunded ${fmtMoney(selectedTx.amount)} (mock).`),
-                      },
-                    ]
-                  : []),
+                // {
+                //   id: "hold",
+                //   label: "Send to review",
+                //   icon: Flag,
+                //   onRun: () => patchTx(selectedTx.id, { status: "review" }),
+                // },
+                // ...(selectedTx.type === "withdraw"
+                //   ? [
+                //       {
+                //         id: "release",
+                //         label: "Release payout",
+                //         icon: ArrowUpRight,
+                //         tone: "primary" as const,
+                //         onRun: () => patchTx(selectedTx.id, { status: "completed" }),
+                //       },
+                //     ]
+                //   : []),
+                // ...(selectedTx.status === "Approved"
+                //   ? [
+                //       {
+                //         id: "refund",
+                //         label: "Issue refund",
+                //         icon: RotateCcw,
+                //         tone: "danger" as const,
+                //         confirm: "Refund this transaction?",
+                //         onRun: () => alert(`Refunded ${fmtMoney(selectedTx.amount)} (mock).`),
+                //       },
+                //     ]
+                //   : []),
               ]
             : undefined
         }
       />
 
       {/* Account sheet */}
-      <RecordSheet<AdminUser>
+      <RecordSheet<WalletAccount>
         open={!!selectedAcc}
         onOpenChange={(o) => !o && setSelectedAcc(null)}
         eyebrow="Wallet account"
-        title={selectedAcc?.name ?? ""}
+        title={selectedAcc?.fullName ?? ""}
         subtitle={selectedAcc?.email}
         record={selectedAcc}
         fields={accFields}
-        onSave={(p) => selectedAcc && patchAcc(selectedAcc.id, p)}
+        onSave={async (p) => {
+          if (!selectedAcc) {
+            toast({
+              title: "Error",
+              description: "Error in Selection",
+              variant: "warning",
+            });
+            return;
+          }
+
+          try {
+            await updateDocument({
+              collections: "users",
+              document: {
+                ...selectedAcc,
+                ...p,
+              },
+            });
+
+            modToast();
+          } catch (error) {
+            errorToast(error);
+          } finally {
+            setSelectedAcc(null);
+          }
+        }}
         extra={
           selectedAcc && (
             <div>
-              <p className="a-eyebrow mb-2">Balance</p>
-              <p className="font-display text-3xl font-extrabold text-[var(--a-accent)]">
-                {fmtMoney(selectedAcc.balance)}
-              </p>
-              <p className="mt-1 text-[10px] text-[var(--a-muted)]">Spendable</p>
+              <div className="flex flex-col gap-1">
+                <p className="a-eyebrow ">Balance</p>
+                <p className="font-display text-3xl font-extrabold text-[var(--a-accent)]">
+                  {fmtMoney(selectedAcc.wallet.balance)}
+                </p>
+                <p className="a-eyebrow mb-">Bid Balance</p>
+                <p className="font-display text-3xl font-extrabold text-[var(--a-accent)]">
+                  {fmtMoney(selectedAcc.wallet.bidBalance)}
+                </p>
+              </div>
+              {/* <p className="mt-1 text-[10px] text-[var(--a-muted)]">Spendable</p> */}
               <ul className="mt-4 space-y-2 text-xs">
                 <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Tx count</span>
                   <span className="a-mono text-[var(--a-fg-2)]">
-                    {txs.filter((t) => t.email === selectedAcc.email).length}
+                    {transactions.filter((t) => t.userID === selectedAcc.userID).length}
                   </span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-[var(--a-muted)]">Last seen</span>
+                  <span className="text-[var(--a-muted)]">Joined Date</span>
                   <span className="a-mono text-[var(--a-fg-2)]">
-                    {fmtDateTime(selectedAcc.lastSeen)}
+                    {fmtDateTime(selectedAcc.joinedDate)}
                   </span>
                 </li>
               </ul>
@@ -458,14 +613,20 @@ function WalletOps() {
                   label: "Suspend account",
                   icon: Ban,
                   tone: "danger",
-                  confirm: `Suspend ${selectedAcc.name}?`,
+                  confirm: `Suspend ${selectedAcc.fullName}?`,
                   onRun: () => patchAcc(selectedAcc.id, { status: "suspended" }),
                 },
                 {
                   id: "credit",
                   label: "Credit $100",
                   icon: WalletIcon,
-                  onRun: () => patchAcc(selectedAcc.id, { balance: selectedAcc.balance + 100 }),
+                  onRun: () =>
+                    patchAcc(selectedAcc.id, {
+                      wallet: {
+                        balance: selectedAcc.wallet.balance + 100,
+                        bidBalance: selectedAcc.wallet.bidBalance,
+                      },
+                    }),
                 },
                 {
                   id: "debit",
@@ -473,20 +634,25 @@ function WalletOps() {
                   icon: WalletIcon,
                   tone: "danger",
                   onRun: () =>
-                    patchAcc(selectedAcc.id, { balance: Math.max(0, selectedAcc.balance - 100) }),
+                    patchAcc(selectedAcc.id, {
+                      wallet: {
+                        balance: Math.max(0, selectedAcc.wallet.balance - 100),
+                        bidBalance: selectedAcc.wallet.bidBalance,
+                      },
+                    }),
                 },
-                {
-                  id: "reset",
-                  label: "Force password reset",
-                  icon: KeyRound,
-                  onRun: () => alert(`Reset email sent to ${selectedAcc.email} (mock).`),
-                },
-                {
-                  id: "message",
-                  label: "Message user",
-                  icon: Mail,
-                  onRun: () => alert(`Opened message thread with ${selectedAcc.name} (mock).`),
-                },
+                // {
+                //   id: "reset",
+                //   label: "Force password reset",
+                //   icon: KeyRound,
+                //   onRun: () => alert(`Reset email sent to ${selectedAcc.email} (mock).`),
+                // },
+                // {
+                //   id: "message",
+                //   label: "Message user",
+                //   icon: Mail,
+                //   onRun: () => alert(`Opened message thread with ${selectedAcc.fullName} (mock).`),
+                // },
               ]
             : undefined
         }

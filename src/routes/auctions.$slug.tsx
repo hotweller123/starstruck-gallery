@@ -1,6 +1,6 @@
 import { ReactHTMLElement, useMemo, useState } from "react";
 import { createFileRoute, Link, notFound, useNavigate, useParams } from "@tanstack/react-router";
-import { Gavel, Heart, ShieldCheck, Mail, MapPin } from "lucide-react";
+import { Gavel, Heart, ShieldCheck, Mail, MapPin, DollarSign } from "lucide-react";
 import {
   auctionLots,
   formatBid,
@@ -46,9 +46,10 @@ export const Route = createFileRoute("/auctions/$slug")({
 });
 
 function AuctionLotPage() {
-  const { auctions } = useDataStore(
+  const { auctions, bids } = useDataStore(
     useShallow((s) => ({
       auctions: s.auctions,
+      bids: s.bids,
     })),
   );
   const { slug } = useParams({ from: "/auctions/$slug" });
@@ -146,7 +147,11 @@ function AuctionLotPage() {
         return;
       }
 
-      const payload: Omit<Bid, "id"> = {
+      const payload: Omit<Bid, "id" | "lastBid"> = {
+        fullName: user?.fullName,
+        email: user?.email,
+        lotTitle: lot.title,
+        status: "Leading",
         auctionID: lot.id,
         bidAmount: formBidAmount,
         placedAt: new Date().toISOString(),
@@ -158,28 +163,37 @@ function AuctionLotPage() {
 
       const previousBid = doc(db, "bids", lot.id);
       const getPreviousBid = await getDoc(previousBid);
-      const previousUserBid = doc(db, "users", (getPreviousBid.data() as WalletAccount).userID);
-      const getPreviousBidUser = await getDoc(previousUserBid);
 
-      if (getPreviousBid.exists() && getPreviousBidUser.exists()) {
-        const bidData = getPreviousBid.data() as Bid;
-        const userData = getPreviousBidUser.data() as WalletAccount;
-        const newBal = await (userData.wallet.balance + bidData.bidAmount);
-        const newBidBal = await Math.max(0, userData.wallet.bidBalance - bidData.bidAmount);
+      if (getPreviousBid.exists()) {
+        const previousUserBid = doc(db, "users", (getPreviousBid.data() as Bid).userID);
+        const getPreviousBidUser = await getDoc(previousUserBid);
+        if (getPreviousBid.exists() && getPreviousBidUser.exists()) {
+          const bidData = getPreviousBid.data() as Bid;
+          const userData = getPreviousBidUser.data() as WalletAccount;
+          const newBal = await (userData.wallet.balance + bidData.bidAmount);
+          const newBidBal = await Math.max(0, userData.wallet.bidBalance - bidData.bidAmount);
 
-        await updateDocument({
-          collections: "users",
-          document: {
-            id: userData.userID,
-            wallet: {
-              balance: newBal,
-              bidBalance: newBidBal,
+          await updateDocument({
+            collections: "users",
+            document: {
+              id: userData.userID,
+              wallet: {
+                balance: newBal,
+                bidBalance: newBidBal,
+              },
             },
-          },
-        });
+          });
 
-        console.log(newBal);
-        console.log(newBidBal);
+          setTimeout(async () => {
+            await updateDocument({
+              collections: "bids",
+              document: {
+                id: lot.id,
+                lastBid: bidData.bidAmount,
+              },
+            });
+          }, 3000);
+        }
       }
 
       await setDocument({
@@ -190,7 +204,6 @@ function AuctionLotPage() {
         },
       });
 
-      console.log({ currentUserBal: user.wallet.balance });
       await handleWalletBalance({
         balance: user.wallet.balance,
         bidAmount: formBidAmount,
@@ -238,9 +251,33 @@ function AuctionLotPage() {
   });
 
   const checkIfUserCanBid = lot?.userID !== user?.userID;
+  const checkIfUserCanPlaceBid = bids.find((b) => b.id == lot.id)?.userID !== user?.userID;
+
+  console.log({
+    checkIfUserCanBid,
+    checkIfUserCanPlaceBid,
+    userID: bids,
+  });
 
   return (
     <article>
+      <div className="border-b border-ink/10 bg-surface/30 md:hidden">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
+          <span>Wallet connected · {user?.fullName} </span>
+          <div className="flex justify-between w-full items-center">
+            <div className="flex items-center gap-1">
+              <DollarSign className="size-4" />
+              {formatBid(user?.wallet.balance ?? 0)}
+              <p>·</p>
+              <Gavel className="size-4" />
+              {formatBid(user?.wallet.bidBalance ?? 0)}
+            </div>
+            <Link to="/wallet" className="text-ink hover:text-clay block">
+              Open wallet →
+            </Link>
+          </div>
+        </div>
+      </div>
       <div className="mx-auto max-w-7xl px-6 pt-12">
         <Link
           to="/auctions"
@@ -379,7 +416,7 @@ function AuctionLotPage() {
               </div>
             </div>
 
-            {checkIfUserCanBid ? (
+            {checkIfUserCanBid || checkIfUserCanPlaceBid ? (
               <>
                 <FormProvider {...formControl}>
                   <div className="">
@@ -431,7 +468,9 @@ function AuctionLotPage() {
             ) : (
               <>
                 <p className="text-ink/75 font-display italic text-xl mt-4">
-                  You Can't Place Bid As You Are The Author Of This Work
+                  {!checkIfUserCanBid
+                    ? "You Can't Place Bid As You Are The Author Of This Work"
+                    : "You Will Be Notified If You Are Subsequently Outbidded"}
                 </p>
               </>
             )}

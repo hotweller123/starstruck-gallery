@@ -18,10 +18,13 @@ import {
   Palette as PaletteIcon,
   ShoppingBag,
   CircleDollarSign,
+  DollarSign,
+  Move,
 } from "lucide-react";
 import { BentoCard, KpiTile, SectionHeader, StatusChip } from "@/components/admin/primitives";
 import {
   adminActivity,
+  fmtDateTime,
   fmtMoney,
   overviewKpis,
   pendingKyc,
@@ -29,19 +32,55 @@ import {
   revenueSeries,
 } from "@/data/admin-mock";
 import { artworks } from "@/data/artworks";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminOverview,
 });
 
 function AdminOverview() {
+  const { transactions, auctions, users } = useDataStore(
+    useShallow((s) => ({
+      transactions: s.transactions,
+      auctions: s.auctions,
+      users: s.users,
+    })),
+  );
+
   const topArtworks = [...artworks].sort((a, b) => b.price - a.price).slice(0, 5);
+  const deposits = transactions.filter((t) => t.type == "deposit");
+  const withdrawals = transactions.filter((t) => t.type == "withdraw");
+
+  const activities = [...withdrawals, ...deposits].map((a) => ({
+    id: a.id,
+    kind: a.type,
+    who: a.fullName,
+    detail: a.type,
+    amount: a.amount,
+    at: a.createdAt,
+  }));
+
+  const totals = useMemo(() => {
+    let depositA = 0;
+    let withdrawalA = 0;
+    for (const t of transactions) {
+      if (t.type == "deposit") depositA += t.amount;
+      if (t.type == "withdraw") withdrawalA += t.amount;
+    }
+
+    return {
+      depositA,
+      withdrawalA,
+    };
+  }, [transactions]);
 
   return (
     <div className="mx-auto max-w-[1440px]">
       <SectionHeader
         title="Overview"
-        description="Live snapshot of the exhibition and wallet operations. All numbers are mock data."
+        description="Live snapshot of the exhibition and wallet operations. "
         action={
           <div className="flex items-center gap-2">
             <button className="rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
@@ -57,27 +96,27 @@ function AdminOverview() {
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiTile
-          label="Platform revenue"
-          value={overviewKpis.revenue.value}
+          label="All Deposit"
+          value={totals.depositA}
           delta={overviewKpis.revenue.delta}
           delay={0.0}
         />
         <KpiTile
-          label="Wallet volume · 24h"
-          value={overviewKpis.volume24h.value}
+          label="All Withdrawals"
+          value={totals.withdrawalA}
           delta={overviewKpis.volume24h.delta}
           delay={0.05}
         />
         <KpiTile
           label="Active auctions"
-          value={overviewKpis.activeAuctions.value}
+          value={auctions.length}
           delta={overviewKpis.activeAuctions.delta}
           format="number"
           delay={0.1}
         />
         <KpiTile
-          label="New users"
-          value={overviewKpis.newUsers.value}
+          label="Users"
+          value={users.length}
           delta={overviewKpis.newUsers.delta}
           format="number"
           delay={0.15}
@@ -162,18 +201,18 @@ function AdminOverview() {
         {/* Live activity */}
         <BentoCard
           className="lg:col-span-4"
-          eyebrow="Live"
+          eyebrow=""
           title="Activity feed"
           delay={0.2}
           action={
             <span className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-pos)]">
-              <span className="size-1.5 rounded-full bg-[var(--a-pos)] a-live" /> LIVE
+              <span className="size-1.5 rounded-full bg-[var(--a-pos)] a-live" />
             </span>
           }
         >
           <ul className="space-y-3">
-            {adminActivity.map((e) => {
-              const Icon = ACTIVITY_ICON[e.kind];
+            {activities.slice(0, 5).map((e) => {
+              const Icon = ACTIVITY_ICON[e.kind as keyof typeof ACTIVITY_ICON] || CircleDot;
               return (
                 <li key={e.id} className="flex items-start gap-3">
                   <span className="grid size-8 shrink-0 place-items-center rounded-md bg-[var(--a-surface-2)] text-[var(--a-accent)]">
@@ -182,9 +221,9 @@ function AdminOverview() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs text-[var(--a-fg-2)]">
                       <span className="font-semibold text-[var(--a-fg)]">{e.who}</span>{" "}
-                      <span className="text-[var(--a-muted)]">{e.detail}</span>
+                      <span className="text-[var(--a-muted)] capitalize">{e.detail}</span>
                     </p>
-                    <p className="text-[10px] text-[var(--a-faint)]">{e.at} ago</p>
+                    <p className="text-[10px] text-[var(--a-faint)]">{fmtDateTime(e.at)} ago</p>
                   </div>
                   {e.amount !== undefined && (
                     <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
@@ -199,9 +238,9 @@ function AdminOverview() {
 
         {/* Top artworks */}
         <BentoCard
-          className="lg:col-span-5"
-          eyebrow="Trending"
-          title="Top performing artworks"
+          className="lg:col-span-6"
+          eyebrow="Listed Auctions"
+          title="New Arrivals"
           delay={0.22}
           action={
             <Link
@@ -213,20 +252,20 @@ function AdminOverview() {
           }
         >
           <ul className="divide-y divide-[var(--a-border)]">
-            {topArtworks.map((a, i) => (
+            {auctions.map((a, i) => (
               <li key={a.slug} className="flex items-center gap-3 py-2.5">
                 <span className="a-mono w-6 text-center text-[11px] font-bold text-[var(--a-muted)]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <img src={a.image} alt={a.title} className="size-10 rounded-md object-cover" />
+                <img src={a.images[0]} alt={a.title} className="size-10 rounded-md object-cover" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{a.title}</p>
                   <p className="truncate text-[10px] text-[var(--a-muted)]">
-                    {a.artist} · {a.categoryLabel}
+                    {a.sellerSlug} · {a.categoryLabel}
                   </p>
                 </div>
                 <p className="a-mono text-xs font-bold text-[var(--a-accent)]">
-                  {fmtMoney(a.price)}
+                  {fmtMoney(a.currentBid)}
                 </p>
               </li>
             ))}
@@ -235,7 +274,7 @@ function AdminOverview() {
 
         {/* Pending withdrawals */}
         <BentoCard
-          className="lg:col-span-4"
+          className="lg:col-span-6"
           eyebrow="Queue"
           title="Pending withdrawals"
           delay={0.24}
@@ -249,41 +288,46 @@ function AdminOverview() {
           }
         >
           <ul className="space-y-2.5">
-            {pendingWithdrawals.length === 0 ? (
+            {withdrawals.length === 0 ? (
               <li className="py-8 text-center text-xs text-[var(--a-muted)]">All clear.</li>
             ) : (
-              pendingWithdrawals.slice(0, 5).map((tx) => (
-                <li
-                  key={tx.id}
-                  className="flex items-center justify-between gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-2.5"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{tx.user}</p>
-                    <p className="a-mono truncate text-[10px] text-[var(--a-muted)]">
-                      {tx.id} · {tx.method}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                      {fmtMoney(tx.amount)}
-                    </p>
-                    <div className="mt-1 flex gap-1">
+              withdrawals
+                .filter((w) => w.status == "Pending")
+                .slice(0, 5)
+                .map((tx) => (
+                  <li
+                    key={tx.id}
+                    className="flex items-center justify-between gap-3 rounded-md border border-[var(--a-border)] bg-[var(--a-bg-2)] p-2.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-[var(--a-fg)]">
+                        {tx.fullName}
+                      </p>
+                      <p className="a-mono truncate text-[10px] text-[var(--a-muted)]">
+                        {tx.channel}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                        {fmtMoney(tx.amount)}
+                      </p>
+                      {/* <div className="mt-1 flex gap-1">
                       <button className="rounded bg-[var(--a-pos)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)] hover:bg-[var(--a-pos)]/25">
                         OK
                       </button>
                       <button className="rounded bg-[var(--a-neg)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-neg)] hover:bg-[var(--a-neg)]/25">
                         Reject
                       </button>
+                    </div> */}
                     </div>
-                  </div>
-                </li>
-              ))
+                  </li>
+                ))
             )}
           </ul>
         </BentoCard>
 
         {/* Pending KYC */}
-        <BentoCard className="lg:col-span-3" eyebrow="Review" title="Pending KYC" delay={0.26}>
+        {/* <BentoCard className="lg:col-span-3" eyebrow="Review" title="Pending KYC" delay={0.26}>
           <ul className="space-y-2.5">
             {pendingKyc.length === 0 ? (
               <li className="py-8 text-center text-xs text-[var(--a-muted)]">No submissions.</li>
@@ -308,7 +352,7 @@ function AdminOverview() {
               ))
             )}
           </ul>
-        </BentoCard>
+        </BentoCard> */}
       </div>
     </div>
   );
@@ -321,6 +365,9 @@ const ACTIVITY_ICON = {
   bid: Gavel,
   sale: ShoppingBag,
   listing: PaletteIcon,
+  purchase: DollarSign,
+  transfer_out: Move,
+  transfer_in: Move,
 } as const;
 
 void CircleDot;

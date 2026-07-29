@@ -35,6 +35,9 @@ import {
   Truck,
   RotateCcw,
   NotebookIcon,
+  Hammer,
+  Check,
+  X,
 } from "lucide-react";
 import { BentoCard, DataTable, StatusChip } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
@@ -48,34 +51,54 @@ import {
   type UserNote,
   type AdminTx,
 } from "@/data/admin-mock";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { Bid, WalletAccount, WalletTx } from "@/types";
+import { AuctionLot, inHours } from "@/data/auctions";
+import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
+import { useToast } from "@/lib/useToast";
+import useDoc from "@/hooks/useDoc";
+import { ToastPosition } from "@/components/ui/toast";
 
 export const Route = createFileRoute("/admin/users/$id")({
   component: UserDetail,
 });
 
 type SheetTarget =
-  | { kind: "bid"; row: UserBid }
-  | { kind: "order"; row: UserOrder }
-  | { kind: "tx"; row: AdminTx }
-  | { kind: "fav"; row: UserFavourite & { id: string } }
-  | { kind: "note"; row: UserNote }
+  | { kind: "bid"; row: Bid }
+  // | { kind: "order"; row: UserOrder }
+  | { kind: "tx"; row: WalletTx }
+  | { kind: "auction"; row: AuctionLot }
+  // | { kind: "fav"; row: UserFavourite & { id: string } }
+  // | { kind: "note"; row: UserNote }
   | null;
 
 function UserDetail() {
+  const { users, userAuctions, transactions, userBids } = useDataStore(
+    useShallow((s) => ({
+      users: s.users,
+      userAuctions: s.auctions,
+      transactions: s.transactions,
+      userBids: s.bids,
+    })),
+  );
   const { id } = useParams({ from: "/admin/users/$id" });
-  const data = getUserActivity(id);
+  const currentUser = users.find((u) => u.id == id);
 
   // Local mutable copies so edits from the sheet reflect immediately.
-  const [bids, setBids] = useState<UserBid[]>(data?.bids ?? []);
-  const [orders, setOrders] = useState<UserOrder[]>(data?.orders ?? []);
-  const [txs, setTxs] = useState<AdminTx[]>(data?.txs ?? []);
-  const [favourites, setFavourites] = useState<UserFavourite[]>(data?.favourites ?? []);
-  const [notes, setNotes] = useState<UserNote[]>(data?.notes ?? []);
+  const [bids, setBids] = useState<Bid[]>(userBids ?? []);
+  // const [orders, setOrders] = useState<UserOrder[]>(currentUser?.orders ?? []);
+  const [txs, setTxs] = useState<WalletTx[]>(transactions ?? []);
+  const [auctions, setAuctions] = useState<AuctionLot[]>(userAuctions ?? []);
+  // const [favourites, setFavourites] = useState<UserFavourite[]>(currentUser?.favourites ?? []);
+  // const [notes, setNotes] = useState<UserNote[]>(currentUser?.notes ?? []);
   const [target, setTarget] = useState<SheetTarget>(null);
 
-  const favRows = useMemo(() => favourites.map((f) => ({ ...f, id: f.slug })), [favourites]);
+  // const favRows = useMemo(() => favourites.map((f) => ({ ...f, id: f.slug })), [favourites]);
 
-  if (!data) {
+  const [open, setOpen] = useState(false);
+
+  if (!currentUser) {
     return (
       <div className="mx-auto max-w-[1440px]">
         <Link
@@ -89,13 +112,70 @@ function UserDetail() {
     );
   }
 
-  const { user, wallet, series } = data;
-  const initials = user.name
+  // const { user, wallet, series } = currentUser;
+  const initials = currentUser.fullName
     .split(" ")
     .map((p) => p[0])
     .join("")
     .slice(0, 2);
   const close = () => setTarget(null);
+
+  const accFields: FieldDef<WalletAccount>[] = [
+    { key: "fullName", label: "Name", span: 2, editable: false },
+    { key: "email", label: "Email", editable: false },
+    {
+      key: "token",
+      label: "Token",
+      editable: false,
+    },
+    { key: "userName", label: "User Name/Seller Slug" },
+
+    {
+      key: "status",
+      label: "Status",
+      kind: "select",
+      options: ["active", "pending", "suspended"].map((v) => ({ value: v, label: v })),
+    },
+    { key: "wallet.balance", label: "Wallet balance", kind: "money" },
+    { key: "wallet.bidBalance", label: "Wallet Bid Balance", kind: "money" },
+    {
+      key: "joinedDate",
+      label: "Joined",
+      editable: false,
+      render: (v) => fmtDateTime(v as string),
+    },
+  ];
+
+  const { toast } = useToast();
+  const { updateDocument } = useDoc();
+
+  const errorToast = (error: any, position?: ToastPosition, description?: string, action?: any) => {
+    toast({
+      title: "Error",
+      description: description || error.message,
+      action: action ?? undefined,
+      variant: "error",
+      position,
+    });
+  };
+
+  const modToast = () => {
+    toast({
+      title: "Success",
+      description: "Changes Made",
+      variant: "info",
+      duration: 40000,
+    });
+  };
+
+  const warnToast = () => {
+    toast({
+      title: "Error",
+      description: "Error In Selection",
+      variant: "warning",
+      duration: 40000,
+    });
+  };
 
   return (
     <div className="mx-auto max-w-[1440px]">
@@ -116,62 +196,144 @@ function UserDetail() {
         <div className="flex items-center gap-4">
           <span
             className="grid size-16 place-items-center rounded-xl text-lg font-extrabold text-[var(--a-accent-ink)] shadow-lg"
-            style={{ background: user.avatar }}
+            style={{ background: "orange" }}
           >
             {initials}
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-2xl font-extrabold tracking-tight text-[var(--a-fg)]">
-                {user.name}
+                {currentUser.fullName}
               </h1>
-              <StatusChip value={user.status} />
+              <StatusChip value={currentUser.status} />
               <span className="inline-flex items-center gap-1 rounded-full border border-[var(--a-border-hi)] bg-[var(--a-accent-soft)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--a-accent)]">
-                <ShieldCheck className="size-3" /> {user.role}
+                <ShieldCheck className="size-3" /> {currentUser.role}
               </span>
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--a-muted)]">
               <span className="inline-flex items-center gap-1.5">
-                <Mail className="size-3" /> {user.email}
+                <Mail className="size-3" /> {currentUser.email}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Calendar className="size-3" /> Joined {fmtDateTime(user.joined)}
+                <Calendar className="size-3" /> Joined {fmtDateTime(currentUser.joinedDate)}
               </span>
-              <span className="inline-flex items-center gap-1.5">
+              {/* <span className="inline-flex items-center gap-1.5">
                 <MapPin className="size-3" /> Lisbon, PT
-              </span>
-              <span className="a-mono">{wallet.accountNumber}</span>
+              </span> */}
+              <span className="a-mono">{currentUser.token}</span>
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* todo: add href link for mail */}
           <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
             <Mail className="size-3.5" /> Message
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
+          {/* <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]">
             <KeyRound className="size-3.5" /> Reset password
-          </button>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--a-neg)] hover:bg-[var(--a-neg)]/10">
-            <Ban className="size-3.5" /> Suspend
-          </button>
-          <button className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]">
-            <CheckCircle2 className="size-3.5" /> Approve
+          </button> */}
+
+          <button
+            className="inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
+            onClick={() => setOpen(true)}
+          >
+            <CheckCircle2 className="size-3.5" /> View Details
           </button>
         </div>
       </motion.div>
 
+      <RecordSheet<WalletAccount>
+        open={open}
+        onOpenChange={setOpen}
+        fields={accFields}
+        record={currentUser}
+        title={currentUser.fullName + " Information"}
+        subtitle={""}
+        eyebrow={fmtMoney(currentUser.wallet.balance)}
+        onSave={async (p) => {
+          if (!currentUser) {
+            warnToast();
+            return;
+          }
+
+          try {
+            await updateDocument({
+              collections: "users",
+              document: {
+                ...currentUser,
+                ...p,
+              },
+            });
+
+            modToast();
+          } catch (error) {
+            errorToast(error);
+          }
+        }}
+        operations={[
+          {
+            id: "activate",
+            label: "Activate User",
+            icon: Check,
+            tone: "success",
+            onRun: async () => {
+              if (!currentUser) {
+                warnToast();
+                return;
+              }
+
+              try {
+                await updateDocument({
+                  collections: "users",
+                  document: {
+                    ...currentUser,
+                    status: "active",
+                  },
+                });
+              } catch (error) {
+                errorToast(error);
+              }
+            },
+          },
+          {
+            id: "suspend",
+            label: "Suspend User",
+            icon: X,
+            tone: "danger",
+            onRun: async () => {
+              if (!currentUser) {
+                warnToast();
+                return;
+              }
+
+              try {
+                await updateDocument({
+                  collections: "users",
+                  document: {
+                    ...currentUser,
+                    status: "suspended",
+                  },
+                });
+              } catch (error) {
+                errorToast(error);
+              }
+            },
+          },
+        ]}
+      />
+
       {/* Wallet KPIs */}
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <WalletStat label="Available" value={fmtMoney(wallet.available)} accent />
-        <WalletStat label="Pending" value={fmtMoney(wallet.pending)} />
-        <WalletStat label="In escrow" value={fmtMoney(wallet.inEscrow)} />
-        <WalletStat label="Lifetime fees" value={fmtMoney(wallet.feesPaid)} />
+        <WalletStat label="Balance" value={fmtMoney(currentUser.wallet.balance)} accent />
+        <WalletStat label="Bid Balance" value={fmtMoney(currentUser.wallet.bidBalance)} />
+        {/* <WalletStat label="In escrow" value={fmtMoney(wallet.inEscrow)} />
+        <WalletStat label="Lifetime fees" value={fmtMoney(wallet.feesPaid)} /> */}
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* Balance chart */}
-        <BentoCard
+        {/* <BentoCard
           className="lg:col-span-8"
           eyebrow="Last 14 days"
           title="Wallet balance trend"
@@ -225,10 +387,10 @@ function UserDetail() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </BentoCard>
+        </BentoCard> */}
 
         {/* Security & account */}
-        <BentoCard
+        {/* <BentoCard
           className="lg:col-span-4"
           eyebrow="Security"
           title="Account integrity"
@@ -250,17 +412,73 @@ function UserDetail() {
               value={fmtMoney(wallet.lifetimeOut)}
             />
           </ul>
-        </BentoCard>
+        </BentoCard> */}
 
         {/* Bids */}
         <BentoCard
           className="lg:col-span-7"
+          eyebrow="Exhibition · Auctions"
+          title={`Listed Auctions From ${currentUser.fullName}`}
+          delay={0.12}
+          action={
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-accent)]">
+              <Gavel className="size-3" /> {auctions.length} total
+            </span>
+          }
+        >
+          <DataTable
+            rows={auctions}
+            onRowClick={(r) => setTarget({ kind: "auction", row: r })}
+            columns={[
+              {
+                key: "title",
+                header: "Title",
+                render: (r) => (
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
+                      <Gavel className="size-3" />
+                    </span>
+                    <span className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</span>
+                  </div>
+                ),
+              },
+              {
+                key: "startBid",
+                header: "Start Bid",
+                render: (r) => (
+                  <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                    {fmtMoney(r.startBid)}
+                  </span>
+                ),
+              },
+              {
+                key: "currentBid",
+                header: "Current Bid",
+                render: (r) => (
+                  <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                    {fmtMoney(r.currentBid)}
+                  </span>
+                ),
+              },
+              { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
+              {
+                key: "at",
+                header: "Time Of Upload",
+                render: (r) => (
+                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.endsAt)}</span>
+                ),
+              },
+            ]}
+          />
+        </BentoCard>
+        <BentoCard
+          className="lg:col-span-5"
           eyebrow="Exhibition · Bidding"
           title="Active & past bids"
           delay={0.18}
           action={
             <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-accent)]">
-              <Gavel className="size-3" /> {bids.length} total
+              <Hammer className="size-3" /> {bids.length} total
             </span>
           }
         >
@@ -274,7 +492,7 @@ function UserDetail() {
                 render: (r) => (
                   <div className="flex items-center gap-2">
                     <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
-                      <Gavel className="size-3" />
+                      <Hammer className="size-3" />
                     </span>
                     <span className="text-xs font-semibold text-[var(--a-fg)]">{r.lotTitle}</span>
                   </div>
@@ -285,16 +503,16 @@ function UserDetail() {
                 header: "Bid",
                 render: (r) => (
                   <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                    {fmtMoney(r.amount)}
+                    {fmtMoney(r.bidAmount)}
                   </span>
                 ),
               },
-              { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
+              { key: "status", header: "Status", render: (r) => <StatusChip value={"Leading"} /> },
               {
                 key: "at",
                 header: "When",
                 render: (r) => (
-                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.at)}</span>
+                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.placedAt)}</span>
                 ),
               },
             ]}
@@ -302,7 +520,7 @@ function UserDetail() {
         </BentoCard>
 
         {/* Orders */}
-        <BentoCard
+        {/* <BentoCard
           className="lg:col-span-5"
           eyebrow="Exhibition · Purchases"
           title="Orders"
@@ -345,7 +563,7 @@ function UserDetail() {
               </li>
             ))}
           </ul>
-        </BentoCard>
+        </BentoCard> */}
 
         {/* Wallet transactions */}
         <BentoCard
@@ -367,9 +585,11 @@ function UserDetail() {
             onRowClick={(r) => setTarget({ kind: "tx", row: r })}
             columns={[
               {
-                key: "id",
-                header: "Tx ID",
-                render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.id}</span>,
+                key: "fullName",
+                header: "Full Name",
+                render: (r) => (
+                  <span className="a-mono text-xs text-[var(--a-muted)]">{r.fullName}</span>
+                ),
               },
               {
                 key: "type",
@@ -383,7 +603,7 @@ function UserDetail() {
               {
                 key: "method",
                 header: "Method",
-                render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.method}</span>,
+                render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.channel}</span>,
               },
               {
                 key: "amount",
@@ -407,7 +627,7 @@ function UserDetail() {
         </BentoCard>
 
         {/* Favourites */}
-        <BentoCard
+        {/* <BentoCard
           className="lg:col-span-4"
           eyebrow="Exhibition · Watchlist"
           title="Favourited works"
@@ -436,10 +656,10 @@ function UserDetail() {
               </li>
             ))}
           </ul>
-        </BentoCard>
+        </BentoCard> */}
 
         {/* Admin notes */}
-        <BentoCard
+        {/* <BentoCard
           className="lg:col-span-12"
           eyebrow="Internal"
           title="Admin notes"
@@ -494,65 +714,69 @@ function UserDetail() {
               </li>
             ))}
           </ul>
-        </BentoCard>
+        </BentoCard> */}
       </div>
 
       {/* -------- Record sheets -------- */}
 
       {target?.kind === "bid" && (
-        <RecordSheet<UserBid>
+        <RecordSheet<Bid>
           open
           onOpenChange={(o) => !o && close()}
           eyebrow="Bid"
-          title={target.row.lotTitle}
-          subtitle={`Lot ${target.row.lotSlug}`}
+          title={target.row.lotTitle!}
+          subtitle={`Lot ${target.row.lotTitle}`}
           record={target.row}
           fields={bidFields}
-          onSave={(patch) => {
-            setBids((prev) => prev.map((b) => (b.id === target.row.id ? { ...b, ...patch } : b)));
+          onSave={async (patch) => {
+            return;
+
             close();
           }}
           operations={[
-            {
-              id: "mark-leading",
-              label: "Mark leading",
-              icon: Crown,
-              tone: "primary",
-              onRun: () => {
-                setBids((prev) =>
-                  prev.map((b) => (b.id === target.row.id ? { ...b, status: "leading" } : b)),
-                );
-                close();
-              },
-            },
+            // {
+            //   id: "mark-leading",
+            //   label: "Mark leading",
+            //   icon: Crown,
+            //   tone: "primary",
+            //   onRun: () => {
+            //     return;
+            //     setBids((prev) =>
+            //       prev.map((b) => (b.id === target.row.id ? { ...b, status: "leading" } : b)),
+            //     );
+            //     close();
+            //   },
+            // },
             {
               id: "mark-won",
               label: "Mark won",
               icon: CheckCircle2,
               tone: "success",
               onRun: () => {
+                return;
                 setBids((prev) =>
                   prev.map((b) => (b.id === target.row.id ? { ...b, status: "won" } : b)),
                 );
                 close();
               },
             },
-            {
-              id: "withdraw",
-              label: "Withdraw bid",
-              icon: XCircle,
-              tone: "danger",
-              confirm: "Withdraw this bid?",
-              onRun: () => {
-                setBids((prev) => prev.filter((b) => b.id !== target.row.id));
-                close();
-              },
-            },
+            // {
+            //   id: "withdraw",
+            //   label: "Withdraw bid",
+            //   icon: XCircle,
+            //   tone: "danger",
+            //   confirm: "Withdraw this bid?",
+            //   onRun: () => {
+            //     return;
+            //     setBids((prev) => prev.filter((b) => b.id !== target.row.id));
+            //     close();
+            //   },
+            // },
           ]}
         />
       )}
 
-      {target?.kind === "order" && (
+      {/* {target?.kind === "order" && (
         <RecordSheet<UserOrder>
           open
           onOpenChange={(o) => !o && close()}
@@ -615,10 +839,10 @@ function UserDetail() {
             },
           ]}
         />
-      )}
+      )} */}
 
       {target?.kind === "tx" && (
-        <RecordSheet<AdminTx>
+        <RecordSheet<WalletTx>
           open
           onOpenChange={(o) => !o && close()}
           eyebrow="Wallet ledger"
@@ -627,6 +851,7 @@ function UserDetail() {
           record={target.row}
           fields={txFields}
           onSave={(patch) => {
+            return;
             setTxs((prev) => prev.map((t) => (t.id === target.row.id ? { ...t, ...patch } : t)));
             close();
           }}
@@ -637,6 +862,7 @@ function UserDetail() {
               icon: CheckCircle2,
               tone: "success",
               onRun: () => {
+                return;
                 setTxs((prev) =>
                   prev.map((t) => (t.id === target.row.id ? { ...t, status: "completed" } : t)),
                 );
@@ -645,9 +871,10 @@ function UserDetail() {
             },
             {
               id: "review",
-              label: "Flag for review",
+              label: "Put On Hold",
               icon: RefreshCw,
               onRun: () => {
+                return;
                 setTxs((prev) =>
                   prev.map((t) => (t.id === target.row.id ? { ...t, status: "review" } : t)),
                 );
@@ -656,11 +883,12 @@ function UserDetail() {
             },
             {
               id: "fail",
-              label: "Mark failed",
+              label: "Decline",
               icon: XCircle,
               tone: "danger",
               confirm: "Mark this transaction as failed?",
               onRun: () => {
+                return;
                 setTxs((prev) =>
                   prev.map((t) => (t.id === target.row.id ? { ...t, status: "failed" } : t)),
                 );
@@ -670,8 +898,71 @@ function UserDetail() {
           ]}
         />
       )}
+      {target?.kind === "auction" && (
+        <RecordSheet<AuctionLot>
+          open
+          onOpenChange={(o) => !o && close()}
+          eyebrow="Auctioned ArtWork Details"
+          title={`${target.row.title.toUpperCase()} · ${target.row.sellerSlug}`}
+          subtitle={` ${target.row.category}`}
+          record={target.row}
+          fields={auctionFields}
+          onSave={(patch) => {
+            return;
+            setTxs((prev) => prev.map((t) => (t.id === target.row.id ? { ...t, ...patch } : t)));
+            close();
+          }}
+          extra={
+            target.row.images.length && (
+              <AuctionImageSwiper images={target.row.images} alt={currentUser.fullName} />
+            )
+          }
+          operations={[
+            {
+              id: "active",
+              label: "Approve",
+              icon: CheckCircle2,
+              tone: "success",
+              onRun: () => {
+                return;
+                setTxs((prev) =>
+                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "completed" } : t)),
+                );
+                close();
+              },
+            },
+            {
+              id: "suspend",
+              label: "Suspend",
+              tone: "danger",
+              icon: RefreshCw,
+              onRun: () => {
+                return;
+                setTxs((prev) =>
+                  prev.map((t) => (t.id === target.row.id ? { ...t, status: "review" } : t)),
+                );
+                close();
+              },
+            },
+            // {
+            //   id: "fail",
+            //   label: "Decline",
+            //   icon: XCircle,
+            //   tone: "danger",
+            //   confirm: "Mark this transaction as failed?",
+            //   onRun: () => {
+            //     return;
+            //     setTxs((prev) =>
+            //       prev.map((t) => (t.id === target.row.id ? { ...t, status: "failed" } : t)),
+            //     );
+            //     close();
+            //   },
+            // },
+          ]}
+        />
+      )}
 
-      {target?.kind === "fav" && (
+      {/* {target?.kind === "fav" && (
         <RecordSheet
           open
           onOpenChange={(o) => !o && close()}
@@ -710,9 +1001,9 @@ function UserDetail() {
             },
           ]}
         />
-      )}
+      )} */}
 
-      {target?.kind === "note" && (
+      {/* {target?.kind === "note" && (
         <RecordSheet<UserNote>
           open
           onOpenChange={(o) => !o && close()}
@@ -739,31 +1030,30 @@ function UserDetail() {
             },
           ]}
         />
-      )}
+      )} */}
     </div>
   );
 }
 
 /* ------------- Field definitions ------------- */
 
-const bidFields: FieldDef<UserBid>[] = [
+const bidFields: FieldDef<Bid>[] = [
   { key: "id", label: "Bid ID", kind: "readonly" },
   { key: "lotTitle", label: "Lot title", editable: true },
-  { key: "lotSlug", label: "Lot slug", kind: "readonly" },
-  { key: "amount", label: "Bid amount", kind: "money", editable: true },
-  {
-    key: "status",
-    label: "Status",
-    kind: "select",
-    editable: true,
-    options: [
-      { value: "leading", label: "Leading" },
-      { value: "outbid", label: "Outbid" },
-      { value: "won", label: "Won" },
-      { value: "lost", label: "Lost" },
-    ],
-  },
-  { key: "at", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  { key: "bidAmount", label: "Bid amount", kind: "money", editable: true },
+  // {
+  //   key: "status",
+  //   label: "Status",
+  //   kind: "select",
+  //   editable: true,
+  //   options: [
+  //     { value: "leading", label: "Leading" },
+  //     { value: "outbid", label: "Outbid" },
+  //     { value: "won", label: "Won" },
+  //     { value: "lost", label: "Lost" },
+  //   ],
+  // },
+  { key: "placedAt", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
 ];
 
 const orderFields: FieldDef<UserOrder>[] = [
@@ -786,15 +1076,15 @@ const orderFields: FieldDef<UserOrder>[] = [
   { key: "at", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
 ];
 
-const txFields: FieldDef<AdminTx>[] = [
-  { key: "id", label: "Tx ID", kind: "readonly" },
-  { key: "user", label: "User", kind: "readonly" },
+const txFields: FieldDef<WalletTx>[] = [
+  // { key: "id", label: "Tx ID", kind: "readonly" },
+  { key: "fullName", label: "FullName", kind: "readonly" },
   { key: "email", label: "Email", kind: "readonly" },
   {
     key: "type",
     label: "Type",
     kind: "select",
-    editable: true,
+    editable: false,
     options: [
       { value: "deposit", label: "Deposit" },
       { value: "withdraw", label: "Withdraw" },
@@ -803,7 +1093,7 @@ const txFields: FieldDef<AdminTx>[] = [
       { value: "sale", label: "Sale" },
     ],
   },
-  { key: "method", label: "Method", editable: true },
+  { key: "channel", label: "Method", editable: false },
   { key: "amount", label: "Amount", kind: "money", editable: true },
   {
     key: "status",
@@ -811,13 +1101,54 @@ const txFields: FieldDef<AdminTx>[] = [
     kind: "select",
     editable: true,
     options: [
-      { value: "completed", label: "Completed" },
-      { value: "pending", label: "Pending" },
-      { value: "failed", label: "Failed" },
-      { value: "review", label: "Review" },
+      { value: "Approved", label: "Approved" },
+      { value: "Pending", label: "Pending" },
+      { value: "Failed", label: "Failed" },
+      { value: "On Hold", label: "On Hold" },
     ],
   },
   { key: "createdAt", label: "Created", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+];
+const auctionFields: FieldDef<AuctionLot>[] = [
+  { key: "title", label: "Lot title", span: 2 },
+  // { key: "lotNumber", label: "Lot #" },
+  { key: "categoryLabel", label: "Category" },
+  { key: "medium", label: "Medium" },
+  { key: "dimensions", label: "Dimensions" },
+  { key: "year", label: "Year", kind: "number" },
+  { key: "estimateLow", label: "Estimate low", kind: "money" },
+  { key: "estimateHigh", label: "Estimate high", kind: "money" },
+  { key: "currentBid", label: "Current bid", kind: "money" },
+  { key: "startBid", label: "Start bid", kind: "money" },
+  { key: "condition", label: "Condition" },
+  { key: "provenance", label: "Provenance", kind: "textarea" },
+  { key: "description", label: "Description", kind: "textarea", span: 2 },
+  // {
+  //   key: "status",
+  //   label: "Status",
+  //   kind: "select",
+  //   render(value, row) {
+  //     return (
+  //       <>
+  //         <span className="capitalize">{value as string}</span>
+  //       </>
+  //     );
+  //   },
+  //   options: [
+  //     {
+  //       label: "Active",
+  //       value: "active",
+  //     },
+  //     {
+  //       label: "Pending",
+  //       value: "pending",
+  //     },
+  //     {
+  //       label: "Suspended",
+  //       value: "suspended",
+  //     },
+  //   ],
+  // },
 ];
 
 const favFields: FieldDef<UserFavourite & { id: string }>[] = [

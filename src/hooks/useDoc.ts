@@ -1,14 +1,15 @@
 import { AuctionLot } from "@/data/auctions";
 import { toast } from "@/lib/useToast";
 import { db } from "@/services/firebase";
-import { WalletAccount, WalletTx } from "@/types";
+import { Bid, Listing, WalletAccount, WalletTx } from "@/types";
 import { addDoc, collection, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 
 export interface Collections {
   users: WalletAccount;
   transactions: WalletTx;
   auctions: AuctionLot;
-  bids: Partial<AuctionLot & WalletAccount>;
+  bids: Bid;
+  listings: Listing;
 }
 
 // type CollectionKey<T extends keyof Collections> = Collections[T];
@@ -90,10 +91,12 @@ export default function useDoc() {
     const currentDoc = doc(colref, id);
 
     await deleteDoc(currentDoc)
-      .then(() =>
-        toast.reserved({
-          title: message || "Deleted Successfullly",
-        }),
+      .then(
+        () =>
+          message &&
+          toast.reserved({
+            title: message || "Deleted Successfullly",
+          }),
       )
       .catch((err) =>
         toast.error({

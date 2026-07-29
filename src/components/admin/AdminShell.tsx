@@ -13,8 +13,10 @@ import {
   ChevronsRight,
   Shield,
   UserCircle,
+  LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuthStore } from "@/store/zustand";
 
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -165,17 +167,14 @@ function SidebarInner({
 
       <div className="border-t border-[var(--a-border)] p-3">
         {!collapsed ? (
-          <div className="rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-3">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[var(--a-warn)] a-live" />
-              <p className="text-[11px] font-semibold text-[var(--a-fg-2)]">Mock data mode</p>
-            </div>
-            <p className="mt-1 text-[10px] leading-relaxed text-[var(--a-muted)]">
-              No backend connected. All writes are in-memory.
-            </p>
+          <div className="">
+            <button className="p-1.5 justify-between gap-1.5 flex items-center border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] text-sm hover:bg-[var(--a-neg)]/20 border w-full">
+              Sign Out
+              <LogOut className="size-4" />
+            </button>
           </div>
         ) : (
-          <span className="mx-auto block size-2 rounded-full bg-[var(--a-warn)] a-live" />
+          <span className="mx-auto block size-2 rounded-full bg-[var(--a-neg)] a-live" />
         )}
       </div>
     </div>
@@ -183,6 +182,7 @@ function SidebarInner({
 }
 
 function Topbar({ onMenu }: { onMenu: () => void }) {
+  const { user } = useAuthStore();
   return (
     <header className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-[var(--a-border)] bg-[var(--a-bg)]/85 px-4 backdrop-blur md:px-8">
       <button
@@ -192,33 +192,36 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <Menu className="size-5" />
       </button>
 
-      <div className="relative hidden flex-1 max-w-md md:block">
+      {/* <div className="relative hidden flex-1 max-w-md md:block">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--a-faint)]" />
         <input
           placeholder="Search artworks, users, tx id…"
           className="h-9 w-full rounded-md border border-[var(--a-border)] bg-[var(--a-input)] pl-9 pr-3 text-sm text-[var(--a-fg)] placeholder:text-[var(--a-faint)] outline-none focus:border-[var(--a-border-hi)]"
         />
-      </div>
+      </div> */}
       <div className="flex-1 " />
 
-      <span className="hidden items-center gap-1.5 rounded-full border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-muted)] sm:inline-flex">
+      {/* <span className="hidden items-center gap-1.5 rounded-full border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--a-muted)] sm:inline-flex">
         <span className="size-1.5 rounded-full bg-[var(--a-warn)] a-live" /> Mock env
       </span>
 
       <button className="relative grid size-9 place-items-center rounded-md text-[var(--a-muted)] hover:bg-[var(--a-surface)] hover:text-[var(--a-fg)]">
         <Bell className="size-4" />
         <span className="absolute right-2 top-2 size-1.5 rounded-full bg-[var(--a-accent)]" />
-      </button>
+      </button> */}
 
-      <div className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3">
+      <Link
+        to="/admin/account"
+        className="flex items-center gap-2 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] py-1 pl-1 pr-3"
+      >
         <span className="grid size-7 place-items-center rounded bg-[var(--a-accent)] text-[11px] font-bold text-[var(--a-accent-ink)]">
-          AD
+          SA
         </span>
         <div className="hidden text-left leading-tight sm:block">
-          <p className="text-[11px] font-semibold text-[var(--a-fg)]">Avery Doss</p>
-          <p className="text-[10px] text-[var(--a-muted)]">Super admin</p>
+          <p className="text-[11px] font-semibold text-[var(--a-fg)]">{user?.fullName}</p>
+          <p className="text-[10px] text-[var(--a-muted)] capitalize">Administrator</p>
         </div>
-      </div>
+      </Link>
     </header>
   );
 }

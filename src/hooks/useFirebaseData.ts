@@ -14,13 +14,13 @@ export function useFirebaseDataHook() {
 
   const transactions = useFirebaseQueryCollection(
     "transactions",
-    user ? [where("userID", "==", user?.userID)] : [],
+    user?.role == "user" ? [where("userID", "==", user?.userID)] : [],
   );
   const users = useFirebaseQueryCollection("users");
   const auctions = useFirebaseQueryCollection("auctions");
   const bids = useFirebaseQueryCollection(
     "bids",
-    user ? [where("userID", "==", user?.userID)] : [],
+    // user ? [where("userID", "==", user?.userID)] : [],
   );
   const { setState } = useDataStore(
     useShallow((state) => ({
@@ -31,7 +31,8 @@ export function useFirebaseDataHook() {
   const isLoading =
     transactions.isLoading || users.isLoading || auctions.isLoading || bids.isLoading;
 
-  if (transactions.data && users.data) {
+  if (transactions.data && users.data && auctions.data && bids.data) {
+    // console.log(auctions.data, " from firebase provider");
     setState({
       transactions: transactions.data as WalletTx[],
       users: users.data as WalletAccount[],

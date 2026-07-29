@@ -17,13 +17,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
 
 export const Route = createFileRoute("/admin/users/")({
   component: UsersAdmin,
 });
 
 function UsersAdmin() {
-  const [users, setUsers] = useState<AdminUser[]>(seedUsers);
+  // const [users, setUsers] = useState<AdminUser[]>(seedUsers);
+  const { users } = useDataStore(
+    useShallow((s) => ({
+      users: s.users,
+    })),
+  );
   const [q, setQ] = useState("");
   const [role, setRole] = useState<"all" | UserRole>("all");
 
@@ -31,15 +38,15 @@ function UsersAdmin() {
 
   const rows = users
     .filter((u) => role === "all" || u.role === role)
-    .filter((u) => !q || u.name.toLowerCase().includes(ql) || u.email.includes(ql));
+    .filter((u) => !q || u.fullName.toLowerCase().includes(ql) || u.email.includes(ql));
 
   const counts = {
     admin: users.filter((u) => u.role === "admin").length,
-    moderator: users.filter((u) => u.role === "moderator").length,
     user: users.filter((u) => u.role === "user").length,
   };
 
   function setUserRole(id: string, next: UserRole) {
+    return;
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: next } : u)));
   }
 
@@ -57,12 +64,11 @@ function UsersAdmin() {
 
       <div className="mb-4 grid grid-cols-3 gap-3">
         <RoleCard label="Admins" count={counts.admin} />
-        <RoleCard label="Moderators" count={counts.moderator} />
         <RoleCard label="Members" count={counts.user} />
       </div>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-0.5">
+        {/* <div className="flex rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] p-0.5">
           {(["all", "admin", "moderator", "user"] as const).map((r) => (
             <button
               key={r}
@@ -76,7 +82,7 @@ function UsersAdmin() {
               {r}
             </button>
           ))}
-        </div>
+        </div> */}
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--a-faint)]" />
           <input
@@ -99,56 +105,38 @@ function UsersAdmin() {
               <div className="flex items-center gap-2.5">
                 <span
                   className="grid size-9 place-items-center rounded-md text-[11px] font-bold text-[var(--a-accent-ink)] shadow"
-                  style={{ background: u.avatar }}
+                  style={{ background: "orange" }}
                 >
-                  {u.name
+                  {u.fullName
                     .split(" ")
                     .map((p) => p[0])
                     .join("")
                     .slice(0, 2)}
                 </span>
                 <div>
-                  <p className="text-xs font-semibold text-[var(--a-fg)]">{u.name}</p>
+                  <p className="text-xs font-semibold text-[var(--a-fg)]">{u.fullName}</p>
                   <p className="a-mono text-[10px] text-[var(--a-muted)]">{u.email}</p>
                 </div>
               </div>
             ),
           },
-          {
-            key: "role",
-            header: "Role",
-            rowLink: false,
-            render: (u) => (
-              <>
-                <Select
-                  onValueChange={(e) => {
-                    setUserRole(u.id, e as UserRole);
-                  }}
-                  value={u.role}
-                >
-                  <SelectTrigger className="rounded-md border border-[var(--a-border)] bg-[var(--a-input)] px-2 py-1 text-xs text-[var(--a-fg)] focus:border-[var(--a-border-hi)] capitalize">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {["admin", "moderator", "user"].map((r) => (
-                        <SelectItem key={r} value={r} className="capitalize">
-                          {r}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </>
-            ),
-          },
+
           { key: "status", header: "Status", render: (u) => <StatusChip value={u.status} /> },
           {
             key: "bal",
             header: "Balance",
             render: (u) => (
               <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
-                {fmtMoney(u.balance)}
+                {fmtMoney(u.wallet.balance)}
+              </span>
+            ),
+          },
+          {
+            key: "wallet.bidBalance",
+            header: "Bid Balance",
+            render: (u) => (
+              <span className="a-mono text-xs font-bold text-[var(--a-fg)]">
+                {fmtMoney(u.wallet.bidBalance)}
               </span>
             ),
           },
@@ -156,16 +144,16 @@ function UsersAdmin() {
             key: "joined",
             header: "Joined",
             render: (u) => (
-              <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.joined)}</span>
+              <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.joinedDate)}</span>
             ),
           },
-          {
-            key: "last",
-            header: "Last seen",
-            render: (u) => (
-              <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.lastSeen)}</span>
-            ),
-          },
+          // {
+          //   key: "last",
+          //   header: "Last seen",
+          //   render: (u) => (
+          //     <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(u.lastSeen)}</span>
+          //   ),
+          // },
           {
             key: "view",
             header: "",

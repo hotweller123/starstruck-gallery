@@ -32,8 +32,8 @@ const ICON_STROKE = 1.25;
 const aboutLinks = [
   { to: "/about", label: "Our story", note: "Founded 2019. Four seasons a year." },
   { to: "/contact", label: "Contact", note: "Inquiries, partnerships, press." },
-  { to: "/contact", label: "Partnerships", note: "Patrons, sponsors and houses." },
-  { to: "/about", label: "Journal", note: "Long-reads, studio visits, broadsheets." },
+  // { to: "/contact", label: "Partnerships", note: "Patrons, sponsors and houses." },
+  // { to: "/about", label: "Journal", note: "Long-reads, studio visits, broadsheets." },
 ] as const;
 
 export function MegaNav() {

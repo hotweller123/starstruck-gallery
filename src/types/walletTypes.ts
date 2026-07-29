@@ -16,6 +16,9 @@ export interface AdminWallet {
   address: string;
   image: string;
   id: string;
+  isDefault: boolean;
+  memo: string;
+  createdAt: string;
 }
 
 export interface WalletAccount {

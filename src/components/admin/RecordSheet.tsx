@@ -22,7 +22,7 @@ import {
 export type FieldKind = "text" | "number" | "textarea" | "select" | "readonly" | "money";
 
 export interface FieldDef<T> {
-  key: keyof T & string;
+  key: string; // supports dot paths e.g. "wallet.balance"
   label: string;
   kind?: FieldKind;
   options?: { value: string; label: string }[];
@@ -51,7 +51,7 @@ interface RecordSheetProps<T> {
   fields: FieldDef<T>[];
   operations?: OperationDef[];
   extra?: ReactNode; // extra panel (e.g. preview)
-  onSave?: (patch: Partial<T>) => void;
+  onSave?: (patch: Record<string, any>) => void;
 }
 
 export function RecordSheet<T extends { id: string }>({
@@ -67,7 +67,7 @@ export function RecordSheet<T extends { id: string }>({
   onSave,
 }: RecordSheetProps<T>) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<Partial<T>>({});
+  const [draft, setDraft] = useState<Record<string, any>>({});
 
   useEffect(() => {
     if (open) {
@@ -78,16 +78,20 @@ export function RecordSheet<T extends { id: string }>({
 
   if (!record) return null;
 
-  function update<K extends keyof T>(key: K, value: T[K]) {
+  function update(key: string, value: unknown) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
-  function getValue<K extends keyof T>(key: K): T[K] {
-    return (draft[key] !== undefined ? draft[key] : record![key]) as T[K];
+  function getValue(key: string): unknown {
+    if (key in draft) return draft[key];
+    return getByPath(record, key);
   }
 
   function handleSave() {
-    if (onSave && Object.keys(draft).length) onSave(draft);
+    if (onSave && Object.keys(draft).length > 0) {
+      const patch = buildPatch(draft);
+      onSave(patch);
+    }
     setEditing(false);
     setDraft({});
   }
@@ -162,7 +166,7 @@ export function RecordSheet<T extends { id: string }>({
                                   kind={f.kind ?? "text"}
                                   value={value}
                                   options={f.options}
-                                  onChange={(v) => update(f.key, v as T[typeof f.key])}
+                                  onChange={(v) => update(f.key, v)}
                                 />
                               ) : (
                                 <ViewField field={f} value={value} row={record} />
@@ -327,4 +331,34 @@ function EditField({
       }
     />
   );
+}
+
+// --- dot-path helpers for nested objects like wallet.balance ---
+
+function getByPath(obj: any, path: string): any {
+  if (!obj || !path) return undefined;
+  return path.split(".").reduce((acc, k) => (acc != null ? acc[k] : undefined), obj);
+}
+
+function setByPath(obj: any, path: string, value: any): any {
+  const keys = path.split(".");
+  const last = keys.pop()!;
+  const target = keys.reduce((acc, k) => {
+    if (acc[k] == null || typeof acc[k] !== "object") acc[k] = {};
+    return acc[k];
+  }, obj);
+  target[last] = value;
+  return obj;
+}
+
+function buildPatch(draft: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [k, v] of Object.entries(draft)) {
+    if (k.includes(".")) {
+      setByPath(result, k, v);
+    } else {
+      result[k] = v;
+    }
+  }
+  return result;
 }

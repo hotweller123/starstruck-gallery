@@ -15,6 +15,7 @@ import {
   X,
   Check,
   Pencil,
+  Key,
 } from "lucide-react";
 import { BentoCard } from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
@@ -26,6 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuthStore, useDataStore } from "@/store/zustand";
+import { useShallow } from "zustand/shallow";
+import { AdminWallet } from "@/types";
+import { fmtDateTime } from "@/data/admin-mock";
+import { WalletLoader } from "@/components/wallet";
 
 export const Route = createFileRoute("/admin/account")({
   component: AdminAccountPage,
@@ -97,11 +103,15 @@ const NETWORKS: CryptoWallet["network"][] = [
 ];
 
 function AdminAccountPage() {
-  const [profile, setProfile] = useState<AdminProfile>(initialProfile);
-  const [wallets, setWallets] = useState<CryptoWallet[]>(initialWallets);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const { user } = useAuthStore();
+  const { wallets } = useDataStore(
+    useShallow((s) => ({
+      wallets: s.wallets,
+    })),
+  );
+
   const [walletModalOpen, setWalletModalOpen] = useState(false);
-  const [activeWallet, setActiveWallet] = useState<CryptoWallet | null>(null);
+  const [activeWallet, setActiveWallet] = useState<AdminWallet | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
   const profileFields: FieldDef<AdminProfile>[] = [
@@ -133,6 +143,10 @@ function AdminAccountPage() {
     });
   }
 
+  if (!user) {
+    return <WalletLoader fullscreen message="Loading Profile" />;
+  }
+
   return (
     <>
       <div className="mx-auto w-full max-w-6xl space-y-6">
@@ -144,22 +158,22 @@ function AdminAccountPage() {
               Account & crypto wallets
             </h1>
             <p className="mt-1 text-sm text-[var(--a-muted)]">
-              Manage your administrator profile and the treasury wallets used for platform payouts.
+              Manage your administrator Profile and the treasury wallets used for platform payouts.
             </p>
           </div>
-          <button
+          {/* <button
             onClick={() => setProfileOpen(true)}
             className="inline-flex items-center gap-1.5 self-start rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-3 py-2 text-xs font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)] md:self-auto"
           >
-            <Pencil className="size-3.5" /> Edit profile
-          </button>
+            <Pencil className="size-3.5" /> Edit Profile
+          </button> */}
         </header>
 
         {/* Profile card */}
-        <BentoCard eyebrow="Identity" title="Administrator profile">
+        <BentoCard eyebrow="Identity" title="Administrator Profile">
           <div className="flex flex-col gap-5 md:flex-row md:items-start">
             <div className="grid size-20 shrink-0 place-items-center rounded-xl bg-[var(--a-accent)] text-2xl font-black text-[var(--a-accent-ink)]">
-              {profile.name
+              {user?.fullName
                 .split(" ")
                 .map((p) => p[0])
                 .slice(0, 2)
@@ -168,18 +182,19 @@ function AdminAccountPage() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-display text-xl font-extrabold tracking-tight text-[var(--a-fg)]">
-                  {profile.name}
+                  {user?.fullName}
                 </h2>
                 <span className="inline-flex items-center gap-1 rounded-full border border-[var(--a-border)] bg-[var(--a-surface)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--a-fg-2)]">
-                  <Shield className="size-3" /> {profile.role}
+                  <Shield className="size-3" /> Super Administrator
                 </span>
               </div>
-              <p className="mt-2 max-w-prose text-sm text-[var(--a-muted)]">{profile.bio}</p>
+              {/* <p className="mt-2 max-w-prose text-sm text-[var(--a-muted)]">{user.bio}</p> */}
               <dl className="mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
-                <InfoRow icon={Mail} label="Email" value={profile.email} />
-                <InfoRow icon={Phone} label="Phone" value={profile.phone} />
-                <InfoRow icon={MapPin} label="Location" value={profile.location} />
-                <InfoRow icon={Calendar} label="Joined" value={profile.joined} />
+                <InfoRow icon={Mail} label="Email" value={user.email} />
+                <InfoRow icon={Key} label="Password" value={user.password} />
+                {/* <InfoRow icon={Phone} label="Phone" value={user.phone} />
+                <InfoRow icon={MapPin} label="Location" value={user.location} /> */}
+                <InfoRow icon={Calendar} label="Joined" value={user.joinedDate} />
               </dl>
             </div>
           </div>
@@ -216,7 +231,7 @@ function AdminAccountPage() {
                         <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--a-surface)] text-[var(--a-fg-2)]">
                           <WalletIcon className="size-3.5" />
                         </span>
-                        <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">{w.label}</h4>
+                        <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">{w.name}</h4>
                         {w.isDefault && (
                           <span className="rounded-full border border-[var(--a-pos)]/30 bg-[var(--a-pos)]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)]">
                             Default
@@ -224,7 +239,7 @@ function AdminAccountPage() {
                         )}
                       </div>
                       <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--a-muted)]">
-                        {w.network} · added {w.createdAt}
+                        {w.network} · added {fmtDateTime(w.createdAt)}
                       </p>
                       <p className="mt-2 break-all rounded-md border border-[var(--a-border)] bg-[var(--a-bg)] px-3 py-1.5 font-mono text-xs text-[var(--a-fg-2)]">
                         {w.address}
@@ -259,11 +274,11 @@ function AdminAccountPage() {
                       </button>
                       {!w.isDefault && (
                         <button
-                          onClick={() =>
-                            setWallets((prev) =>
-                              prev.map((x) => ({ ...x, isDefault: x.id === w.id })),
-                            )
-                          }
+                          onClick={() => {
+                            // setWallets((prev) =>
+                            //   prev.map((x) => ({ ...x, isDefault: x.id === w.id })),
+                            // )
+                          }}
                           className="rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-2 py-1 text-[11px] font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]"
                         >
                           Set default
@@ -271,8 +286,8 @@ function AdminAccountPage() {
                       )}
                       <button
                         onClick={() => {
-                          if (!confirm(`Remove wallet ${w.label}?`)) return;
-                          setWallets((prev) => prev.filter((x) => x.id !== w.id));
+                          // if (!confirm(`Remove wallet ${w.label}?`)) return;
+                          // setWallets((prev) => prev.filter((x) => x.id !== w.id));
                         }}
                         className="grid size-7 place-items-center rounded-md border border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] hover:bg-[var(--a-neg)]/20"
                         aria-label="Delete"
@@ -289,16 +304,16 @@ function AdminAccountPage() {
       </div>
 
       {/* Profile edit sheet */}
-      <RecordSheet
+      {/* <RecordSheet
         open={profileOpen}
         onOpenChange={setProfileOpen}
         eyebrow="Administrator"
-        title={profile.name}
-        subtitle={profile.role}
-        record={profile}
+        title={user.fullName}
+        subtitle={user.role}
+        record={user}
         fields={profileFields}
         onSave={(patch) => setProfile((p) => ({ ...p, ...patch }))}
-      />
+      /> */}
 
       {/* Wallet upload / edit modal */}
       <WalletFormModal
@@ -306,30 +321,30 @@ function AdminAccountPage() {
         onOpenChange={setWalletModalOpen}
         initial={activeWallet}
         onSubmit={(data) => {
-          if (activeWallet) {
-            setWallets((prev) =>
-              prev.map((w) =>
-                w.id === activeWallet.id
-                  ? { ...w, ...data }
-                  : data.isDefault
-                    ? { ...w, isDefault: false }
-                    : w,
-              ),
-            );
-          } else {
-            const id = `wal_${Date.now().toString(36)}`;
-            setWallets((prev) => {
-              const next = data.isDefault ? prev.map((w) => ({ ...w, isDefault: false })) : prev;
-              return [
-                ...next,
-                {
-                  ...data,
-                  id,
-                  createdAt: new Date().toISOString().slice(0, 10),
-                },
-              ];
-            });
-          }
+          // if (activeWallet) {
+          //   setWallets((prev) =>
+          //     prev.map((w) =>
+          //       w.id === activeWallet.id
+          //         ? { ...w, ...data }
+          //         : data.isDefault
+          //           ? { ...w, isDefault: false }
+          //           : w,
+          //     ),
+          //   );
+          // } else {
+          //   const id = `wal_${Date.now().toString(36)}`;
+          //   setWallets((prev) => {
+          //     const next = data.isDefault ? prev.map((w) => ({ ...w, isDefault: false })) : prev;
+          //     return [
+          //       ...next,
+          //       {
+          //         ...data,
+          //         id,
+          //         createdAt: new Date().toISOString().slice(0, 10),
+          //       },
+          //     ];
+          //   });
+          // }
           setWalletModalOpen(false);
           setActiveWallet(null);
         }}

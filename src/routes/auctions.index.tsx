@@ -71,7 +71,7 @@ function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
       const ms = new Date(l.endsAt).getTime() - Date.now();
       if (ms <= 0 || ms > 24 * 3_600_000) return false;
     }
-    if (l.price < f.priceMin || l.price > f.priceMax) return false;
+    if (l.startBid < f.priceMin || l.startBid > f.priceMax) return false;
     return true;
   });
 

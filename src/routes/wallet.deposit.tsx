@@ -166,7 +166,7 @@ function DepositPage() {
           description: "Transaction Description",
           position: "bottom-left",
         });
-        setDone(balanceAfter);
+        setDone(amount);
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
         toast.error({
