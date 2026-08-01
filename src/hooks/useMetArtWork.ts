@@ -112,9 +112,7 @@ interface UseMetArtworksReturn {
 export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
   // Use a stable default for SSR hydration safety.
   // Randomization happens only on client via fetchRandomCategory or search.
-  const [currentCategory, setCurrentCategory] = React.useState(
-    initialQuery || MET_ARTWORK_SEARCH_TERMS[0],
-  );
+  const [currentCategory, setCurrentCategory] = React.useState(initialQuery || getRandomCategory());
 
   const artworksQuery = useQuery({
     queryKey: ["met", "full-search", currentCategory],

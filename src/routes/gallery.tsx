@@ -9,6 +9,7 @@ import { ActiveFilterChips } from "@/components/site/ActiveFilterChips";
 import { makeDefaultFilters, type Filters } from "@/components/site/filters-types";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { useChicagoArtworksByCategory } from "@/queries";
+import { Loader } from "@/components/site/Loader";
 
 export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
@@ -42,11 +43,13 @@ function applyFilters(f: Filters, artworks: Artwork[]) {
 }
 
 function GalleryPage() {
-  const [filters, setFilters] = useState<Filters>(() => makeDefaultFilters(100, 100_000));
+  const [filters, setFilters] = useState<Filters>(() =>
+    makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
+  );
 
   // Best practice: fetch directly with TanStack Query
   const met = useMetArtworks();
-  const chicago = useChicagoArtworksByCategory("Painting", 30);
+  // const chicago = useChicagoArtworksByCategory("Painting", 30);
 
   // Prefer Met data (already transformed to local Artwork shape)
   // Fall back to Chicago if Met is empty
@@ -54,10 +57,11 @@ function GalleryPage() {
 
   const filtered = useMemo(() => applyFilters(filters, modMetArtworks), [filters, modMetArtworks]);
 
-  const isLoading = met.isLoading || chicago.isLoading;
+  const isLoading = met.isLoading;
 
   return (
     <>
+      {isLoading && <Loader message="Loading Artworks..." size="sm" variant="soft" />}
       <PageHeader
         eyebrow="The exhibition"
         title="All Works"
