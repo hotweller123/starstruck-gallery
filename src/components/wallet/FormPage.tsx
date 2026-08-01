@@ -401,9 +401,7 @@ export function WCopied({
         }}
         className="cursor-pointer gap-3 overflow-clip rounded-2xl py-3 px-3 bg-[var(--w-input)] border border-[var(--w-border)] rounded-[1rem] text-[var(--w-brand)] flex justify-between items-center"
       >
-        <p className="break-all line-clamp-1 text-sm text-white">
-          {label}fougphiadfosuip'agohup97hsdfoui
-        </p>
+        <p className="break-all line-clamp-1 text-sm text-[var(--w-brand)]">{label}</p>
         <Copy size={17} />
       </div>
     </div>

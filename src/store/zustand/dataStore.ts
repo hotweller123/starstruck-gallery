@@ -1,5 +1,5 @@
 import { AuctionLot } from "@/data/auctions";
-import { AdminWallet, Bid, WalletAccount, WalletTx } from "@/types";
+import { AdminWallet, Bid, Listing, WalletAccount, WalletTx } from "@/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -9,6 +9,7 @@ interface DataStore {
   wallets: AdminWallet[];
   auctions: AuctionLot[];
   bids: Bid[];
+  listings: Listing[];
   setState: (state: Partial<Omit<DataStore, "setState">>) => void;
 }
 
@@ -19,16 +20,8 @@ export const useDataStore = create<DataStore>()(
       users: [],
       auctions: [],
       bids: [],
-      wallets: Array.from({ length: 3 }).map((_, i) => ({
-        address: "fsadfsdfsfasdfasfsagsafdgib;l;",
-        id: `${i}`,
-        image: "asdhfofhosdhbauodsfb;nsfdsa",
-        name: "Ethereum",
-        network: `TRC ${i + 21}`,
-        memo: "This is the memo of the admin wallet",
-        isDefault: false,
-        createdAt: new Date().toISOString(),
-      })),
+      wallets: [],
+      listings: [],
       setState: (state) => {
         set((stateValues) => ({
           ...stateValues,

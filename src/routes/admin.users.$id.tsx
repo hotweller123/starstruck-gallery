@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useState, useMemo, MouseEvent } from "react";
+import { useState, useMemo, MouseEvent, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Area,
@@ -60,9 +60,9 @@ import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
 import { useToast } from "@/lib/useToast";
 import useDoc from "@/hooks/useDoc";
 import { ToastPosition } from "@/components/ui/toast";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { db } from "@/services/firebase";
-import { WalletLoader } from "@/components/wallet";
+import { AdminLoader } from "@/components/admin/AdminLoader";
 
 export const Route = createFileRoute("/admin/users/$id")({
   component: UserDetail,
@@ -198,7 +198,17 @@ function UserDetail() {
     setUniqueImageID(null);
   };
 
-  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("Processing...");
+
+  // Page readiness loader (when store hasn't hydrated yet)
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => {
+    if (users && users.length > 0) {
+      setPageLoading(false);
+    }
+  }, [users?.length]);
 
   return (
     <div className="mx-auto max-w-[1440px]">
@@ -209,7 +219,15 @@ function UserDetail() {
         <ArrowLeft className="size-3.5" /> Back to users
       </Link>
 
-      {loading && <WalletLoader compact isLoading={loading} partial />}
+      <AdminLoader
+        fullscreen
+        variant="page"
+        isLoading={pageLoading}
+        message="Loading user"
+        subMessage="Fetching profile & activity"
+      />
+
+      <AdminLoader fullscreen variant="action" isLoading={actionLoading} message={actionMessage} />
 
       {/* Identity card */}
       <motion.div
@@ -282,7 +300,8 @@ function UserDetail() {
             return;
           }
 
-          setLoading(true);
+          setActionMessage("Saving user details...");
+          setActionLoading(true);
 
           try {
             await updateDocument({
@@ -298,7 +317,7 @@ function UserDetail() {
             errorToast(error);
           } finally {
             close();
-            setLoading(false);
+            setActionLoading(false);
           }
         }}
         operations={[
@@ -313,7 +332,8 @@ function UserDetail() {
                 return;
               }
 
-              setLoading(true);
+              setActionMessage("Activating user...");
+              setActionLoading(true);
               try {
                 await updateDocument({
                   collections: "users",
@@ -322,11 +342,12 @@ function UserDetail() {
                     status: "active",
                   },
                 });
+                modToast();
               } catch (error) {
                 errorToast(error);
               } finally {
                 close();
-                setLoading(true);
+                setActionLoading(false);
               }
             },
           },
@@ -341,7 +362,8 @@ function UserDetail() {
                 return;
               }
 
-              setLoading(true);
+              setActionMessage("Suspending user...");
+              setActionLoading(true);
               try {
                 await updateDocument({
                   collections: "users",
@@ -350,11 +372,12 @@ function UserDetail() {
                     status: "suspended",
                   },
                 });
+                modToast();
               } catch (error) {
                 errorToast(error);
               } finally {
                 close();
-                setLoading(false);
+                setActionLoading(false);
               }
             },
           },
@@ -610,7 +633,8 @@ function UserDetail() {
                   return;
                 }
 
-                setLoading(true);
+                setActionMessage("Deleting bid and returning funds...");
+                setActionLoading(true);
 
                 try {
                   await updateDocument({
@@ -642,7 +666,7 @@ function UserDetail() {
                   });
                 } finally {
                   setTarget(null);
-                  setLoading(false);
+                  setActionLoading(false);
                 }
               },
             },
@@ -664,7 +688,8 @@ function UserDetail() {
                   return;
                 }
 
-                setLoading(true);
+                setActionMessage("Closing auction and transferring ownership...");
+                setActionLoading(true);
                 try {
                   //for current Bidder..deduct from bidding balance
                   await updateDocument({
@@ -682,16 +707,23 @@ function UserDetail() {
                   });
 
                   //for original owner...add to the wallet balance
-                  await updateDocument({
-                    collections: "users",
-                    document: {
-                      id: Lot.userID,
-                      wallet: {
-                        balance: currentUser.wallet.balance + target.row.bidAmount,
-                        bidBalance: currentUser.wallet.bidBalance,
+                  const originalUser = await getDoc(doc(db, "users", Lot.userID));
+
+                  if (originalUser.exists()) {
+                    const data = originalUser.data() as WalletAccount;
+                    const topbal = data.wallet.balance + target.row.bidAmount;
+
+                    await updateDocument({
+                      collections: "users",
+                      document: {
+                        id: Lot.userID,
+                        wallet: {
+                          balance: topbal,
+                          bidBalance: data.wallet.bidBalance,
+                        },
                       },
-                    },
-                  });
+                    });
+                  }
 
                   await addDocToCollection({
                     collections: "listings",
@@ -713,6 +745,7 @@ function UserDetail() {
                       condition: Lot?.condition,
                       totalBidCounts: Lot?.bidCount,
                       placedAt: target.row.placedAt,
+                      timeStamp: serverTimestamp() as unknown as Timestamp,
                     },
                   });
 
@@ -721,7 +754,7 @@ function UserDetail() {
                     document: {
                       id: target.row.id,
                       endsAt: inHours(12),
-                      status: "outbidded",
+                      status: "closed",
                     },
                   });
 
@@ -740,7 +773,7 @@ function UserDetail() {
                   });
                 } finally {
                   setTarget(null);
-                  setLoading(false);
+                  setActionLoading(false);
                 }
               },
             },
@@ -767,7 +800,8 @@ function UserDetail() {
               return;
             }
 
-            setLoading(true);
+            setActionMessage("Updating transaction...");
+            setActionLoading(true);
 
             try {
               await updateDocument({
@@ -783,6 +817,7 @@ function UserDetail() {
               errorToast(error);
             } finally {
               setTarget(null);
+              setActionLoading(false);
             }
           }}
           operations={[
@@ -796,6 +831,8 @@ function UserDetail() {
                   warnToast();
                   return;
                 }
+                setActionMessage("Approving transaction...");
+                setActionLoading(true);
                 try {
                   await updateDocument({
                     collections: "transactions",
@@ -809,7 +846,7 @@ function UserDetail() {
                   errorToast(error);
                 } finally {
                   setTarget(null);
-                  setLoading(false);
+                  setActionLoading(false);
                 }
               },
             },
@@ -823,7 +860,8 @@ function UserDetail() {
                   warnToast();
                   return;
                 }
-                setLoading(true);
+                setActionMessage("Declining transaction...");
+                setActionLoading(true);
 
                 try {
                   await updateDocument({
@@ -838,7 +876,7 @@ function UserDetail() {
                   errorToast(error);
                 } finally {
                   setTarget(null);
-                  setLoading(false);
+                  setActionLoading(false);
                 }
               },
             },
@@ -860,7 +898,8 @@ function UserDetail() {
               return;
             }
 
-            setLoading(true);
+            setActionMessage("Updating auction lot...");
+            setActionLoading(true);
             try {
               await updateDocument({
                 collections: "auctions",
@@ -888,7 +927,7 @@ function UserDetail() {
               });
             } finally {
               setTarget(null);
-              setLoading(false);
+              setActionLoading(false);
             }
             // patch(selected.slug, p);
             // setSelected({ ...selected, ...p } as LotRow);

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
+// import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { filterOptions, formatPrice } from "@/data/artworks";
 import { categories } from "@/data/categories";
 import { type Filters, type MultiKey, makeDefaultFilters } from "./filters-types";
+import Slider from "@mui/material/Slider";
 
 interface Props {
   value: Filters;
@@ -114,14 +115,24 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
           <Section
             title={`Price · ${formatPrice(draft.priceMin)} — ${formatPrice(draft.priceMax)}`}
           >
-            <Slider
+            {/* <Slider
               value={[draft.priceMin, draft.priceMax]}
-              min={filterOptions.priceMin}
-              max={filterOptions.priceMax}
-              step={100}
+              min={100}
+              max={1_000_000}
+              step={10}
               onValueChange={([min, max]) =>
                 setDraft((d) => ({ ...d, priceMin: min, priceMax: max }))
               }
+            /> */}
+            <Slider
+              value={[draft.priceMin, draft.priceMax]}
+              min={100}
+              max={100_000}
+              step={20}
+              color="red"
+              onChange={(e, [min, max]) => {
+                setDraft((d) => ({ ...d, priceMin: min, priceMax: max }));
+              }}
             />
           </Section>
 

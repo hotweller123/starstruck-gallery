@@ -36,7 +36,7 @@ export interface AuctionLot {
   currentBid: number;
   bidCount: number;
   reserveMet: boolean;
-  status: "active" | "pending" | "suspended" | "outbidded";
+  status: "active" | "pending" | "suspended" | "outbidded" | "closed";
   endsAt: string; // ISO
   userID: string;
 }

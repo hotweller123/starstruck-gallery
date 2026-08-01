@@ -1,7 +1,7 @@
 import { AuctionLot } from "@/data/auctions";
 import { useFirebaseQueryCollection } from "@/queries/firebasequeries";
 import { useAuthStore, useDataStore } from "@/store/zustand";
-import { Bid, WalletAccount, WalletTx } from "@/types";
+import { AdminWallet, Bid, Listing, WalletAccount, WalletTx } from "@/types";
 import { query, where } from "firebase/firestore";
 import { useShallow } from "zustand/shallow";
 
@@ -22,6 +22,14 @@ export function useFirebaseDataHook() {
     "bids",
     user?.role == "user" ? [where("userID", "==", user?.userID)] : [],
   );
+  const listings = useFirebaseQueryCollection(
+    "listings",
+    user?.role == "user" ? [where("userID", "==", user?.userID)] : [],
+  );
+  const wallets = useFirebaseQueryCollection(
+    "wallets",
+    // user?.role == "user" ? [where("userID", "==", user?.userID)] : [],
+  );
   const { setState } = useDataStore(
     useShallow((state) => ({
       setState: state.setState,
@@ -29,23 +37,74 @@ export function useFirebaseDataHook() {
   );
 
   const isLoading =
-    transactions.isLoading || users.isLoading || auctions.isLoading || bids.isLoading;
+    transactions.isLoading ||
+    users.isLoading ||
+    auctions.isLoading ||
+    bids.isLoading ||
+    listings.isLoading ||
+    wallets.isLoading;
 
-  if (transactions.data && users.data && auctions.data && bids.data) {
-    // console.log(auctions.data, " from firebase provider");
+  if (transactions.data) {
     setState({
       transactions: transactions.data as WalletTx[],
+    });
+  }
+
+  if (users.data) {
+    setState({
       users: users.data as WalletAccount[],
+    });
+  }
+
+  if (auctions.data) {
+    setState({
       auctions: auctions.data as AuctionLot[],
+    });
+  }
+
+  if (bids.data) {
+    setState({
       bids: bids.data as Bid[],
     });
   }
+
+  if (listings.data) {
+    setState({
+      listings: listings.data as Listing[],
+    });
+  }
+
+  if (wallets.data) {
+    setState({
+      wallets: wallets.data as AdminWallet[],
+    });
+  }
+
+  // const dataMappings = [
+  //   { key: "transactions", data: transactions.data, type: "WalletTx[]" },
+  //   { key: "users", data: users.data, type: "WalletAccount[]" },
+  //   { key: "auctions", data: auctions.data, type: "AuctionLot[]" },
+  //   { key: "bids", data: bids.data, type: "Bid[]" },
+  //   { key: "listings", data: listings.data, type: "Listing[]" },
+  //   { key: "wallets", data: wallets.data, type: "AdminWallet[]" },
+  // ];
+
+  // dataMappings.forEach(({ key, data, type }) => {
+  //   if (data) {
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       [key]: data as any, // Replace `any` with the appropriate type if needed
+  //     }));
+  //   }
+  // });
 
   return {
     transactions: transactions.data ?? [],
     users: users.data ?? [],
     auctions: auctions.data ?? [],
     bids: bids.data ?? [],
+    listings: listings.data ?? [],
+    wallets: wallets.data ?? [],
 
     isLoading,
     // You can also expose the raw query objects if needed
@@ -54,6 +113,8 @@ export function useFirebaseDataHook() {
       users,
       auctions,
       bids,
+      listings,
+      wallets,
     },
   };
 }

@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Bid {
   slug: string; // gotten from the auction lot data
   bidAmount: number;
@@ -31,4 +33,5 @@ export interface Listing {
   condition: string;
   totalBidCounts: number;
   placedAt: string;
+  timeStamp: Timestamp;
 }

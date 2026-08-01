@@ -23,13 +23,14 @@ const localUser = {
 
 function ProfilePage() {
   const { user } = useAuthStore();
-  const { auctions, bids } = useDataStore(
+  const { auctions, bids, listings } = useDataStore(
     useShallow((s) => ({
       auctions: s.auctions,
       bids: s.bids,
+      listings: s.listings,
     })),
   );
-  const { favorites, cart, listings } = useStore();
+  const { favorites, cart } = useStore();
 
   const stats = [
     { label: "Favourites", value: favorites.length, to: "/favourites", icon: Heart },
@@ -40,7 +41,7 @@ function ProfilePage() {
       icon: ShoppingBag,
     },
     { label: "Active bids", value: bids.length, to: "/bids", icon: Gavel },
-    { label: "Listings", value: listings.length, to: "/sell", icon: Upload },
+    { label: "Listings", value: listings.length, to: "/listings", icon: Upload },
     {
       label: "Active Auctions",
       value: checkForUserID(auctions, user?.userID).length || 0,
@@ -55,6 +56,7 @@ function ProfilePage() {
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-24 lg:grid-cols-[1fr_1.4fr]">
         <aside className="border border-ink/10 p-8">
+          {!user && <p className="text-detail mb-5 font-mono text-sm">Placeholder Info:</p>}
           <div className="flex size-24 items-center justify-center rounded-full bg-clay/15 font-display text-4xl italic text-clay">
             {user?.fullName
               .split(" ")

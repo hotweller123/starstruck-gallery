@@ -14,7 +14,7 @@ export interface AdminWallet {
   name: string;
   network: string;
   address: string;
-  image: string;
+  qrCode: string;
   id: string;
   isDefault: boolean;
   memo: string;

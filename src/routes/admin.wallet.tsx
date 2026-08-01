@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Download,
@@ -35,6 +35,7 @@ import { useShallow } from "zustand/shallow";
 import { useToast } from "@/lib/useToast";
 import useDoc from "@/hooks/useDoc";
 import { ToastPosition } from "@/components/ui/toast";
+import { AdminLoader } from "@/components/admin/AdminLoader";
 
 export const Route = createFileRoute("/admin/wallet")({
   component: WalletOps,
@@ -65,6 +66,20 @@ function WalletOps() {
 
   const [selectedTx, setSelectedTx] = useState<WalletTx | null>(null);
   const [selectedAcc, setSelectedAcc] = useState<WalletAccount | null>(null);
+
+  // Full-screen action loader (for any useDoc call)
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("Processing...");
+
+  // Page readiness loader (initial dashboard hydration)
+  const [pageLoading, setPageLoading] = useState(true);
+
+  // Hide page loader once store has data
+  useEffect(() => {
+    if (users.length > 0 || transactions.length > 0) {
+      setPageLoading(false);
+    }
+  }, [users.length, transactions.length]);
 
   const totals = useMemo(() => {
     const dep = transactions
@@ -114,6 +129,16 @@ function WalletOps() {
 
   const { toast } = useToast();
   const { updateDocument } = useDoc();
+
+  // Helper to start/stop the elegant full-screen admin loader
+  const startAction = (msg: string) => {
+    setActionMessage(msg);
+    setActionLoading(true);
+  };
+  const stopAction = () => setActionLoading(false);
+
+  // Simple readiness: hide page loader once we have data
+  // (Replace with real isAuthHydrated / store hydration flag when available)
 
   const errorToast = (error: any, position?: ToastPosition, description?: string, action?: any) => {
     toast({
@@ -201,6 +226,16 @@ function WalletOps() {
 
   return (
     <div className="mx-auto max-w-[1440px]">
+      <AdminLoader
+        fullscreen
+        variant="page"
+        isLoading={pageLoading}
+        message="Loading wallet ops"
+        subMessage="Syncing transactions & accounts"
+      />
+
+      <AdminLoader fullscreen variant="action" isLoading={actionLoading} message={actionMessage} />
+
       <SectionHeader
         title="Wallet ops"
         description="Inspect transactions, manage accounts, approve pending payouts. Click any row to view, edit and run operations."
@@ -399,6 +434,7 @@ function WalletOps() {
             });
             return;
           }
+          startAction("Updating transaction...");
           try {
             await updateDocument({
               collections: "transactions",
@@ -413,12 +449,13 @@ function WalletOps() {
             errorToast(error);
           } finally {
             setSelectedTx(null);
+            stopAction();
           }
         }}
         extra={
           selectedTx && (
             <div>
-              <p className="a-eyebrow mb-2">Ledger entry</p>
+              <p className="a-eyebrow mb-2">Transaction Details</p>
               <ul className="space-y-2 text-xs text-[var(--a-fg-2)]">
                 <li className="flex justify-between">
                   <span className="text-[var(--a-muted)]">Channel</span>
@@ -440,6 +477,11 @@ function WalletOps() {
                   <span className="text-[var(--a-muted)]">Date</span>
                   <span className="a-mono">{fmtDateTime(selectedTx.createdAt)}</span>
                 </li>
+                {selectedTx.type == "deposit" && (
+                  <li className="border-[var(--a-muted)]/20 border p-3 grid place-items-center">
+                    <img src={selectedTx.details?.proof ?? ""} className="aspect-auto" />
+                  </li>
+                )}
               </ul>
             </div>
           )
@@ -457,6 +499,7 @@ function WalletOps() {
                       warnToast();
                       return;
                     }
+                    startAction("Approving transaction...");
                     try {
                       await updateDocument({
                         collections: "transactions",
@@ -470,6 +513,7 @@ function WalletOps() {
                       errorToast(error);
                     } finally {
                       setSelectedTx(null);
+                      stopAction();
                     }
                   },
                 },
@@ -483,6 +527,7 @@ function WalletOps() {
                       warnToast();
                       return;
                     }
+                    startAction("Declining transaction...");
                     try {
                       await updateDocument({
                         collections: "transactions",
@@ -496,6 +541,7 @@ function WalletOps() {
                       errorToast(error);
                     } finally {
                       setSelectedTx(null);
+                      stopAction();
                     }
                   },
                 },
@@ -552,6 +598,7 @@ function WalletOps() {
             return;
           }
 
+          startAction("Saving account...");
           try {
             await updateDocument({
               collections: "users",
@@ -566,6 +613,7 @@ function WalletOps() {
             errorToast(error);
           } finally {
             setSelectedAcc(null);
+            stopAction();
           }
         }}
         extra={
@@ -607,7 +655,21 @@ function WalletOps() {
                   label: "Mark verified",
                   icon: ShieldCheck,
                   tone: "success",
-                  onRun: () => patchAcc(selectedAcc.id, { status: "active" }),
+                  onRun: async () => {
+                    startAction("Marking account verified...");
+                    try {
+                      await updateDocument({
+                        collections: "users",
+                        document: { id: selectedAcc.id, status: "active" },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedAcc(null);
+                      stopAction();
+                    }
+                  },
                 },
                 {
                   id: "suspend",
@@ -615,32 +677,74 @@ function WalletOps() {
                   icon: Ban,
                   tone: "danger",
                   confirm: `Suspend ${selectedAcc.fullName}?`,
-                  onRun: () => patchAcc(selectedAcc.id, { status: "suspended" }),
+                  onRun: async () => {
+                    startAction("Suspending account...");
+                    try {
+                      await updateDocument({
+                        collections: "users",
+                        document: { id: selectedAcc.id, status: "suspended" },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedAcc(null);
+                      stopAction();
+                    }
+                  },
                 },
                 {
                   id: "credit",
                   label: "Credit $100",
                   icon: WalletIcon,
-                  onRun: () =>
-                    patchAcc(selectedAcc.id, {
-                      wallet: {
-                        balance: selectedAcc.wallet.balance + 100,
-                        bidBalance: selectedAcc.wallet.bidBalance,
-                      },
-                    }),
+                  onRun: async () => {
+                    startAction("Crediting wallet...");
+                    try {
+                      await updateDocument({
+                        collections: "users",
+                        document: {
+                          id: selectedAcc.id,
+                          wallet: {
+                            balance: selectedAcc.wallet.balance + 100,
+                            bidBalance: selectedAcc.wallet.bidBalance,
+                          },
+                        },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedAcc(null);
+                      stopAction();
+                    }
+                  },
                 },
                 {
                   id: "debit",
                   label: "Debit $100",
                   icon: WalletIcon,
                   tone: "danger",
-                  onRun: () =>
-                    patchAcc(selectedAcc.id, {
-                      wallet: {
-                        balance: Math.max(0, selectedAcc.wallet.balance - 100),
-                        bidBalance: selectedAcc.wallet.bidBalance,
-                      },
-                    }),
+                  onRun: async () => {
+                    startAction("Debiting wallet...");
+                    try {
+                      await updateDocument({
+                        collections: "users",
+                        document: {
+                          id: selectedAcc.id,
+                          wallet: {
+                            balance: Math.max(0, selectedAcc.wallet.balance - 100),
+                            bidBalance: selectedAcc.wallet.bidBalance,
+                          },
+                        },
+                      });
+                      modToast();
+                    } catch (error) {
+                      errorToast(error);
+                    } finally {
+                      setSelectedAcc(null);
+                      stopAction();
+                    }
+                  },
                 },
                 // {
                 //   id: "reset",

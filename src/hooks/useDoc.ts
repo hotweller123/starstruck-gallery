@@ -1,7 +1,7 @@
 import { AuctionLot } from "@/data/auctions";
 import { toast } from "@/lib/useToast";
 import { db } from "@/services/firebase";
-import { Bid, Listing, WalletAccount, WalletTx } from "@/types";
+import { AdminWallet, Bid, Listing, WalletAccount, WalletTx } from "@/types";
 import { addDoc, collection, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 
 export interface Collections {
@@ -10,6 +10,7 @@ export interface Collections {
   auctions: AuctionLot;
   bids: Bid;
   listings: Listing;
+  wallets: AdminWallet;
 }
 
 // type CollectionKey<T extends keyof Collections> = Collections[T];

@@ -110,6 +110,34 @@ function AuctionLotPage() {
   const submitBid = formControl.handleSubmit(async () => {
     if (!user || user.wallet.balance == 0) return;
 
+    // Guard: prevent bidding if seller, current leader, or lot not active
+    if (lot.userID === user.userID) {
+      toast({
+        title: "Not allowed",
+        description: "You cannot bid on your own auction lot.",
+        variant: "info",
+      });
+      return;
+    }
+    const currentLeader = bids.find((b) => b.id === lot.id);
+    if (currentLeader?.userID === user.userID) {
+      toast({
+        title: "Already leading",
+        description:
+          "You are the current highest bidder and cannot place another bid until outbid.",
+        variant: "info",
+      });
+      return;
+    }
+    if (lot.status !== "active") {
+      toast({
+        title: "Auction unavailable",
+        description: "This lot is not open for bidding.",
+        variant: "info",
+      });
+      return;
+    }
+
     const { bidAmount: formBidAmount } = formControl.getValues();
 
     if (
@@ -250,14 +278,12 @@ function AuctionLotPage() {
     }
   });
 
-  const checkIfUserCanBid = lot?.userID !== user?.userID;
-  const checkIfUserCanPlaceBid = bids.find((b) => b.id == lot.id)?.userID !== user?.userID;
+  const isSeller = lot?.userID === user?.userID;
+  const currentHighestBid = bids.find((b) => b.id === lot.id);
+  const isCurrentLeader = currentHighestBid?.userID === user?.userID;
+  const isLotClosedForBidding = lot.status !== "active";
 
-  console.log({
-    checkIfUserCanBid,
-    checkIfUserCanPlaceBid,
-    userID: bids,
-  });
+  const canPlaceBid = !!user && !isSeller && !isCurrentLeader && !isLotClosedForBidding;
 
   return (
     <article>
@@ -416,7 +442,7 @@ function AuctionLotPage() {
               </div>
             </div>
 
-            {checkIfUserCanBid || checkIfUserCanPlaceBid ? (
+            {canPlaceBid ? (
               <>
                 <FormProvider {...formControl}>
                   <div className="">
@@ -466,13 +492,41 @@ function AuctionLotPage() {
                 </FormProvider>
               </>
             ) : (
-              <>
-                <p className="text-ink/75 font-display italic text-xl mt-4">
-                  {!checkIfUserCanBid
-                    ? "You Can't Place Bid As You Are The Author Of This Work"
-                    : "You Will Be Notified If You Are Subsequently Outbidded"}
-                </p>
-              </>
+              <div className="mt-6 rounded border border-ink/15 bg-surface/60 p-4">
+                {isLotClosedForBidding ? (
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center rounded bg-ink/5 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-detail">
+                      {lot.status === "closed" ? "Closed" : "Unavailable"}
+                    </div>
+                    <p className="text-sm text-ink/80">
+                      {lot.status === "closed"
+                        ? "This auction has closed. Bidding is no longer available."
+                        : "Bidding is currently unavailable for this lot."}
+                    </p>
+                  </div>
+                ) : isSeller ? (
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center rounded bg-ink/5 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-detail">
+                      Seller
+                    </div>
+                    <p className="text-sm text-ink/80">You cannot bid on your own auction lot.</p>
+                  </div>
+                ) : isCurrentLeader ? (
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center rounded bg-clay/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-clay">
+                      Leading
+                    </div>
+                    <p className="text-sm text-ink/80">
+                      You are currently the highest bidder. You cannot place another bid until you
+                      are outbid.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-ink/80">
+                    Bidding is currently unavailable for this lot.
+                  </p>
+                )}
+              </div>
             )}
             {/* <p className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-detail">
               <ShieldCheck className="size-3.5" strokeWidth={1.5} />

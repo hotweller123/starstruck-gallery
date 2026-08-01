@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -31,7 +31,13 @@ import { useAuthStore, useDataStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
 import { AdminWallet } from "@/types";
 import { fmtDateTime } from "@/data/admin-mock";
-import { WalletLoader } from "@/components/wallet";
+import { AdminLoader } from "@/components/admin/AdminLoader";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useDoc from "@/hooks/useDoc";
+import { copyClipboard, photoFN } from "@/utils";
+import { toast } from "@/lib/useToast";
 
 export const Route = createFileRoute("/admin/account")({
   component: AdminAccountPage,
@@ -104,51 +110,56 @@ const NETWORKS: CryptoWallet["network"][] = [
 
 function AdminAccountPage() {
   const { user } = useAuthStore();
-  const { wallets } = useDataStore(
+  const { wallets, setState } = useDataStore(
     useShallow((s) => ({
       wallets: s.wallets,
+      setState: s.setState,
     })),
   );
+
+  console.log({ wallets });
 
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [activeWallet, setActiveWallet] = useState<AdminWallet | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const profileFields: FieldDef<AdminProfile>[] = [
-    { key: "name", label: "Full name", editable: true },
-    { key: "email", label: "Email", editable: true },
-    { key: "phone", label: "Phone", editable: true },
-    {
-      key: "role",
-      label: "Role",
-      kind: "select",
-      options: [
-        { value: "Super Administrator", label: "Super Administrator" },
-        { value: "Administrator", label: "Administrator" },
-        { value: "Moderator", label: "Moderator" },
-      ],
-    },
-    { key: "location", label: "Location", editable: true },
-    { key: "timezone", label: "Timezone", editable: true },
-    { key: "twoFactor", label: "Two-factor", editable: true },
-    { key: "bio", label: "Bio", kind: "textarea", editable: true, span: 2 },
-    { key: "joined", label: "Joined", kind: "readonly" },
-    { key: "id", label: "Admin ID", kind: "readonly" },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+
+  const startLoad = (loading: boolean, msg: string) => {
+    setLoading(true);
+    setLoadingText(msg);
+  };
+
+  const stopLoad = () => {
+    setLoading(false);
+    setLoadingText("");
+  };
 
   function copy(addr: string) {
-    navigator.clipboard?.writeText(addr).then(() => {
-      setCopied(addr);
-      setTimeout(() => setCopied(null), 1400);
-    });
+    setCopied(addr);
+    setTimeout(() => setCopied(null), 1400);
+
+    copyClipboard(addr);
   }
 
+  const { addDocToCollection, updateDocument, deleteDocument } = useDoc();
+
   if (!user) {
-    return <WalletLoader fullscreen message="Loading Profile" />;
+    return (
+      <AdminLoader
+        fullscreen
+        variant="page"
+        message="Loading profile"
+        subMessage="Preparing admin account"
+      />
+    );
   }
 
   return (
     <>
+      <AdminLoader isLoading={loading} fullscreen message={loadingText} variant="action" />
+
       <div className="mx-auto w-full max-w-6xl space-y-6">
         {/* Header */}
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -172,7 +183,14 @@ function AdminAccountPage() {
         {/* Profile card */}
         <BentoCard eyebrow="Identity" title="Administrator Profile">
           <div className="flex flex-col gap-5 md:flex-row md:items-start">
-            <div className="grid size-20 shrink-0 place-items-center rounded-xl bg-[var(--a-accent)] text-2xl font-black text-[var(--a-accent-ink)]">
+            <div
+              className="grid size-20 shrink-0 place-items-center rounded-xl bg-[var(--a-accent)] text-2xl font-black text-[var(--a-accent-ink)]"
+              onClick={() =>
+                setState({
+                  wallets: [],
+                })
+              }
+            >
               {user?.fullName
                 .split(" ")
                 .map((p) => p[0])
@@ -202,7 +220,7 @@ function AdminAccountPage() {
 
         {/* Wallets */}
         <BentoCard
-          eyebrow="Treasury"
+          eyebrow=""
           title="Crypto wallets"
           action={
             <button
@@ -250,7 +268,9 @@ function AdminAccountPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
                       <button
-                        onClick={() => copy(w.address)}
+                        onClick={() => {
+                          copy(w.address);
+                        }}
                         className="inline-flex items-center gap-1 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-2 py-1 text-[11px] font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]"
                       >
                         {copied === w.address ? (
@@ -263,7 +283,7 @@ function AdminAccountPage() {
                           </>
                         )}
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => {
                           setActiveWallet(w);
                           setWalletModalOpen(true);
@@ -271,23 +291,35 @@ function AdminAccountPage() {
                         className="inline-flex items-center gap-1 rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-2 py-1 text-[11px] font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]"
                       >
                         <Pencil className="size-3" /> Edit
-                      </button>
-                      {!w.isDefault && (
+                      </button> */}
+                      {/* {!w.isDefault && (
                         <button
                           onClick={() => {
-                            // setWallets((prev) =>
-                            //   prev.map((x) => ({ ...x, isDefault: x.id === w.id })),
+                            awa
                             // )
                           }}
                           className="rounded-md border border-[var(--a-border)] bg-[var(--a-surface)] px-2 py-1 text-[11px] font-semibold text-[var(--a-fg-2)] hover:bg-[var(--a-surface-2)]"
                         >
                           Set default
                         </button>
-                      )}
+                      )} */}
                       <button
-                        onClick={() => {
-                          // if (!confirm(`Remove wallet ${w.label}?`)) return;
-                          // setWallets((prev) => prev.filter((x) => x.id !== w.id));
+                        onClick={async () => {
+                          startLoad(true, "Wallet Deleting...");
+                          try {
+                            await deleteDocument({
+                              collectionName: "wallets",
+                              id: w.id,
+                              message: `${w.name} Wallet Details Has Been Deleted Successfully`,
+                            });
+                          } catch (error) {
+                            toast.error({
+                              title: "Error",
+                              description: error.message,
+                            });
+                          } finally {
+                            stopLoad();
+                          }
                         }}
                         className="grid size-7 place-items-center rounded-md border border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 text-[var(--a-neg)] hover:bg-[var(--a-neg)]/20"
                         aria-label="Delete"
@@ -320,33 +352,40 @@ function AdminAccountPage() {
         open={walletModalOpen}
         onOpenChange={setWalletModalOpen}
         initial={activeWallet}
-        onSubmit={(data) => {
-          // if (activeWallet) {
-          //   setWallets((prev) =>
-          //     prev.map((w) =>
-          //       w.id === activeWallet.id
-          //         ? { ...w, ...data }
-          //         : data.isDefault
-          //           ? { ...w, isDefault: false }
-          //           : w,
-          //     ),
-          //   );
-          // } else {
-          //   const id = `wal_${Date.now().toString(36)}`;
-          //   setWallets((prev) => {
-          //     const next = data.isDefault ? prev.map((w) => ({ ...w, isDefault: false })) : prev;
-          //     return [
-          //       ...next,
-          //       {
-          //         ...data,
-          //         id,
-          //         createdAt: new Date().toISOString().slice(0, 10),
-          //       },
-          //     ];
-          //   });
-          // }
-          setWalletModalOpen(false);
-          setActiveWallet(null);
+        onSubmit={async (data) => {
+          if (!data) {
+            toast.error({
+              title: "Error",
+              description: "Error Uploading Wallet",
+              position: "top-left",
+            });
+            return;
+          }
+
+          startLoad(true, "Uploading Wallet Details");
+
+          try {
+            const image = await photoFN(data.qrCode as unknown as File);
+
+            await addDocToCollection({
+              collections: "wallets",
+              document: {
+                ...data,
+                createdAt: new Date().toISOString(),
+                qrCode: image,
+              },
+            });
+          } catch (error) {
+            toast.error({
+              title: "Error",
+              description: error.message,
+              position: "top",
+            });
+          } finally {
+            setWalletModalOpen(false);
+            setActiveWallet(null);
+            stopLoad();
+          }
         }}
       />
     </>
@@ -391,6 +430,39 @@ function EmptyWallets({ onAdd }: { onAdd: () => void }) {
   );
 }
 
+/* ------------ Zod schema + types ------------ */
+const walletFormSchema = z.object({
+  name: z.string().trim().min(1, "Name is required.").max(80, "Label too long (max 80)."),
+  network: z.string().min(1, { message: "Network is required" }),
+  address: z
+    .string()
+    .trim()
+    .min(12, "Address looks invalid (12–120 chars).")
+    .max(120, "Address looks invalid (12–120 chars)."),
+  qrCode: z
+    .instanceof(File, { message: "Please select an image file." })
+    .refine((file) => file.size <= 5000000, `Max size 5MB.`)
+    .refine(
+      (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+      "Supported: .jpg, .png, .webp",
+    ),
+  memo: z.string().min(1, { message: "Note is required" }).trim(),
+  isDefault: z.boolean().default(false),
+});
+
+type WalletFormData = z.infer<typeof walletFormSchema>;
+
+// export interface AdminWallet {
+//   name: string;
+//   network: string;
+//   address: string;
+//   image: string;
+//   id: string;
+//   isDefault: boolean;
+//   memo: string;
+//   createdAt: string;
+// }
+
 /* ------------ Wallet form modal (fullscreen on mobile) ------------ */
 function WalletFormModal({
   open,
@@ -400,43 +472,52 @@ function WalletFormModal({
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  initial: CryptoWallet | null;
-  onSubmit: (data: Omit<CryptoWallet, "id" | "createdAt">) => void;
+  initial: AdminWallet | null;
+  onSubmit: (data: Omit<AdminWallet, "id" | "createdAt">) => void;
 }) {
-  const [label, setLabel] = useState("");
-  const [network, setNetwork] = useState<CryptoWallet["network"]>("Bitcoin");
-  const [address, setAddress] = useState("");
-  const [memo, setMemo] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // sync when modal opens
-  useStateSync(open, () => {
-    setLabel(initial?.label ?? "");
-    setNetwork(initial?.network ?? "Bitcoin");
-    setAddress(initial?.address ?? "");
-    setMemo(initial?.memo ?? "");
-    setIsDefault(initial?.isDefault ?? false);
-    setError(null);
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(walletFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      network: "",
+      qrCode: undefined,
+      address: "",
+      memo: "",
+      isDefault: false,
+    },
   });
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmedLabel = label.trim();
-    const trimmedAddr = address.trim();
-    if (!trimmedLabel) return setError("Label is required.");
-    if (trimmedLabel.length > 80) return setError("Label too long (max 80).");
-    if (!trimmedAddr) return setError("Wallet address is required.");
-    if (trimmedAddr.length < 12 || trimmedAddr.length > 120)
-      return setError("Address looks invalid (12–120 chars).");
+  // Reset form when modal opens or initial data changes
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: initial?.name ?? "",
+        network: initial?.network ?? "",
+        address: initial?.address ?? "",
+        memo: initial?.memo ?? "",
+        isDefault: initial?.isDefault ?? false,
+        qrCode: initial?.qrCode,
+      });
+    }
+  }, [open, initial, reset]);
+
+  const onFormSubmit = (data) => {
     onSubmit({
-      label: trimmedLabel,
-      network,
-      address: trimmedAddr,
-      memo: memo.trim() || undefined,
-      isDefault,
+      name: data.name,
+      network: data.network,
+      address: data.address,
+      memo: data.memo.trim(),
+      isDefault: data.isDefault,
+      qrCode: data.qrCode,
     });
-  }
+  };
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -464,7 +545,7 @@ function WalletFormModal({
                 </DialogPrimitive.Description>
                 <div className="flex items-start justify-between gap-3 border-b border-[var(--a-border)] px-5 py-4 md:px-6">
                   <div>
-                    <p className="a-eyebrow">Treasury</p>
+                    {/* <p className="a-eyebrow">Treasury</p> */}
                     <DialogPrimitive.Title className="font-display mt-0.5 text-xl font-extrabold tracking-tight md:text-2xl">
                       {initial ? "Edit crypto wallet" : "Upload crypto wallet"}
                     </DialogPrimitive.Title>
@@ -477,69 +558,116 @@ function WalletFormModal({
                   </DialogPrimitive.Close>
                 </div>
 
-                <form onSubmit={submit} className="flex flex-1 flex-col overflow-hidden">
+                <form
+                  onSubmit={handleSubmit(onFormSubmit)}
+                  className="flex flex-1 flex-col overflow-hidden"
+                >
                   <div className="flex-1 space-y-4 overflow-y-auto a-scrollbar px-5 py-5 md:px-6">
-                    <Field label="Label">
+                    <Field label="Name">
                       <input
-                        value={label}
-                        onChange={(e) => setLabel(e.target.value)}
-                        placeholder="e.g. Treasury — BTC cold"
+                        {...register("name")}
+                        placeholder="E.g Ethereum"
                         maxLength={80}
                         className={inputCls}
                       />
+                      {errors.name && (
+                        <p className="mt-1 text-[10px] text-[var(--a-neg)]">
+                          {errors.name.message}
+                        </p>
+                      )}
                     </Field>
-                    <Field label="Network">
-                      <Select
-                        onValueChange={(e) => setNetwork(e as CryptoWallet["network"])}
-                        value={network}
-                      >
-                        <SelectTrigger className={inputCls}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {NETWORKS.map((n) => (
-                              <SelectItem key={n} value={n}>
-                                {n}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+
+                    <Field label="Name">
+                      <input
+                        {...register("network")}
+                        placeholder="E.g TRC-20"
+                        maxLength={80}
+                        className={inputCls}
+                      />
+                      {errors.network && (
+                        <p className="mt-1 text-[10px] text-[var(--a-neg)]">
+                          {errors.network.message}
+                        </p>
+                      )}
                     </Field>
+
                     <Field label="Wallet address">
                       <input
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
+                        {...register("address")}
                         placeholder="Paste full address"
                         maxLength={120}
                         className={`${inputCls} font-mono text-xs`}
                       />
+                      {errors.address && (
+                        <p className="mt-1 text-[10px] text-[var(--a-neg)]">
+                          {errors.address.message}
+                        </p>
+                      )}
                     </Field>
-                    <Field label="Memo / tag (optional)">
+
+                    <Field label="Memo">
                       <input
-                        value={memo}
-                        onChange={(e) => setMemo(e.target.value)}
-                        placeholder="Internal note"
+                        {...register("memo")}
+                        placeholder="Note"
                         maxLength={120}
                         className={inputCls}
                       />
+                      {errors.memo && (
+                        <p className="mt-1 text-[10px] text-[var(--a-neg)]">
+                          {errors.memo.message}
+                        </p>
+                      )}
                     </Field>
-                    <label className="flex items-center gap-2 text-sm text-[var(--a-fg-2)]">
-                      <input
-                        type="checkbox"
-                        checked={isDefault}
-                        onChange={(e) => setIsDefault(e.target.checked)}
-                        className="size-4 accent-[var(--a-accent)]"
-                      />
-                      Set as default payout wallet
-                    </label>
-                    {error && (
+
+                    <Field label="Qr Code">
+                      <>
+                        <Controller
+                          name={"qrCode"}
+                          control={control}
+                          render={({ field }) => {
+                            return (
+                              <input
+                                type="file"
+                                onChange={(e) => {
+                                  const type = e.target.files[0];
+                                  field.onChange(type);
+                                }}
+                                className={`${inputCls}`}
+                              />
+                            );
+                          }}
+                        ></Controller>
+                        {errors.qrCode && (
+                          <p className="mt-1 text-[10px] text-[var(--a-neg)]">
+                            {errors.qrCode.message}
+                          </p>
+                        )}
+                      </>
+                    </Field>
+
+                    {/* <Controller
+                      name="isDefault"
+                      control={control}
+                      render={({ field }) => (
+                        <label className="flex items-center gap-2 text-sm text-[var(--a-fg-2)]">
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
+                            className="size-4 accent-[var(--a-accent)]"
+                          />
+                          Set as default payout wallet
+                        </label>
+                      )}
+                    /> */}
+
+                    {/* {Object.keys(errors).length > 0 && (
                       <p className="rounded-md border border-[var(--a-neg)]/30 bg-[var(--a-neg)]/10 px-3 py-2 text-xs font-semibold text-[var(--a-neg)]">
-                        {error}
+                        Please fix the errors above.
                       </p>
-                    )}
+                    )} */}
                   </div>
+
                   <div className="flex items-center justify-end gap-2 border-t border-[var(--a-border)] bg-[var(--a-bg-2)] px-5 py-3 md:px-6">
                     <button
                       type="button"
@@ -575,16 +703,4 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {children}
     </div>
   );
-}
-
-/* run a setup fn whenever `open` flips to true */
-function useStateSync(open: boolean, fn: () => void) {
-  const ran = useRef(false);
-  useEffect(() => {
-    if (open && !ran.current) {
-      fn();
-      ran.current = true;
-    }
-    if (!open) ran.current = false;
-  }, [open, fn]);
 }

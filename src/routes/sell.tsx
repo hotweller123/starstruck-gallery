@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Loader2, Trash2 } from "lucide-react";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { Loader2, Trash2, Image as ImageIcon } from "lucide-react";
 import { useStore, type UserListing } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
 import Fields, { FieldProps } from "@/components/site/Fields";
@@ -23,6 +23,9 @@ import { formatMoney } from "@/lib/wallet";
 export const Route = createFileRoute("/sell")({
   component: SellPage,
   head: () => ({ meta: [{ title: "Sell your work — Aethelred" }] }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    fromListing: typeof search.fromListing === "string" ? search.fromListing : undefined,
+  }),
 });
 
 const categories = [
@@ -76,8 +79,8 @@ const auctionSchema = z.object({
   estimateLow: z
     .number()
     .positive("Estimated Low Amount must be greater than 0")
-    .min(10, { message: "Minimum Amount Must Be Above 10" })
-    .max(1_000_000, "Amount must be less than 1,000,000"),
+    .min(100, { message: "Minimum Amount Must Be Above 10" })
+    .max(100_000, "Amount must be less than 1,000,000"),
   // price: z
   //   .number()
   //   .positive("Amount must be greater than 0")
@@ -85,13 +88,13 @@ const auctionSchema = z.object({
   estimateHigh: z
     .number()
     .positive("Estimated High Amount must be greater than 0")
-    .min(10, { message: "Minimum Amount Must Be Above 10" })
-    .max(1_000_000, { message: "Maximum Amount is a Million" }),
+    .min(200, { message: "Minimum Amount Must Be Above 10" })
+    .max(200_000, { message: "Maximum Amount is a Million" }),
   startBid: z
     .number()
     .positive("Start Bid Amount must be greater than 0")
-    .min(1, { message: "Start Bid is required" })
-    .max(1_000_000, { message: "Maximum Amount is a Million" }),
+    .min(100, { message: "Start Bid is required" })
+    .max(100_000, { message: "Maximum Amount is a Million" }),
   // currentBid: z
   //   .number()
   //   .positive("Current Bid Amount must be greater than 0")
@@ -108,7 +111,6 @@ function SellPage() {
   // No hooks, no useState, no useEffect, no useForm, nothing after the early returns.
   // ================================================================
 
-  const { listings, addListing, removeListing } = useStore();
   const { auctions } = useDataStore(
     useShallow((s) => ({
       auctions: s.auctions,
@@ -363,7 +365,7 @@ function SellPage() {
         />
       )}
 
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.4fr_1fr]">
+      <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-32 pt-6 ">
         <FormProvider {...formControl}>
           <form onSubmit={submit} className="flex flex-col gap-6">
             {/* Image Uploader */}
@@ -398,57 +400,6 @@ function SellPage() {
               </button>
             </div>
           </form>
-
-          <aside className="self-start lg:sticky lg:top-32">
-            <h2 className="font-display text-2xl italic">Your listings</h2>
-            <p className="mt-2 text-xs text-detail">Drafts you've submitted so far.</p>
-            {auctions.length === 0 ? (
-              <div className="mt-6 border border-dashed border-ink/15 p-8 text-center text-sm text-detail">
-                No listings yet.
-              </div>
-            ) : (
-              <ul className="mt-6 flex flex-col gap-4">
-                {auctions.map((a) => (
-                  <li key={a.id!} className="flex gap-4 border border-ink/10 p-3">
-                    {/* <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" /> */}
-                    <div className="flex-1 ">
-                      <AuctionImageSwiper
-                        images={a.images}
-                        alt="Auctions Drafts"
-                        aspect="aspect-[5/5]"
-                      />
-                    </div>
-
-                    <div className="flex flex-1 flex-col">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                        {a.category}
-                      </p>
-                      <p className="font-display text-lg italic">{a.title}</p>
-                      <p className="text-xs text-detail">{a.sellerSlug}</p>
-                      <p className="mt-auto text-sm">{formatMoney(a.startBid)}</p>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        setLoadingForm(true);
-                        setTimeout(() => {
-                          setLoadingForm(false);
-                        }, 2000);
-                        await deleteDocument({
-                          collectionName: "auctions",
-                          id: a.id!,
-                          message: `${a.title} Has Been Deleted Successfully From Your Draft`,
-                        });
-                      }}
-                      className="self-start text-detail hover:text-clay"
-                      aria-label="Remove"
-                    >
-                      <Trash2 className="size-4" strokeWidth={1.25} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </aside>
         </FormProvider>
       </section>
     </>

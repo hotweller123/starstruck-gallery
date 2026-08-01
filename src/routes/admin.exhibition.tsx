@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MouseEvent, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import {
   Plus,
   Search,
@@ -42,8 +42,9 @@ import { useToast } from "@/lib/useToast";
 import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
 import { Bid, WalletAccount } from "@/types";
 import useDoc from "@/hooks/useDoc";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { db } from "@/services/firebase";
+import { AdminLoader } from "@/components/admin/AdminLoader";
 
 export const Route = createFileRoute("/admin/exhibition")({
   component: ExhibitionAdmin,
@@ -54,12 +55,32 @@ type Tab = "artworks" | "artists" | "auctions" | "categories" | "bids";
 function ExhibitionAdmin() {
   const [tab, setTab] = useState<Tab>("auctions");
   const [q, setQ] = useState("");
+
   const { auctions, bids } = useDataStore(
     useShallow((s) => ({
       auctions: s.auctions,
       bids: s.bids,
     })),
   );
+
+  // Action loader state (envelops screen for any admin useDoc call)
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("Processing...");
+
+  // Page readiness loader for initial dashboard hydration
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => {
+    if ((auctions && auctions.length > 0) || (bids && bids.length > 0)) {
+      setPageLoading(false);
+    }
+  }, [auctions?.length, bids?.length]);
+
+  const startAction = (msg: string) => {
+    setActionMessage(msg);
+    setActionLoading(true);
+  };
+  const stopAction = () => setActionLoading(false);
 
   // const [artworks, setArtworks] = useState<Artwork[]>(seedArtworks);
   // const [artists, setArtists] = useState<Artist[]>(seedArtists);
@@ -71,6 +92,16 @@ function ExhibitionAdmin() {
 
   return (
     <div className="mx-auto max-w-[1440px]">
+      <AdminLoader
+        fullscreen
+        variant="page"
+        isLoading={pageLoading}
+        message="Loading exhibition"
+        subMessage="Preparing auction & bid data"
+      />
+
+      <AdminLoader fullscreen variant="action" isLoading={actionLoading} message={actionMessage} />
+
       <SectionHeader
         title="Exhibition"
         description="Curate the catalog: artworks, artists, live auctions and categories. Click any row to view, edit and run operations."
@@ -111,8 +142,12 @@ function ExhibitionAdmin() {
       {/* {tab === "artists" && (
         <ArtistsPanel q={q} rows={artists} setRows={setArtists} artworks={artworks} />
       )} */}
-      {tab === "auctions" && <AuctionsPanel q={q} rows={auctions} />}
-      {tab === "bids" && <BidsPanel q={q} rows={bids} />}
+      {tab === "auctions" && (
+        <AuctionsPanel q={q} rows={auctions} startAction={startAction} stopAction={stopAction} />
+      )}
+      {tab === "bids" && (
+        <BidsPanel q={q} rows={bids} startAction={startAction} stopAction={stopAction} />
+      )}
       {/* {tab === "categories" && (
         <CategoriesPanel q={q} rows={categories} setRows={setCategories} artworks={artworks} />
       )} */}
@@ -469,7 +504,17 @@ function ArtistsPanel({
 
 type LotRow = AuctionLot & { id: string };
 
-function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
+function AuctionsPanel({
+  q,
+  rows,
+  startAction,
+  stopAction,
+}: {
+  q: string;
+  rows: AuctionLot[];
+  startAction: (msg: string) => void;
+  stopAction: () => void;
+}) {
   const [selected, setSelected] = useState<LotRow | null>(null);
   const data: LotRow[] = rows
     .filter((l) => !q || l.title.toLowerCase().includes(q.toLowerCase()) || l.lotNumber.includes(q))
@@ -645,6 +690,7 @@ function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
         fields={fields}
         onSave={async (p) => {
           if (!selected) return;
+          startAction("Updating auction lot...");
           try {
             await updateDocument({
               collections: "auctions",
@@ -673,6 +719,7 @@ function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
             });
           } finally {
             setSelected(null);
+            stopAction();
           }
         }}
         extra={
@@ -745,7 +792,17 @@ function AuctionsPanel({ q, rows }: { q: string; rows: AuctionLot[] }) {
 
 type BidRow = Bid & { id: string };
 
-function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
+function BidsPanel({
+  q,
+  rows,
+  startAction,
+  stopAction,
+}: {
+  q: string;
+  rows: Bid[];
+  startAction: (msg: string) => void;
+  stopAction: () => void;
+}) {
   const [selected, setSelected] = useState<BidRow | null>(null);
   const data: BidRow[] = rows
     .filter(
@@ -779,6 +836,9 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
   ];
 
   const { updateDocument, addDocToCollection, deleteDocument } = useDoc();
+
+  // Note: startAction/stopAction come from parent (ExhibitionAdmin)
+  // They drive the full-screen AdminLoader for any useDoc calls.
 
   return (
     <>
@@ -831,6 +891,7 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
         fields={fields}
         onSave={async (p) => {
           if (!selected) return;
+          startAction("Updating bid...");
           try {
             await updateDocument({
               collections: "bids",
@@ -855,6 +916,8 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
               duration: 50000,
               position: "top",
             });
+          } finally {
+            stopAction();
           }
         }}
         operations={
@@ -876,6 +939,7 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                       return;
                     }
 
+                    startAction("Deleting bid and returning funds...");
                     try {
                       const bidder = await getDoc(doc(db, "users", selected.userID));
 
@@ -908,6 +972,7 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                       });
                     } finally {
                       setSelected(null);
+                      stopAction();
                     }
                   },
                 },
@@ -929,11 +994,14 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                       return;
                     }
 
+                    startAction("Closing bid & transferring ownership...");
                     try {
                       const biddingUser = await getDoc(doc(db, "users", selected.userID));
+                      const originalUser = await getDoc(doc(db, "users", Lot.userID));
 
-                      if (biddingUser.exists()) {
+                      if (biddingUser.exists() && originalUser.exists()) {
                         const data = biddingUser.data() as WalletAccount;
+                        const data2 = originalUser.data() as WalletAccount;
 
                         //for current Bidder..deduct from bidding balance
                         await updateDocument({
@@ -948,13 +1016,16 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                         });
 
                         //for original owner...add to the wallet balance
+                        const topBal = data2.wallet.balance + selected.bidAmount;
+                        console.log({ topBal, bidBalance2: data2.wallet.bidBalance });
+
                         await updateDocument({
                           collections: "users",
                           document: {
                             id: Lot.userID,
                             wallet: {
-                              balance: data.wallet.balance + selected.bidAmount,
-                              bidBalance: data.wallet.bidBalance,
+                              balance: topBal,
+                              bidBalance: data2.wallet.bidBalance,
                             },
                           },
                         });
@@ -979,6 +1050,7 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                             condition: Lot?.condition,
                             totalBidCounts: Lot?.bidCount,
                             placedAt: selected.placedAt,
+                            timeStamp: serverTimestamp() as unknown as Timestamp,
                           },
                         });
 
@@ -987,7 +1059,7 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                           document: {
                             id: selected.id,
                             endsAt: inHours(12),
-                            status: "outbidded",
+                            status: "closed",
                           },
                         });
 
@@ -1005,8 +1077,10 @@ function BidsPanel({ q, rows }: { q: string; rows: Bid[] }) {
                         variant: "error",
                         position: "bottom",
                       });
+                      console.log(error.message);
                     } finally {
                       setSelected(null);
+                      stopAction();
                     }
                   },
                 },

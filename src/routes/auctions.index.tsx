@@ -15,8 +15,8 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { AuctionCard } from "@/components/site/AuctionCard";
 import { Countdown } from "@/components/site/Countdown";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import Slider from "@mui/material/Slider";
 import {
   Select,
   SelectContent,
@@ -58,8 +58,8 @@ const defaultFilters = (): AuctionFilters => ({
   seller: [],
   reserveMet: false,
   endingSoon: false,
-  priceMin: 10000,
-  priceMax: 1_000_000,
+  priceMin: 100,
+  priceMax: 100_000,
 });
 
 function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
@@ -344,7 +344,7 @@ function AuctionFilterSheet({
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <Section title={`Bid · ${formatBid(draft.priceMin)} — ${formatBid(draft.priceMax)}`}>
-            <Slider
+            {/* <Slider
               value={[draft.priceMin, draft.priceMax]}
               className="mx-auto w-full max-w-xs"
               min={auctionPriceMin}
@@ -353,6 +353,17 @@ function AuctionFilterSheet({
               onValueChange={([min, max]) =>
                 setDraft((d) => ({ ...d, priceMin: min, priceMax: max }))
               }
+            /> */}
+
+            <Slider
+              value={[draft.priceMin, draft.priceMax]}
+              min={100}
+              max={100_000}
+              step={30}
+              color="red"
+              onChange={(e, [min, max]) => {
+                setDraft((d) => ({ ...d, priceMin: min, priceMax: max }));
+              }}
             />
           </Section>
 

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ListingsRouteImport } from './routes/listings'
 import { Route as GenerateRouteImport } from './routes/generate'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FavouritesRouteImport } from './routes/favourites'
@@ -55,6 +56,11 @@ const SellRoute = SellRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingsRoute = ListingsRouteImport.update({
+  id: '/listings',
+  path: '/listings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GenerateRoute = GenerateRouteImport.update({
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/generate': typeof GenerateRoute
+  '/listings': typeof ListingsRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/generate': typeof GenerateRoute
+  '/listings': typeof ListingsRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/favourites': typeof FavouritesRoute
   '/gallery': typeof GalleryRoute
   '/generate': typeof GenerateRoute
+  '/listings': typeof ListingsRoute
   '/profile': typeof ProfileRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRouteWithChildren
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/favourites'
     | '/gallery'
     | '/generate'
+    | '/listings'
     | '/profile'
     | '/sell'
     | '/wallet'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/favourites'
     | '/gallery'
     | '/generate'
+    | '/listings'
     | '/profile'
     | '/sell'
     | '/wallet'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/favourites'
     | '/gallery'
     | '/generate'
+    | '/listings'
     | '/profile'
     | '/sell'
     | '/wallet'
@@ -420,6 +432,7 @@ export interface RootRouteChildren {
   FavouritesRoute: typeof FavouritesRoute
   GalleryRoute: typeof GalleryRoute
   GenerateRoute: typeof GenerateRoute
+  ListingsRoute: typeof ListingsRoute
   ProfileRoute: typeof ProfileRoute
   SellRoute: typeof SellRoute
   WalletRoute: typeof WalletRouteWithChildren
@@ -454,6 +467,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listings': {
+      id: '/listings'
+      path: '/listings'
+      fullPath: '/listings'
+      preLoaderRoute: typeof ListingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/generate': {
@@ -712,6 +732,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavouritesRoute: FavouritesRoute,
   GalleryRoute: GalleryRoute,
   GenerateRoute: GenerateRoute,
+  ListingsRoute: ListingsRoute,
   ProfileRoute: ProfileRoute,
   SellRoute: SellRoute,
   WalletRoute: WalletRouteWithChildren,

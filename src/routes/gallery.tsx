@@ -42,9 +42,7 @@ function applyFilters(f: Filters, artworks: Artwork[]) {
 }
 
 function GalleryPage() {
-  const [filters, setFilters] = useState<Filters>(() =>
-    makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
-  );
+  const [filters, setFilters] = useState<Filters>(() => makeDefaultFilters(100, 100_000));
 
   // Best practice: fetch directly with TanStack Query
   const met = useMetArtworks();

@@ -35,7 +35,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import qrcode from "@/assets/swminto.jpg";
-import { copyClipboard, formatMoney } from "@/utils";
+import { copyClipboard, formatMoney, photoFN } from "@/utils";
 import useDoc from "@/hooks/useDoc";
 import { toast } from "@/lib/useToast";
 
@@ -48,7 +48,7 @@ const PRESETS = [50, 100, 250, 500, 1000, 2500];
 
 const METHODS = [
   // { value: "card", label: "Debit / Credit card" },
-  { value: "bank", label: "Bank transfer (ACH / SEPA)" },
+  // { value: "bank", label: "Bank transfer (ACH / SEPA)" },
   { value: "crypto", label: "Crypto Details" },
 ];
 
@@ -122,6 +122,7 @@ function DepositPage() {
   const submit = formControl.handleSubmit(
     async (data) => {
       try {
+        const proof = await photoFN(formControl.getValues("proof"));
         const balanceAfter = amount + user.wallet.balance;
         const payload: Omit<WalletTx, "id"> = {
           channel: method,
@@ -142,6 +143,7 @@ function DepositPage() {
             name: wallet?.name ?? "",
             address: wallet?.address ?? "",
             network: wallet?.network ?? "",
+            proof,
           },
         };
 
@@ -269,7 +271,7 @@ function DepositPage() {
                 <>
                   <div className="flex flex-col gap-5">
                     <img
-                      src={qrcode}
+                      src={wallet.qrCode}
                       alt="swminto"
                       className="object-cover aspect-square border border-muted/20 "
                       style={{
@@ -277,7 +279,7 @@ function DepositPage() {
                       }}
                     />
 
-                    <WCopied label={wallet.address} value={wallet.address} />
+                    <WCopied label={"Click To Copy Wallet Address"} value={wallet.address} />
                     <WFile
                       label="Upload Proof"
                       name="proof"

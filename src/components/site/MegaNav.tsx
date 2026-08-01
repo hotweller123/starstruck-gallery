@@ -127,6 +127,14 @@ export function MegaNav() {
           >
             Auction
           </Link>
+          <Link
+            to="/listings"
+            className="text-[11px] font-medium uppercase tracking-[0.22em] text-ink/80 hover:text-clay"
+            activeProps={{ className: "text-clay" }}
+            onMouseEnter={closeNow}
+          >
+            Listings
+          </Link>
           {(["categories", "artists", "about"] as const).map((key) => (
             <button
               key={key}
@@ -379,6 +387,11 @@ export function MegaNav() {
                   onNavigate={() => setMobileOpen(false)}
                 />
                 <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink
+                  to="/listings"
+                  label="My listings"
+                  onNavigate={() => setMobileOpen(false)}
+                />
                 <MobileNavLink
                   to="/sell"
                   label="Sell your work"

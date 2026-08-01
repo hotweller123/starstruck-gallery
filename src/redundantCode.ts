@@ -833,3 +833,54 @@
         />
       )} */
 }
+
+// <aside className="self-start lg:sticky lg:top-32">
+//             <h2 className="font-display text-2xl italic">Your listings</h2>
+//             <p className="mt-2 text-xs text-detail">Drafts you've submitted so far.</p>
+//             {auctions.length === 0 ? (
+//               <div className="mt-6 border border-dashed border-ink/15 p-8 text-center text-sm text-detail">
+//                 No listings yet.
+//               </div>
+//             ) : (
+//               <ul className="mt-6 flex flex-col gap-4">
+//                 {auctions.map((a) => (
+//                   <li key={a.id!} className="flex gap-4 border border-ink/10 p-3">
+//                     {/* <img src={l.image} alt={l.title} className="size-20 shrink-0 object-cover" /> */}
+//                     <div className="flex-1 ">
+//                       <AuctionImageSwiper
+//                         images={a.images}
+//                         alt="Auctions Drafts"
+//                         aspect="aspect-[5/5]"
+//                       />
+//                     </div>
+
+//                     <div className="flex flex-1 flex-col">
+//                       <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+//                         {a.category}
+//                       </p>
+//                       <p className="font-display text-lg italic">{a.title}</p>
+//                       <p className="text-xs text-detail">{a.sellerSlug}</p>
+//                       <p className="mt-auto text-sm">{formatMoney(a.startBid)}</p>
+//                     </div>
+//                     <button
+//                       onClick={async () => {
+//                         setLoadingForm(true);
+//                         setTimeout(() => {
+//                           setLoadingForm(false);
+//                         }, 2000);
+//                         await deleteDocument({
+//                           collectionName: "auctions",
+//                           id: a.id!,
+//                           message: `${a.title} Has Been Deleted Successfully From Your Draft`,
+//                         });
+//                       }}
+//                       className="self-start text-detail hover:text-clay"
+//                       aria-label="Remove"
+//                     >
+//                       <Trash2 className="size-4" strokeWidth={1.25} />
+//                     </button>
+//                   </li>
+//                 ))}
+//               </ul>
+//             )}
+//           </aside>
